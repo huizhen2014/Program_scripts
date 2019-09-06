@@ -16,3 +16,11 @@ ggplot(x_m,aes(Cars,Property,fill=as.factor(Value)))+
   theme(axis.text.x=element_text(angle=90))+
   guides(fill=FALSE)##取消图例，过大
 ggsave("x_m_heatmap.png")
+
+##5. 或者将value值rescale为0到1范围内到连续变量
+library(scales)
+x_m$Value <- rescale(x_m$Value)
+ggplot(x_m,aes(Cars,Property,fill=Value))+
+  scale_color_gradient(low="blue",high="red")+
+  theme(axis.text.x=element_text(angle=90))
+
