@@ -92,7 +92,7 @@ xargs为命令传递的过滤器，用于组合多个命名，默认命令为ech
 
 `split [-a suffix_length] [-b byte_count[k|m]] [-l line_count] [-p pattern][file [name]]`
 
-split将文件分割成数个，默认情况下按照没1000行进行分割
+split将文件分割成数个，默认情况下按照每1000行进行分割
 
 -l n，指定行数n分割
 
