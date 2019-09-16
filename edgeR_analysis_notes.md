@@ -14,6 +14,56 @@ edgeR可针对来源任何类型的counts数据，尤其是二代测序，检测
 
 读取且存储counts table及相关信息，DGEList()，可以想lsit一样处理，DGEList对象包含：
 
+##### [Use with downstream Bioconductor DGE packages][https://github.com/mikelove/tximport/blob/master/vignettes/tximport.Rmd]
+
+tximport建议二种导入估计用于差异基因表达分析方式：第一种，用于'edgeR'和'DESeq2'；从定量软件获得基因水平的计数，同时使用转录水平的分布估计来计算基因水平的offset，用于修正样本间的平均转录本长度的变化。对于'edgeR'，需要指定矩阵用于'y$offset'，而'DESeqDataSetFromTximport'可自动调用offset。第二种，使用'tximprot' 函数'countsFromAbundance="lengthScaledTPM"或"scaledTPM"，然后直接使用基因水平的计数矩阵'txi\$counts'。
+
+不建议将原始的基因水平的计数用于下游分析。除非，计数counts不存在长度偏差，例如3‘ tagged RNA-seq data，txi$counts可直接用于下游分析。
+
+**从tximport导入edgeR**
+
+`cts <- txi$counts`
+
+`normMat <- txi$length`
+
+根据观测得到的长度，调整避免改变了counts的数量级
+
+`normMat <- normMat/exp(rowMeans(log(normMat)))`
+
+`normCts <- cts/normMat`
+
+根据sacled counts计算有效长度大小，得到样本间的组成偏差
+
+`eff.lib <- calcNormFactors(normCts) * colSums(normCts)`
+
+合并有效文库长度和长度因子，计算log-link GLM的offsets(sweep用于array, apply用于matrix)
+
+`normMat <- sweep(normMat,2,eff.lib, "*")`  #normMat * eff.lib
+
+`normMat <- log(normMat)`
+
+构建DGEList对象
+
+`y <- DGEList(cts)`
+
+`y <- sacleOffset(y, normMat)`
+
+**`scaleOffset` ensures that the scale of offsets are consistent with library sizes. This is done by ensuring that the mean offset for each gene is the same as the mean log-library size.**
+
+过滤低表达基因
+
+`keep <- filterByExpr(y)`
+
+`y <- y[keep,]`
+
+接着y可用于评估离散度
+
+**或同下图**
+
+![image-20190916193800695](https://tva1.sinaimg.cn/large/006y8mN6ly1g71lbfcrubj31f80jcjuz.jpg)
+
+**而DESeq2不需要上步骤转换，直接导入**
+
 **counts矩阵，不是数据框，包含counts数值**
 
 samples数据框，包含样本或文库信息，另包含lib.size列，用于描述文库大小或测序深度，如果未指定，直接从counts列计算而来
@@ -38,9 +88,15 @@ genes数据框，可选的，包含genes或genomic feature的注释信息
 
 * filterByExpr(y)
 
-read counts过滤，所有文库具有的低counts的genes将会为差异表达分析提供很小的贡献，此外，从生物学角度而言，一个gene必须达到一个最小的水平，才可能被转录为蛋白或表现出生物作用。**经验而言，假如一个gene在所有样本或者所有条件状态下都没有检测到，那么该gene就不会表达，一般设置单个文库的表达至少为5-10才认为该gene在该文库内表达。**也可以定义count-per-million(CPM)，而不根据counts值，因为counts的直接过滤没有考虑样本间文库片段的大小问题。
+CPM: 平均到每百万个read时的一个exon的read计数，用于样本间exon比较
+
+RPKM: 平均到每百万个read时，以1kb为单位时，一个exon的read计数，用于样本间exon比较和样本内exon比较
+
+read counts过滤，所有文库具有的低counts的genes将会为差异表达分析提供很小的贡献，此外，从生物学角度而言，一个gene必须达到一个最小的水平，才可能被转录为蛋白或表现出生物作用。**经验而言，假如一个gene在所有样本或者所有条件状态下都没有检测到，那么该gene就不会表达，一般设置单个文库的表达至少为5-10才认为该gene在该文库内表达。也可以定义count-per-million(CPM)，而不根据counts值，因为counts的直接过滤没有考虑样本间文库片段的大小问题。**
 
 Roughly speaking,the strategy keeps genes that have at least ‘min.count’ reads in a worthwhile number samples. More precisely, the filtering keeps genes that have count-per-million (CPM) above _k_ in _n_ samples, where _k_ is determined by ‘min.count’ and by the sample library sizes and _n_ is determined by the design matrix.
+
+**filterByExpr函数默认选取最小的组内的样本数量为最小的样本数，保留至少在这个数量的样本中有10个或更多的序列片段计数的基因。根据数据集中的总序列数的中位数,`median(y$samples$lib.size)*1e-6`,例如为1.9, 那么10个count约等于10/1.9=5.26, 那么filterByExpr函数保留在至少3个样本(最小组内样本数)中CPM值大于等于5.26的基因；使用CPM过滤可避免对总序列大的样本的偏向性**
 
 返回对应的nrow(y)长度向量，表明哪些行可以保留
 
@@ -58,7 +114,9 @@ Roughly speaking,the strategy keeps genes that have at least ‘min.count’ rea
 
 cpm/rpkm, 计算每百万条read的基因上的count数目/每百万read中基因的每千碱基长度的read数目; CPM只对read count相对总reads数做了数量的均一化。当如果想进行表达量的基因间比较，则不得不考虑基因长度的不同。如果进一步做长度的均一化，就得到了下面的RPKM; RPKM法能消除基因长度和测序量差异对计算基因表达的影响，计算得到的基因表达量可直接用于比较不同样品间的基因表达差异和不同基因间表达高低的比较。
 
-cpm(y, normalized.lib.size=T,log=F), 默认使用normalized library sizes
+cpm(y, log=2,prior.count=2), 这里采用log2, prior.count为避免出现0, 默认使用normalized library sizes
+
+例如：
 
 `rowSums(cpm(y) > 0.5) > =2`
 
@@ -74,7 +132,7 @@ cpm(y, normalized.lib.size=T,log=F), 默认使用normalized library sizes
 
 RNA-seq提供了测量每个RNA样本每个gene的相对丰度，但是不能检测每个细胞内总共的RNA产出。因此，当小部分gene处于非常高表达时，该细胞内的另一部分gene会因为总libraray size被高表达gene所消耗掉，处于under-sample状态，会导致假的下调结果。因此，**calcNormFactors函数会根据library sizes来校准RNA的组成，从而最小化样本中大部分gene的log-fold changes**，默认计算scale factors使用trimmed mean of M-values(TMM) between each pair of samples。使用effective library size取代original library size用于下游分析。
 
-` y <- calcNormFactors(y)`
+` y <- calcNormFactors(y,method="TMM")`
 
 ![image-20190522211622633](http://ww2.sinaimg.cn/large/006tNc79ly1g3aenqm4mjj30hi090gmr.jpg)
 
@@ -84,7 +142,7 @@ RNA-seq提供了测量每个RNA样本每个gene的相对丰度，但是不能检
 
 针对基于模型的标准化，可以设置correction factors用于calcNormFactors，计算effective library size。需要注意的是，标准化的过程，并不设计到原始read coutns的改变，因此在将其输入到edgeR之前，不应对read counts做任何的转换，例如 RPKM和FPKM值取代read counts用于edgeR，或者在counts上加入额外的值，此类转换会阻止edgeR评估数据的平均变异关系。
 
-classic edgeR函数estimateCommonDisp和exactTest所生成的pseudo-count仅作为数不的部分，用于edgeR流程使用，不用其他用途。另外，pseudo-counts是一种标准化后的counts，而prior count是用于offset 小的counts的一个起始值。
+classic edgeR函数estimateCommonDisp和exactTest所生成的pseudo-count仅作为输出的部分，用于edgeR流程使用，不用其他用途。另外，pseudo-counts是一种标准化后的counts，而prior count是用于offset 小的counts的一个起始值。
 
 绘制表达个体样本的表达图，能够更近低查看mean-difference(MD) plots。MD图展示了两个样本经过library-size adjusted后的log-fold改变。默认使用样本1(column=1)文库的比较其他所有样本均值的构成的参考样本文库。
 
@@ -114,13 +172,13 @@ BCV：biological coefficient of variation，是gene真实丰度在重复的RNA�
 
 `y <- estimateTagwiseDisp(y)` ：estimate empirical bayes tagwise dispersion values
 
-完成negative binomial modles fitted和dispersion estimates后，使用exact test检出差异表达，且exact test仅使用于单因素实验差异分析
+**完成negative binomial modles fitted和dispersion estimates后，使用exact test检出差异表达，且exact test仅使用于单因素实验差异分析**
 
 `et <- exactTest(y)`
 
 `topTags(et)`
 
-* 针对复杂实验设计，设计到多个因素的关系，采用广义线性模型分析差异表达
+* 针对复杂实验设计，设计到多个因素的关系，采用广义线性模型分析差异表达(quasi-likelihood (QL) F-test, glmQLFit, glmQLFTest/likelihood ratio test, glmFit, glmLRT)
 
 edgeR采用Cox-Reid profile-adjusted likelihood(CR)方式来评估离散度
 
@@ -142,12 +200,11 @@ edgeR采用Cox-Reid profile-adjusted likelihood(CR)方式来评估离散度
 
 `y <- estimateGLMTagwiseDisp(y, design)`：Compute an empirical Bayes estimate of the negative binomial dispersion parameter for each tag, with expression levels specified by a log-linear model
 
-完成negative binomial modles fitted和dispersion estimates后，可使用quasi-likelihood(QL) F-test或likelihood ratio test评估差异表达
+**完成negative binomial modles fitted和dispersion estimates后，可使用quasi-likelihood(QL) F-test或likelihood ratio test评估差异表达(quasi-likelihood (QL) F-test, glmQLFit, glmQLFTest/likelihood ratio test, glmFit, glmLRT)**
 
-QL F-test能反应出评估每个gene离散度的不确定性，当每个样本的重复次数较小时，能提供更稳健和可信的错误控制率
+QLF-test能反应出评估每个gene离散度的不确定性，当每个样本的重复次数较小时，能提供更稳健和可信的错误控制率
 
-根据design matrix检测表达差异，推荐使用robust=TRUE，允许gene-specific prior of estimates。减少了特别高或低的原始离散度的genes所带来的假阳性结果，同时增加了主体genes的差异表达检出能力(Setting robust=TRUE in glmQLFit is usually recommended21. This allows gene-specific prior df estimates, with
-lower values for outlier genes and higher values for the main body of genes. This reduces the Chance of getting false positives from genes with extremely high or low raw dispersions, while at the same time increasing statistical power to detect differential expression for the main body of genes)
+根据design matrix检测表达差异，推荐使用robust=TRUE，允许gene-specific prior of estimates。减少了特别高或低的原始离散度的genes所带来的假阳性结果，同时增加了主体genes的差异表达检出能力(Setting robust=TRUE in glmQLFit is usually recommended. This allows gene-specific prior df estimates, with lower values for outlier genes and higher values for the main body of genes. This reduces the Chance of getting false positives from genes with extremely high or low raw dispersions, while at the same time increasing statistical power to detect differential expression for the main body of genes)
 
 `fit <- glmQLFit(y, design, robust=T)`
 
@@ -254,7 +311,7 @@ NGenes，对应GO term所含gene数目；Direction表示改变net方向；PValue
 
 1. 当没有重复样本测序时
 
-* 简单选择可靠的离散值，用于exactTest或glmFit。Typical values for the common BCV(square-root-dispersion) for datasets arising from well-controlled experiments are 0.4 for human data, 0.1 for data on genetically identical model organisams or 0.01 for technical replicates。
+* **简单选择可靠的离散值，用于exactTest或glmFit。Typical values for the common BCV(square-root-dispersion) for datasets arising from well-controlled experiments are 0.4 for human data, 0.1 for data on genetically identical model organisams or 0.01 for technical replicates**。
 
 `bcv <- 0.2`
 
@@ -298,7 +355,7 @@ lfc阈值不是限定大于fold-change的阈值才输出，而是大于该阈值
 
 3. 聚类和热图
 
-针对每对RNA样本之间的leading log-fold-change，plotMDS绘制对应的多维度距离图。leading log-fold-change为，每对样本之间的最大剧对log-fold-change的均值(root-mean-square)。同时该函数也提供了针对BCV的距离图。
+针对每对RNA样本之间的leading log-fold-change，plotMDS绘制对应的多维度距离图。leading log-fold-change为，每对样本之间的最大距对log-fold-change的均值(root-mean-square)。同时该函数也提供了针对BCV的距离图。
 
  针对filter和normalization后的DGEList对象
 

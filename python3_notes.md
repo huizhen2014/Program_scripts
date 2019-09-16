@@ -680,19 +680,31 @@ python库参考手册的'Built-in Exceptions', 描述了所有内置异常类, �
 
 `__delitem__(self, key)`: 该方法在对对象的组成部分使用`__del__`语句时被调用, 应删除与key相关联的值
 
-**对于序列, 如果键为负值, 从末尾往前数: x[-n] == x[len[x)-n]]**
+**对于序列, 如果键为负值, 从末尾往前数: x[-n] == x[len(x)-n]**
 
 **若键类型不合适, 可能引发TypeError异常; 对于序列, 如果索引的类型正确的, 但不在允许的范围内, 应引发IndexError异常**
 
-p270
+**使用`super().__init__(args)`继承list，使用list所有内置函数**
 
+* 特性
 
+![image-20190915234459350](https://tva1.sinaimg.cn/large/006y8mN6ly1g70mu3egu5j311807s75l.jpg)
 
+get_size和set_size是假想属性size的存取方法, 这个属性是一个width和height组成的元组; 若想使size成为真正的属性: 使用函数property
 
+![image-20190915234957368](https://tva1.sinaimg.cn/large/006y8mN6ly1g70mz7wjsuj311409edhg.jpg)
 
+在此新版的Rectangle中, 通过调用函数property并将存取方法作为参数(获取方法在前, 设置方法在后)创建了一个特性, 然后将名称size关联到这个特性。
 
+![image-20190915235356911](https://tva1.sinaimg.cn/large/006y8mN6ly1g70n3djtbxj30yo06m3z4.jpg)
 
+实际上, 调用函数property时, 还可以不指定参数，指定一个参数或三或四个参数。
 
+![image-20190915235908380](https://tva1.sinaimg.cn/large/006y8mN6ly1g70n8rzmmnj311g0cctb3.jpg)
+
+property其实并不是函数, 而是一个类. 它的实例包含一些魔法方法, 而所有的魔法都是由这些方法完成的. 这些魔法方法为`__get__`,`__set__`,`__delete__`, 它们一道定义了所谓的描述符协议。p277
+
+* 静态方法和类方法 
 
 
 

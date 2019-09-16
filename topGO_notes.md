@@ -46,11 +46,9 @@ A filter function to filter according to the proportion of elements larger than 
 
 `eset <- ALL[selProbes, ]`
 
-来自array或研究的所有gene为gene universe，当可得到gene-wise scores时，interesting genes为具有显著score的一组gene；或者直接定义一组gene为intereseting gene。
+**来自array或研究的所有gene为gene universe，当可得到gene-wise scores时，interesting genes为具有显著score的一组gene；或者直接定义一组gene为intereseting gene。**
 
-topGO进行富集分析的核心步骤就是创建topGOdata对象，该对象包含了用于GO分析的所有信息：gene universe, interesting
-
- gene, gene score(if available), GO ontology(GO graph)。
+topGO进行富集分析的核心步骤就是创建topGOdata对象，该对象包含了用于GO分析的所有信息：gene universe, interesting gene, gene score(if available), GO ontology(GO graph)。
 
 * 一组gene id及可选的gene-wise score。score可用于差异表达的t-test检验，表型的相关性…
 * gene id和GO term之间的对应关系，一般可直接从bioconductor或microarray获得
@@ -221,6 +219,10 @@ termStat函数返回GO term的统计信息
 
 Excepted是什么？？？
 
+若直接定义一组基因为interesting gene时，对应的geneScore(GOdata)为2，未选中基因为1(`geneList <- factor(as.integer(geneNames %in% myInterestingGenes))`)
+
+![image-20190916131706363](https://tva1.sinaimg.cn/large/006y8mN6gy1g71ab21dg4j315u07i402.jpg)
+
 #### Running the enrichment tests
 
 topGO package提供了多种统计检验和多种统计算法用于富集分析
@@ -271,7 +273,7 @@ GOFisherTest(object)，针对groupStats对象处理counts，基于列联表，�
 
 ![image-20190605110836151](http://ww4.sinaimg.cn/large/006tNc79gy1g3q3rmckq1j30gk03k3yr.jpg)
 
-GOKSTest(object)，针对groupStats对象处理scores，运行Kolmogorov-Smirnov test，返回该检验p-value
+**~~GOKSTest(object)，针对groupStats对象处理scores，运行Kolmogorov-Smirnov test，返回该检验p-value~~**
 
 GOtTest(object)，针对groupStats对象处理Socres，运行t-test，当gene scores为t-statistics或服从正态分布，返回该检验p-value
 
@@ -301,7 +303,7 @@ GOglobalTest, 采用Goeman's globaltest，返回该检验p-value
 
 ![image-20190605103912846](http://ww1.sinaimg.cn/large/006tNc79gy1g3q2x1bsgkj30s20biq4a.jpg)
 
-使用Kolmogorov-Smirnov(KS) test(GSEA)，需要提供gene-wise scoes
+**~~使用Kolmogorov-Smirnov test，需要提供gene-wise scoes~~**
 
 `test.stat <- new("classicScore", testStatistic=GOKSTest, name="KS tests")`
 
@@ -309,7 +311,7 @@ GOglobalTest, 采用Goeman's globaltest，返回该检验p-value
 
 ![image-20190605110124929](http://ww2.sinaimg.cn/large/006tNc79gy1g3q3k5ldwcj30p6094my9.jpg)
 
-同样KS检验运行elim算法
+**~~同样KS检验运行elim算法~~**
 
 `test.stat <- new("elimScore", testStatistic=GOKSTest, name="Fisher test", cutOff=0.01)`
 
@@ -343,7 +345,7 @@ runTest函数仅能用于提前定义好的检验方法和算法(with a predefin
 
 `weight01.t <- runTest(GOdata, algorithem="weight01", statistic="t")`
 
-`elim.ks <- runTest(GOdata, algorithm="elim", statistic="ks")`
+**~~`elim.ks <- runTest(GOdata, algorithm="elim", statistic="ks")`~~**
 
 展示对应的算法和检验
 
@@ -505,7 +507,7 @@ runTest返回对象topGOresult，同时使用Kolmogorov-Smirnov test检验富集
 
 ![image-20190606085524522](http://ww4.sinaimg.cn/large/006tNc79gy1g3r5jcilqkj31720p2thz.jpg)
 
-score函数返回topGOresult对象的p-values，查看classic和elim方式返回值的差异，elim方式相对于classic方式会更保守，GO term根据"elimKS"返回p值排序，秩序值是该GOterm在classicFisher中排序
+**score函数返回topGOresult对象的p-values，查看classic和elim方式返回值的差异，elim方式相对于classic方式会更保守，~~GO term根据"elimKS"返回p值排序，秩序值是该GOterm在classicFisher中排序~~**
 
 `pValue.classic <- score(resultKS)`
 

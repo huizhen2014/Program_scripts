@@ -32,7 +32,7 @@ Fisher精确检验：
 
 - GSEA分析构建prerank gene list
 
-[使用topGO针对DESeq2分析后结果做GSEA][https://www.biostars.org/p/279097/]，KS可尝试！！！
+~~[使用topGO针对DESeq2分析后结果做GSEA][https://www.biostars.org/p/279097/]，KS可尝试！！！~~
 
 ![image-20190831183057554](https://tva1.sinaimg.cn/large/006y8mN6gy1g6k0cvzmwzj30zo09c3zu.jpg)
 
