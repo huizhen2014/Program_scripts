@@ -341,7 +341,7 @@ runTest函数仅能用于提前定义好的检验方法和算法(with a predefin
 
 ![image-20190605124716837](http://ww4.sinaimg.cn/large/006tNc79gy1g3q6mamqaaj30vi0b0myz.jpg)
 
-`weight01.fisher <- runtest(GOdata, algorithm="weight01", statistic="fisher")`
+`weight01.fisher <- runTest(GOdata, algorithm="weight01", statistic="fisher")`
 
 `weight01.t <- runTest(GOdata, algorithem="weight01", statistic="t")`
 

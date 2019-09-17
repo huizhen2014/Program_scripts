@@ -338,6 +338,8 @@ facet_wrap(~cyl, scales="free")
 
 **reorder()可使模型(model)和生厂商(manufacturer)按照城市有油耗(cry)重新排序, 第一个变量为分类变量, 第二个变量为数值变量**
 
+**或者通过factor设定levels来在坐标轴排序**
+
 **mpg3 <- within(mpg2, { model <- reorder(model, cty)**
 
 **manufacturer <- reorder(manufacturer, -cty)})**

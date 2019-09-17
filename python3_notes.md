@@ -706,25 +706,47 @@ property其实并不是函数, 而是一个类. 它的实例包含一些魔法�
 
 * 静态方法和类方法 
 
+略
 
+* 迭代器
 
+迭代(iterate)意味着重复多次, 就像循环那样. 方法`__iter__`返回一个迭代器, 它是包含方法`__next__`的对象, 而调用这个方法时可不提供任何参数. 当你调用方法`__next__`时, 迭代器应返回其下一个值. 如果迭代器没有可供返回的值, 应引发StopIteration异常. 可使用内置的便利函数next, 此时, next(it)与`it.__next__()`等效.
 
+![image-20190916233847850](https://tva1.sinaimg.cn/large/006y8mN6ly1g71s9xgsjmj30y60920tv.jpg)
 
+可通过可迭代对象调用内置函数iter, 可获得一个可迭代器:
 
+![image-20190916234312481](https://tva1.sinaimg.cn/large/006y8mN6ly1g71seiaep5j30xe06oaar.jpg)
 
+使用构造函数list显示地将迭代器转换为列表:
 
+![image-20190916234559648](https://tva1.sinaimg.cn/large/006y8mN6ly1g71sheo4t8j311e0bagna.jpg)
 
+* 简单生成器
 
+![image-20190916234848887](https://tva1.sinaimg.cn/large/006y8mN6ly1g71skchtpfj30u804qaas.jpg)
 
+其工作原理与列表推导相同, 但不是创建一个列表(即不立即执行循环), 而是返回一个生成器, 让你能够逐步执行计算. 不同与列表推导式, 这里使用的是圆括号.
 
+![image-20190916235134728](https://tva1.sinaimg.cn/large/006y8mN6ly1g71sn7zmhyj315u04cjsn.jpg)
 
+或在一对既有圆括号内(如在函数调用中)使用生成器推导, 无需再添加一对圆括号(如上).
 
+* 递归生成器
 
+使用两个for循环可实现两层嵌套列表, 处理任意层嵌套列表, 使用递归:
 
+![image-20190916235653306](https://tva1.sinaimg.cn/large/006y8mN6ly1g71ssqy9odj310207qwfl.jpg)
 
+处理递归时存在两种情况: 基线条件和递归条件, 上式中, 基线情况下展开一个单元, 若为单个元素, 将引发TypeError异常.
 
+![image-20190916235926911](https://tva1.sinaimg.cn/large/006y8mN6ly1g71svefp3oj30y00200t0.jpg)
 
+这里若nested是字符穿或类似字符串对象, 属于序列, 不会引发TypeError异常. 因此, 可在开头尝试将其与一个字符串拼接检查:
 
+![image-20190917000126858](https://tva1.sinaimg.cn/large/006y8mN6ly1g71sxhhpa5j310q0demz8.jpg)
+
+p288
 
 
 

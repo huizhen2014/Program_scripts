@@ -131,11 +131,13 @@
 
 13. reorder(x,X,FUN) 第一参数为被排序的因子序列，**第二个参数是等长度的作为排序参考的序列，第三个是构造排序标准的加工函数**
 
-14. 合并数据，merge(dataframeA,dataframeB,by=c("ID","Country"))
+14. rev(x)反向排序当前x向量顺序
 
-15. 选入数据，dataframe[row indices,colnum indices]
+15. 合并数据，merge(dataframeA,dataframeB,by=c("ID","Country"))
 
-16. 删除数据%in%
+16. 选入数据，dataframe[row indices,colnum indices]
+
+17. 删除数据%in%
 
     myvars <- names(leadership) %in% c("q3","q4")
 
@@ -143,7 +145,7 @@
 
     leadership\$q3 <- leadership\$q4 <- NULL(为定义）
 
-17. sample() 随机抽样
+18. sample() 随机抽样
 
     leadership[ sample(1:nrow(leadership),3,replace=F),]
 
@@ -181,6 +183,11 @@
 3. newobject <- edit(object) 编辑对象并另存为newobject
 
    fix(object) 直接编辑对象
+
+* 因子
+
+1. factor(x, levels=sort(x,decreasing=F)/levels=rev(x))
+2. 将数字专为factor后反转需要: as.numeric(as.charactor(x))
 
 #### 基本数据管理
 
