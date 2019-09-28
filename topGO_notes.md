@@ -88,7 +88,7 @@ gene-to-GO和GO-to-gene之间关系互转
 
 geneList对象用于命名因子指定哪些gene是interesting，哪些gene不是
 
-`GOdata <- new("topGOdata", ontology="MF", allGenes=geneList, annot=annFun.gene2GO, gene2GO=geneID2GO, nodeSize=5)`
+`GOdata <- new("topGOdata", ontology="MF", allGenes=geneList, annot=annFUN.gene2GO, gene2GO=geneID2GO, nodeSize=5)`
 
 ![image-20190604183341397](http://ww1.sinaimg.cn/large/006tNc79gy1g3pb0fqo7ej30yc0383yz.jpg)
 
@@ -217,7 +217,7 @@ termStat函数返回GO term的统计信息
 
 ![image-20190604215353526](http://ww2.sinaimg.cn/large/006tNc79gy1g3pgsqgo46j30uo09yta0.jpg)
 
-Excepted是什么？？？
+Excepted是理论情况下，存在n个显著基因。
 
 若直接定义一组基因为interesting gene时，对应的geneScore(GOdata)为2，未选中基因为1(`geneList <- factor(as.integer(geneNames %in% myInterestingGenes))`)
 

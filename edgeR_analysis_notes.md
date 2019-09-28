@@ -46,7 +46,7 @@ tximport建议二种导入估计用于差异基因表达分析方式：第一种
 
 `y <- DGEList(cts)`
 
-`y <- sacleOffset(y, normMat)`
+`y <- scaleOffset(y, normMat)`
 
 **`scaleOffset` ensures that the scale of offsets are consistent with library sizes. This is done by ensuring that the mean offset for each gene is the same as the mean log-library size.**
 

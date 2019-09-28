@@ -73,6 +73,9 @@ KEGG：KEGG是手动绘制的，代表了分子之间的协同作用和互相作
 
 GO和KEGG是最常用的功能分析。由于它们长期的收录支持以及包含了广泛的物种，因此是首要的分析选择。其他相关的gene sets有Disease Ontology(DO)，Disease Gene Network(DisGeNET), wikiPathways, Molecular Signature Database(MSigDb)。
 
+*  If your input gene id contains duplicated IDs, those duplicated will be removed.
+* Those genes that do not have GO annotation will be removed.
+
 2. Functional Enrichment Analysis Methods
 
 **ORA(Over Representation Analysis) 广泛用于判断，在一个已知的实验所驱动的基因列中( a list of differentially expressed genes, DEGs)，已知的生物功能或过程是否over-represented(= enriched)。**
@@ -91,22 +94,6 @@ P-value 采用超几何分布计算：
 
 95%置信区间为4.5，而算得的率为6.774，远大于4.5，接受DE和Not DE之间存在差异。
 
-**GSEA(Gene Set Enrichment Analysis)解决了ORA分析过程中只考虑差异大的基因，而不考虑差异较小但是一致性表达的一组相关基因的问题。所有基因均用于GSEA分析，GSEA整合gene set中每个基因的统计值，从而检测提前定义的gene set中所有基因发生小的变化，同时发生一致性改变的情况。因为，可能出现许多表型差异与一组变化较小但是一致性变化的基因所联系起来的情况。**
-
-根据表型对基因排秩序。针对一套给定prior的gene set S(e.g., genes sharing the same GO category)，GSEA分析的目的在于判断S中的基因是否随机分布在排完秩序后的gene list(L)中或主要分布在top或bottom。
-
-GSEA分析的三个关键要素：
-
-Calculation of Enrichment Score
-
-富集值(ES)代表了a set S (over-represented) 位于经过排秩序后的gene list(L)的top或bottom的程度。通过统计L中出现的S的情况，计算得ES值。
-
-The score is calculated by walking down the list *L*, increasing a running-sum statistic when we encounter a gene in *S* and decreasing when it is not. The magnitude of the increment depends on the gene statistics (e.g., correlation of the gene with phenotype). The *ES* is the maximum deviation from zero encountered in the random walk; it corresponds to a **weighted Kolmogorov-Smirnov-like statistic**(Subramanian et al. [2005](https://yulab-smu.github.io/clusterProfiler-book/chapter2.html#ref-subramanian_gene_2005)).
-
-Estimation of Significance Level of ES
-
-使用permutation test计算ES的p-value。重新排列gene list L的基因标签，针对permutated data重新计算gene set的ES，针对ES生成null distribution。然后计算相对于该null distribution的ES的p-value。
-
 Adjustment for Multiple Hypothesis Testing
 
 当整个gene set都被评估后，DOSE针对多重假设检验调整评估的显著性水平，同时针对FDR control 计算q-value。
@@ -117,188 +104,21 @@ The false discovery rate (FDR)指的是type I 型错误的期待比率。Type I�
 
 **p-value告诉我们单次检测假阳性的概率；当针对小样本进行大量数目的检测时(genomics或protoemics), 就应使用q-value了：p-value为5%意味着5%的检测将会导致加假阳性结果，q-value为5%意味着5%的显著性结果将会为假阳性。使用q-value来控制FDR的过程称为Benjamini-Hochberg procedure。**
 
-在DOSE中，可以指定DOSE或fqsea(by="DOSE", by="fqsea")来选择相应的GSEA算法，默认DOSE选择fqsea，更快。
-
-**Leading edge analysis and core enriched genes，leading edge分析将会报告Tags值来表明多少比率的genes贡献了enrichment score，List 来表明enrichement score处在list中的什么位置，Singnal表明enrichmen signal的强度。这也可以得到贡献了enrichment的核心富集基因，DOSE支持leading edge分析并在GSEA分析中报告core enriched genes。**
-
 3. Universal enrichment analysis
-
-针对过表达分析，需输入基因向量，也就是gene IDs的向量，可由DESeq2包获得。针对gene sets enrichment 分析，需要一个排秩序后的genes list，geneList包含以下特征：1. 数字向量，倍数改变或其他类型的数字变量；2. 命名向量，根据对应的gene ID命名每个数字；3. 排序后的向量，对数字进行降序排列。
-
-`d <- read.csv(your_csv_file)`
-
-假设第一列为ID，第二列为Fold change
-
-`geneList <- d[,2]`
-
-`name(geneList) <- as.character(d[,1])`
-
-`geneList <- sort(geneList, decreasing=T)`
 
 clusterProfiler支持超几何检验和ontology/pathway的gene set enrichment分析。clusterProfiler针对超几何检验提供enricher函数，针对gene set enrichment分析提供GSEA函数，同时接受自定义的注释。这两个函数接受2个额外的参数，TERM2GENE，TERM2NAME。TERM2GENE为一个数据框，第一列为term ID，第二列为对应的比对的基因；TERM2NAME同样为一数据框，第一列为term ID，第二列为对应的term 名称，且TERM2NAME是可选的。
 
-WikiPathways是一个持续更新的pathway数据库。WikiPathways针对其所支持的物种每月都会更新对应的gmt文件，下载对应的gmt文件，然后生成TERM2GENE和TERM2NAME来用于enricher和GSEA函数。
-
-`library(magrittr)`
-
-`library(clusterProfiler)`
-
-`data(geneList, package="DOSE")`
-
-`gene <- names(geneList)[abs(geneList) >2]`
-
-`wpgmtfile <- system.file("extdata/wikipathways-20180810-gmt-Homo_sapiens.gmt", package="clusterProfiler")`
-
-`wp2gene <- read.gmt(wpgmtfile)`
-
-`wp2gene <- wp2gene %>% tidyr::sparate(ont, c("name", "version", "wpid", "org"), "%%")`
-
-`wpid2gene <- wp2gene %>% dplyr::select(wpid, gene)`
-
-`wpid2name <- wp2gene %>% dplyr::select(wpid, name)`
-
-`ewp <- enricher(gene, TERM2GENE=wpid2gene, TERM2NAME=wpid2name)`
-
-`ewp2 <- GSEA(geneList, TERM2GENE=wpid2gene, TERM2NAME=wpid2name,verbose=F)`
-
-使用setReadable函数将gene IDs转化位gene symbols
-
-`library(org.Hs.eg.db)`
-
-`ewp <- setReadable(ewp, org.Hs.eg.db, keyType="ENTREZID")`
-
-`ewp2 <- setReadable(ewp2, org.Hs.eg.db, keyType="ENTREZID")`
-
-Molecular Signatures Database包含8个主要单元：
-
-1. H：hallmark gene sets
-2. C1：positional gene sets
-3. C2：curated gene sets
-4. C3：motif gene sets
-5. C4：computational gene sets
-6. C5：GO gene sets
-7. C6：oncogenic signatures
-8. C7：immunologic signatures
-
-可以使用从Broad Institute下载GMT文件，使用read.gmt解析后用于enricher()和GSEA()。另外msigdbr包已经包含了MSigDB gene set可直接用于clusterProfiler分析
-
-`library(msigdbr)`
-
-`msigdbr_show_species()`
-
-`m_df <- msigdbr(species="Homo sapiens")`
-
-`head(m_df, 2) %>% as.data.frame`
-
-使用C6，oncogenic gene sets分析
-
-`m_t2g <- msigdbr(species = "Homo sapiens", category = "C6") %>% dplyr::select(gs_name, entrez_gene)`
-
-`head(m_t2g)`
-
-`em <- enricher(gene, TERM2GENE = m_t2g)`
-
-`em2 <- GSEA(geneList, TERM2GENE = m_t2g)`
-
-`head(em)`
-
-`head(em2)`
-
-使用C3查看根据共有的特殊motif是否上调或下挑
-
-`m_t2g <- msigdbr(species = "Homo sapiens", category = "C3") %>% dplyr::select(gs_name, entrez_gene)`
-
-`head(m_t2g)`
-
-`em3 <- GSEA(geneList, TERM2GENE = m_t2g)`
-
-4. Disease analysis
-
-DOSE支持Disease Ontology(DO)富集分析。enrchDO可用于识别疾病相关的基因，gseDO用于DO的gene set enrichment分析。此外，DOSE还支持Network of Cancer Gene(NCG)的富集分析和Disease Gene Network分析。
-
-这里选择fold change 在1以上基因位差异表达基因用于分析它们的疾病关系
-
-`library(DOSE)`
-
-`data(geneList)`
-
-`gene <- names(geneList)[abs(geneList) > 1.5]`
-
-`x <- enrichDO(gene=gene, ont="DO", pavlueCutoff=0.05, pAdjustMethod="BH", universe=names(geneList), minGSSize=5, maxGSSize=500, qvalueCutoff=0.05, readable=FALSE)`
-
-enrichGO函数需要输入entrezgene ID向量，大部分情况是gene 表达研究中的差异性genes，若需要将其他gene ID转为entrezgene ID，使用bitr函数即可。
-
-ont参数可以为"DO"或"DOLite"，目前DOLite数据停止更新了，推荐使用ont="DO"；pvalueCutoff设置p value以及p value adjust阈值；pAdjustMethod设置p value修正方法，包含有Bonferroni correction("bonferroni")，Holm("holm")，Hochberg("hochberg")，Hommel("hommel")，Benjamini & Hochberg("BH")和Benjamini & Yekutieli("BY")，qvalueCutoff常用于控制q-values；universe设置检测的背景基因，如果没有明确指定该参数，enrichDO将使用具有DO注释的人类基因；minGSSize(和maxGSSize)指定只有超过minGSSize(同时低于maxGSSize)基因注释的DO terms才被检测；readable参数指定是否使用gene symbols代表gene IDs; 同样，可以使用setReadable函数将entrezgene IDs转换为gene symbols。
-
-`x <- setReadable(x, "org.Hs.eg.db")`
-
-Network of Cancer Gene(NCG)是一个手动创建的癌症基因数据库。DOSE支持分析gene list判断它们是否存在富集的基因，这些基因存在已知的突变肿瘤类型中(determine whether they are enriched in genes known to be mutated in a given cancer type)。
-
-`gene2 <- names(geneList)[abs(geneList) < 3]`
-
-`ncg <- enrichNCG(gene2)`
-
-参数同enrichDO
-
-DisGeNET是一个整合的且综合的基因疾病相关的数据库(源自公开数据资源和文献)。它包含了基因疾病关系和snp基因疾病关系。
-
-enrichDGN支持基因基因相关的富集分析，enrichDGNv支持snp基因疾病关系分析。
-
-`dgn <- enrichDGN(gene)`
-
-参数同enrichDO
-
-```R
-snp <- c("rs1401296", "rs9315050", "rs5498", "rs1524668", "rs147377392","rs841", "rs909253", "rs7193343", "rs3918232", "rs3760396","rs2231137", "rs10947803", "rs17222919", "rs386602276", "rs11053646","rs1805192", "rs139564723", "rs2230806", "rs20417", "rs966221")
-```
-
-`dgnv <- enrichDGNv(snp)`
-
-参数同enrichDGNv
-
-DO Gene Set Enrichment Analysis
-
-`library(DOSE)`
-
-`data(geneList)`
-
-`y <- gseDO(geneList, nPerm=100, minGSSize=120, pvalueCutoff=0.2, pAdjustMethod="BH",verbose=FALSE)`
-
-nPerm: permutation numbers
-
-NCG Gene Set Enrichment Analysis
-
-`ncg <- gseNCG(geneList, nPerm=100, minGSSize=120, pvalueCutoff=0.2, pAdjustMethod="BH", verbose=F)`
-
-`ncg <- setReadable(ncg, "org.Hs.eg.db")`
-
-DisGeNET Gene Set Enrichment Analysis
-
-`dgn <- gseDGN(geneList, nPerm=100, minGSSize=120, pvalueCutoff=0.2, pAdjustMethod="BH", verbose=F)`
-
-`dgn <- setReadable(dgn, "org.Hs.eg.db")`
-
-5. Gene Ontology Analysis
+4. Gene Ontology Analysis
 
 GO分析(groupGO(), enrichGO(), gseGO())支持具有OrgDb对象的物种。Bioconductor 现已经提供了约20种物种饿OrgDb数据，当然也可以使用AnnotationForge创建Orgdb数据，参考GOSemSim。
 
-假如拥有GO注释数据(数据框格式，第一列为gene ID，第二列为GO ID)，可使用enricher(), gseGO()函数执行over-representation test和gene set enrichement analysis。
+**假如拥有GO注释数据(数据框格式，第一列为gene ID，第二列为GO ID)，可使用enricher(), gseGO()函数执行over-representation test和gene set enrichement analysis。**
+
+![image-20190922195844165](https://tva1.sinaimg.cn/large/006y8mN6gy1g78jmtx9kkj30xm0bkdi2.jpg)
 
 假如基因是通过直接注释(direction annotation)而来的，那么它们也应该被它们ancestor GO nodes所注释(indirect annotation)。假如只有direct annotaion，可将它们的注释传递给buildGOmap函数，该函数将会推导indirection annotation，生成使用与enricher()和gseGO()的数据框。
 
-groupGO用于针对指定水平对gene基于GO分布进行分类。
-
-`library(clusterProfiler)`
-
-`data(geneList, package="DOSE")`
-
-`gene <- names(geneList)[abs(geneList) > 2]`
-
-`gene.df <- bitr(gene, fromType="ENTREZID", toType=c("ENSEMBL","SYMBOL"), OrgDb=org.Hs.eg.db)`
-
-`ggo <- groupGO(gene=gene, OrgDb=org.Hs.eg.db, ont="CC", level=3, readable=T)`
-
-Over-representation test
+#####Over-representation test
 
 `ego <- enrichGO(gene=gene, universe=names(geneList), OrgDb=org.Hs.eg.db, ont="CC", pAdjustMethod="BH", pvalueCutoff=0.01, qvalueCutoff=0.05, readable=T)`
 
@@ -306,43 +126,29 @@ Over-representation test
 
 `ego2 <- setReadable(ego2, OrgDb=org.Hs.eg.db)`
 
-Drop specific GO terms or level
+######Drop specific GO terms or level
 
 dropGO函数可用于去除enrichGO和compareCluster结果中的特殊GOterms或GO levels。
 
-Test GO at sepcific level
+######Test GO at sepcific level
 
 enrichGO不包含参数用于限制特殊GO level的test，但是可使用gofilter函数来限制结果到指定的GO level，用于enrichGO和compareCluster的输出的结果。
 
-Reduce redundancy of enriched GO terms
+######Reduce redundancy of enriched GO terms
 
 GO是一个parent-child的结构形式，因此parent term可能会重叠它所有child terms的很大一部分，这会导致冗杂的发现输出。clusterProfiler提供了simplify函数用于减少来自enrichGO和gseGO的输出中的冗杂GO terms。通过计算GO terms之间的相似度，然后去除哪些高度相似的terms，仅保留一个代表性的term。
 
-GO Gene Set Enrichment Analysis
-
-Gene Set Enrichment Analysis(GSEA)
-
-`ego3 <- gseGO(geneList=geneList, OrgDb=org.Hs.eg.db, ont="CC", nPerm=1000, minGSSize=100, maxGSSize=500, pvalueCutoff=0.05, verbose=F)`
-
-GSEA使用permutation test， 可设定nPerm参数指定permutations数目。
-
-GO Semantic Similarity Analysis
-
-使用GOSemSim检测GO semantic similarity。基因genes或proteins功能上的相似性，将它们聚类，也可用来测量GO terms之间的相似性来减少GO enrichment results的冗杂程度。
-
-GO analsysi for non-model organisms
+#####GO analsysi for non-model organisms
 
 enrichGO和gseGO函数均需要OrgDb数据，若AnnotatonHub没有该物种的OrgDb数据，可以从其他地方获得OrgDb数据，例如，biomaRt和Blast2GO。然后使用enricher或GSEA函数分析。或者，使用AnnotationForge来创建OrgDb数据。
 
-6. KEGG analysis
+5. KEGG analysis
 
-KEGG.db自从2012年后就没更新了，在clusterProfiler包中，enrichKEGG(for KEGG pathway)和enrichMKEGG(for KEGG module)支持下载最新的KEGG在线版本用于富集分析。KEGG Orthology(KO)数据库也支持指定物种organism="ko"。
+KEGG.db自从2012年后就没更新了，在clusterProfiler包中，enrichKEGG(for KEGG pathway)和enrichMKEGG(for KEGG module)支持下载最新的KEGG在线版本用于富集分析。
 
 使用search_kegg_organism函数搜索支持的物种
 
 `library(clusterProfiler)`
-
-`search_kegg_organism("kpc", by="egg_code")`
 
 `kpc <- search_kegg_organism("Klebsiella pneumoniae", by="scientific_name")`
 
@@ -356,95 +162,13 @@ KEGG over-representation test
 
 输入的ID类型，可以是kegg，ncbi-geneid，ncbi-proteinid或uniprot。
 
-KEGG Gene Set Enrichment Analysis
-
-`kk2 <- gseKEGG(geneList=geneList, organism='hsa', nPerm=1000, minGSSize=120, pvalueCutoff=0.05, verbose=F)`
-
-`head(setReadable(kk2, org.Hs.eg.db,keyType="ENTREZID"))`
-
-KEGG Module over-representation test
+#####KEGG Module over-representation test
 
 KEGG Module是人工审核定义的功能单元，在一些情况下，KEGG Module具有明确直接的解释
 
 `mkk <- enrichMKEE(gene=gene, organism='hsa')`
 
-KEGG Module Gene Set Enrichment Analysis
-
-`mkk2 <- gseMKEE(geneList=geneList, organism='hsa')`
-
-7. MSigDb analsysi
-
-`data(geneList, package="DOSE")`
-
-`gene <- names(geneList)[abs(geneList) >2]`
-
-`gmtfile <- system.file("extdata", "c5.cc.0.entrez.gmt", package="clusterProfiler")`
-
-`egmt <- enricher(gene, TERM2GENE=c5)`
-
-8. Reactome pathway analysis
-
-ReactomePA包用于reactome pathway-based analysis. Reactome是一个开源的，开放的，人工审核记录的，经过同行审核的pathway数据库。
-
-当前ReactomePA支持多种模式物种，包括"celegangs", "fly","human","mouse","rat","yeast"和"zabrafish"，输入的gene ID需要为Entrez gene ID，推荐使用clusterProfiler::bitr来转换IDs。
-
-`library(ReactomePA)`
-
-`data(geneList)`
-
-`de <- names(geneList)[abs(geneList) > 1.5]`
-
-`x <- enrichPathway(gene=de, pvalueCutoff=0.05, readable=T)`
-
-Gene Set Enrichment Analysis
-
-`y <- gsePathway(geneList, nPerm=10000,pvalueCutoff=0.2,pAdjustMethod="BH",verbose=F)`
-
-`res <- as.data.frame(y)`
-
-9. MeSH Enrichment Analysis
-
-10. Funcitonal enrichment analysis of genomic coordinations
-
-Pathway analysis of NGS data(RNA-Seq, ChIP-Seq)，来自NGS数据的pathway分析可以被ChIPseeker包，通过连接编码区和非编码到coding genes实现。ChIPseeker包可以注释基因组区域到距离它最近的基因，管家基因，和侧翼基因。此外，它还提供了函数seq2gene，它可以同时考虑来自基因间区的管家基因，启动子区域和侧翼基因，这些区域可能被顺式调控所调节。
-
-11. Biological theme comparison
-
-clusterProfiler可进行biological theme comparision分析，compareCluster，自动计算每个gene clusters的enriched functional categories。
-
-输入的geneCluster参数需要是gene IDs的名称列表
-
-`data(gcSample)`
-
-`ck <- compareCluster(geneCluster=gcSample,fun="enrichKEGG")`
-
-Formula inerface of compareCluster
-
-compareCluster同样支持传递公式类型的比较, Enterz ~ group或者Entrez ~ group + othergroup
-
-`mydf <- data.frame(Entrez=names(geneList), FC=geneList)`
-
-`mydf <- mydf[abs(mydf$FC) > 1,]`
-
-`mydf$group <- "upregulated"`
-
-`mydf$group[mydf$FC<0] <- "downregulated"`
-
-`mydf$othergroup <-"A"`
-
-`mydf$othergroup[abs(mydf$FC) > 2] <- "B"`
-
-`formula_res <- comparaCluster(Entrez ~ group + othergroup, data=mydf, fun="enrichKEGG")`
-
-Visulization of profile comparison
-
-`dotplot(ck)`
-
-`dotplot(formula_res)`
-
-`dotplot(formula_res, x=~group) + ggplot2::facet_grid(~othergroup)`
-
-12. Visualization of Functional Enrichment Result
+6. Visualization of Functional Enrichment Result
 
 enrichplot包提供了多种可视化模型来帮助解释富集结果，它支持来自DOSE, clusterProfiler, ReactomePA和meshes包的富集结果，ORA和GSEA分析结果都支持。
 
@@ -496,93 +220,13 @@ heatplot类似于cnetplot，以heatmap形式展示相关性。
 
 Enrichment Map
 
-Enrichment map将每一个term组织到网络结构中，每个edge都连接着重叠的gene   sets。共同重叠的gene sets就倾向于聚到一起，容易识别fuctional mudule。
+Enrichment map将每一个term组织到网络结构中，每个edge都连接着重叠的gene sets。共同重叠的gene sets就倾向于聚到一起，容易识别fuctional mudule。
 
 `emapplot(edo)`
 
 UpSet Plot
 
 upsetplot是cnetplot的另一种形式，用于展示genes和gene sets之间的复杂关系，它强调不同gene sets之间的gene重叠。
-
-ridgeline plot for expression distribution of GSEA result
-
-ridgeplot用于展示GSEA富集的类别核心富集基因的表达分布，帮助识别上调或者下调的pathways。
-
-running score and preranked list of  GSEA result
-
-Running score and preranked list are traditional methods for visualizing GSEA result. The enrichplot package supports both of them to visulaize the distribution of the gene set and the enrichment score.
-
-`gseaplot(edo2,  geneSetID=1, by="runningScore", title=edo2$Description[1])`
-
-`gseaplot(edo2, geneSetID=1, by="preranked", title=edo2$Description[1])`
-
-`gseaplot(edo2, geneSetID=1, title=edo2$Description[1])`
-
-`gseaplot2(edo2, geneSetID=1, title=edo2$Description[1])`
-
-mutile gene sets to be displayed
-
-`gseaplot2(edo2, geneSetID=1:3)`
-
-display the pvalue
-
-`gseaplot2(edo2, geneSetID=1:3, pvalue_table=TRUE, color=c("#E495A5", "#86B875", "#7DB0DD"), ES_geom="dot")`
-
-display the subplot
-
-`gseaplot(edo2, geneSetID=1:3, subplots=1)`
-
-`gseaplot(edo2, geneSetID=1:3, subplots=1:2)`
-
-gsearank plot the ranked list of genes belong to the specific gene set
-
-`gsearnak(edo2, title=edo2[1, "Description"])`
-
-mutiple gene sets can be aligned using cowplot
-
-`library(ggplot2)`
-
-`library(cowplot)`
-
-`pp <- labpply(1:3, function(i){`
-
-`anno <- edo2[i, c("NES","pvalue","p.adjust")]`
-
-`Lab <- paste0(names(anno), "=", round(anno, 3), collapse="\n")`
-
-`gsearank(edo2, i, edo2[i, 2] + xlab(NULL) + ylab(NULL) + annotate("text", 0, edo2[i, "enrichmentScore"] * 0.9, label=lab, hjust=0, vjust=0)})`
-
-`plot_grid(plotlist=pp, ncol=1)`
-
-pubmed trend of enriched terms
-
-富集分析需要解决的一个问题就是寻找进一步研究的pathways。pmcplot函数可以帮忙绘制出PubMed Central的查询结果的发布趋势。
-
-`terms <- edo$Description[1:3]`
-
-`p <- pmcplot(terms, 2010:2017)`
-
-`p2 <- pmcplot(terms, 2010:2017, proportion=F)`
-
-`plot_grid(p, p2, ncol=2)`
-
-goplot
-
-`gopot(ego)`
-
-browseKEGG
-
-`browseKEGG(kk, 'hsa04110')`
-
-pathview from pathview package
-
-clusterProfiler用户可是使用pathview函数来查看KEGG pathway
-
-`library(pathview)`
-
-`hsa04110 <- pathview(gene.data=geneList, pathway.id = 'hsa04110', species='hsa', limit=list(gene=max(abs(geneList)), cpd=1))`
-
-
 
 
 

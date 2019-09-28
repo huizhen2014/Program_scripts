@@ -38,6 +38,29 @@
 * 查看包中所有函数help help(package="GO.db")
 * Sys.getenv("HOME")，获得用户home目录
 * Sys.getenv("R_HOME")，获得R的home目录：
+* install.packages("./GO.db_3.3.0.tar.gz",type="source",repos = NULL)安装本地下载包
+
+####特殊字符
+
+NA 缺失值或为定义数据
+
+NULL 空对象(null/empty lists)
+
+Inf/-Inf 正或负无限值
+
+NaN 不能定义结果
+
+is.na()/is.finite()/is.nan()
+
+(v1>2) | (v2>3)  '|' boolean OR,  返回向量
+
+(v1>2) & (v2>3)  '&' boolean AND, 返回向量
+
+(v1>2)||(v2>3)  '||' boolean OR，返回单个值
+
+(v1>2)&&(v2>3)  '&&' boolean AND,ditto
+
+library(igraph)/detach(package:igraph)
 
 #### 创建数据集
 
@@ -259,7 +282,9 @@
 
 6. paste(…,sep="") paste("x",1:3,sep=""); paste("x",1:3,sep="m")
 
-7. seq(from,to,by) seq(1,10,2)
+7. paste(list[[1]],collapse=",") 变为长度为1的标量
+
+8. seq(from,to,by) seq(1,10,2)
 
    seq.int(from,to,by)
 
@@ -267,7 +292,7 @@
 
    seq_len(leng.out)
 
-8. rep(x,n) rep(1:3,2) c(1,2,3,1,2,3,)
+9. rep(x,n) rep(1:3,2) c(1,2,3,1,2,3,)
 
    rep(1:4,each=2) == rep(1:4,c(2,2,2,2))
 
@@ -275,13 +300,13 @@
 
    rep_len(1:3,8) 1,2,3,1,2,3,1,2
 
-9. tcut(x,n) 将连续变量x分割为有着n个水平的因子, ordered_result=T创建一个有序因子
+10. tcut(x,n) 将连续变量x分割为有着n个水平的因子, ordered_result=T创建一个有序因子
 
-10. pretty(x,n) 创建美观分割点，通过选取n+1个等间距的取整值，将一个连续变量x分割为n个区间
+11. pretty(x,n) 创建美观分割点，通过选取n+1个等间距的取整值，将一个连续变量x分割为n个区间
 
-11. cat(…,file="my file",append=F) 链接…中对象，并将其输出到屏幕上或文件中(如果声明了一个的话) cat("Hello","Jane","\n")
+12. cat(…,file="my file",append=F) 链接…中对象，并将其输出到屏幕上或文件中(如果声明了一个的话) cat("Hello","Jane","\n")
 
-12. apply(矩阵或数据框，MARGIN,FUN,…）
+13. apply(矩阵或数据框，MARGIN,FUN,…）
 
     apply(mydata,1,mean，trim=0.2)
 
@@ -361,7 +386,7 @@
 
 1. t(mtcar) 将矩阵或数据框进行转置
 
-2. aggregate(x,by,FUN) x为待折叠数据对象，by是一个变量组成列表，将这些列表变量通过FUN变为新的观测 aggregate(mtcars, by=list(cyl,gear), FUN=mean, na.rm=T)
+2. aggregate(x,by,FUN) x为待折叠数据对象，by是一个变量组成列表，将这些列表变量通过FUN变为新的观测` aggregate(mtcars, by=list(mtcars$cyl,mtcars$gear), FUN=mean, na.rm=T)`
 
 3. library(reshape2)
 

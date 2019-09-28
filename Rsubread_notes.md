@@ -4,7 +4,7 @@ Subread package包含了一套用于高通量测序软件用于处理下一代�
 
 align： 用于比对DNA或 RNA测序reads；针对RAN-seq实验检测gene表达水平发现差异表达基因，推荐使用subread aligner，针对RNA-seq reads使用局部比对
 
-subjunc：针对RNA-seq reads比对，同时检出exon-exon junctions，而subread aligner和它主要不同就是不回检出exon-exon juncitons。 
+subjunc：针对RNA-seq reads比对，同时检出exon-exon junctions，而subread aligner和它主要不同就是不会检出exon-exon juncitons。 
 
 sublong：用于比对长reads的DNA-seq测序数据，例如来自Nanopore, PacBo，
 
@@ -80,11 +80,11 @@ a feature为参考基因组的一个区间(一段范围)，meta-feature为一组
 
 `mapping_results_se.bam <- grep("[^_pe].bam$",list.files(),value=T))`
 
-`fc_se <- featureCounts(mapping_results_se.bam,annot.ext="Drosophila_melanogaster.BDGP6.22.43.gtf",isGTFAnnotationFile=T, GTF.featureType="gene",GTF.attrType="gene_id",allowMultiOverlap=T)`
+`fc_se <- featureCounts(mapping_results_se.bam,annot.ext="Drosophila_melanogaster.BDGP6.22.43.gtf",isGTFAnnotationFile=T, GTF.featureType="gene",GTF.attrType="gene_id")`
 
 `mapping_results_pe.bam <- grep("_pe.bam$",list.files(),value=T)`
 
-`fc_pe <- featureCounts(mapping_results_pe.bam,annot.ext="Drosophila_melanogaster.BDGP6.22.43.gtf",isGTFAnnotationFile=T,GTF.featureType="gene",GTF.attrType="gene_id",isPairedEnd=T,allowMultiOverlap=T)`
+`fc_pe <- featureCounts(mapping_results_pe.bam,annot.ext="Drosophila_melanogaster.BDGP6.22.43.gtf",isGTFAnnotationFile=T,GTF.featureType="gene",GTF.attrType="gene_id",isPairedEnd=T)`
 
 `> names(fc_pe)
 [1] "counts"     "annotation" "targets"    "stat"`

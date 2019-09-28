@@ -42,6 +42,8 @@ columns: 显示AnnotationDb对象所能返回的数据种类
 
 keytypes: 显示可以供select，keys和keytype能选择的关键字类型
 
+loadDb: 装载离线下载的annotation package
+
 `head(keys(orgdb, keytype="SYMBOL"))`
 
 **select(x, keys, columns, keytype, …)：根据keys，columns，keytype等参数以数据框的格式返回AnnotationDb对象所含内容, 而mapIds返回向量**
@@ -370,4 +372,37 @@ getBM()共含有4个主要参数：
 
 ![image-20190611191554416](http://ww2.sinaimg.cn/large/006tNc79gy1g3xfki4dioj30uu09wjst.jpg)
 
-略！！！
+***
+
+#### AnnotationForge
+
+构建organism package可直接使用函数makeOrgPackageFromNCBI()或makeOrgPackage()。若package可使用NCBI Taxonomy ID通过NCBI构建，该命令根据tax_id从NCBI搜索相应gene records，因此选择正确的NCBI taxonomy ID很重要。例如，构建zebrafinch organism package:
+
+![image-20190919080516973](https://tva1.sinaimg.cn/large/006y8mN6gy1g74i5k8pfxj318m0c40vc.jpg)
+
+若不能从NCBI处获得所有构建信息，可从其他资源使用makeOrgPackage()函数构建，该函数不依赖NCBI构建。该函数使用data.frame的field name构建为相应的数据库信息，同时可通过columns()和keytypes()查看所构建数据库。对所添加数据种类没有限制，但是data.frame的第一列对应gene ID，命名为"GID"。
+
+当data.frame包含GO information时，使用goTable方法指明。若使用该选项，makeOrgPackage()将1）remove IDs that are too new，2) create a second table to also represent the GOALL, EVIDENCEALL, ONTOLOGYALL fields for the select method。此种情况(使用goTable)，需准守严格规则，该data.frame仅需包含3列，对应为gene id, GO id 和 evidence codes，对应名称为"GID", "GO"和"EVIDENCE"：
+
+![image-20190919090633387](https://tva1.sinaimg.cn/large/006y8mN6gy1g74jxa6geej30yu0mujvj.jpg)
+
+以上三个data.frame先分别删除没有信息列
+
+![image-20190919090759692](https://tva1.sinaimg.cn/large/006y8mN6gy1g74jys1vljj30t209iq5a.jpg)
+
+本地安装package需指明type为"source"
+
+其中go=fGO/gene_info=fSym/chromsoem=fChr 满足：1）数据框，2）第一列名为"GID"，3）不含rownames信息；4）各data.frame的列名称将成为columns()和keytypes()信息，供select()函数使用。
+
+***
+
+
+
+
+
+
+
+
+
+
+
