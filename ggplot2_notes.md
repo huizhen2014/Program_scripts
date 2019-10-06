@@ -242,7 +242,7 @@ p + scale_colour_brewer(palette="Set1")
 
 p + scale_colour_hue("What does\n it eat?")
 
-p + scale_colour_gradient(low="green", high="red")
+p + scale_colour_gradient(low="green", high="red",breaks=c(0,1))
 
 **breaks=c("herbi","carni","omni",NA),labels=c("plants","meat","both","Don't know")**)
 

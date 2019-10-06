@@ -38,6 +38,8 @@ colorRamp/colorRampPalette函数支持自定义的创建一系列颜色梯度
 
 To be continued~
 
+![image-20190930110921343](https://tva1.sinaimg.cn/large/006y8mN6gy1g7hdafv7fpj31200ekq5e.jpg)
+
 
 
 

@@ -172,6 +172,10 @@ library(igraph)/detach(package:igraph)
 
     leadership[ sample(1:nrow(leadership),3,replace=F),]
 
+![image-20191001215105013](https://tva1.sinaimg.cn/large/006y8mN6ly1g7j1gig10pj31400cg0v9.jpg)
+
+先定义列宽度，再一次填充！！！
+
 * 列表
 
 1. g <- "my first list"

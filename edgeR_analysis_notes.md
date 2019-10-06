@@ -634,3 +634,4 @@ camera函数检测一组高表达gene相对于其它差异表达genes，是否�
 `select(org.Hs.eg.db, key=rownames(Counts), column=("ENTREZID"), keytype="ENSEMBL")`
 
 返回对应名称关系，添加进入DGEList后方可进行后续分析，略！！！
+
