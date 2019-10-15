@@ -1,8 +1,8 @@
 ####Introduce
 
-RNA-seq的通过计数数据检测差异表达的基因，该数据呈现出每个样本的每个基因上所能比对到的测序片段数目。其重要的分析问题就是比较不同条件下的有规则变化的统计推导和量化。DESeq2通过负二项式广义线性回归模型来检测差异表达，以及评估离散度和对数倍数改变。
+RNA-seq的通过计数数据检测差异表达的基因，该数据呈现出每个样本的每个基因上所能比对到的测序片段数目。其重要的分析问题就是比较不同条件下的有规则变化的统计推导和量化。**DESeq2通过负二项式广义线性回归模型来检测差异表达，以及评估离散度和对数倍数改变。**
 
-DESeq2模型先评估size factors(estimateSizeFactors)，用于得到样本真实的片段浓度；然后评估diseprsions(estimateDispersions)，用于定义观察到的变异与平均值之间的关系；最后通过负二项式广义线性回归 (nbinomWaldTest)检测样本基因log2倍数改变。
+**DESeq2模型先评估size factors(estimateSizeFactors)，用于得到样本真实的片段浓度；然后评估diseprsions(estimateDispersions)，用于定义观察到的变异与平均值之间的关系；最后通过负二项式广义线性回归 (nbinomWaldTest)检测样本基因log2倍数改变。**
 
 The Wald test (also called the Wald Chi-Squared Test)：卡方检验就是统计样本的实际观测值与理论推断值之间的偏离程度，实际观测值与理论推断值之间的偏离程度就决定卡方值的大小，如果卡方值越大，二者偏差程度越大；反之，二者偏差越小；若两个值完全相等时，卡方值就为0，表明理论值完全符合。
 注意：卡方检验针对分类变量。
@@ -43,7 +43,7 @@ Rsubread包的featureCounts函数可利用比对文件快速出数据矩阵，�
 
 `colData <- colData[, c("condition", "type")]`
 
-这里要保证colData的行名称和countData的列名称要顺序内容一致。
+**这里要保证colData的行名称和countData的列名称要顺序内容一致。**
 
 `rownames(colData) <- sub("fb", "", rownames(colData))`
 
@@ -107,7 +107,7 @@ Rsubread包的featureCounts函数可利用比对文件快速出数据矩阵，�
 
 * Pre-filtering
 
-在运行DESeq2前提前过滤low count的genes并不是必要的，但是过滤low count的genes(没有read或几乎没有read)可以dds文件大小，加速DESeq2接下来的处理速度。
+在运行DESeq2前提前过滤low count的genes并不是必要的，但是过滤low count的genes(没有read或几乎没有read)可以控制dds文件大小，加速DESeq2接下来的处理速度。
 
 `dds <- dds[rowSums(counts(dds)) > 1, ]`
 
@@ -199,7 +199,7 @@ res[, idx]对应的是baseMean，log2FoldChange对应图上的点。
 
 x轴为标准化的counts均值，也就是经过片段校准后的平均counts，y轴对应为log2倍数改变。可以看到没有经过shrinkage的图像显示，counts数越小，dispersion会越大。
 
-目前推荐的流程使用lfcShrink函数生成shrunken MAP评估图。该参数值适用于contrast，指定三个用于比较的参数。
+目前推荐的流程使用lfcShrink函数生成shrunken MAP评估图。该参数值适用于contrast，指定三个用于比较的参数。**此过程不会改变最终差异结果，仅为绘图使用。**
 
 `res_shrunken <- lfcShrink(dds, contrast=c("condition", "treated", "untreated"))`
 
@@ -526,7 +526,7 @@ dispersions estimates是一个很有用的诊断图
 
 * Independent filtering of results
 
-略！
+采用genefilter包中的filtered_p函数过滤，且所有其参数都可在results中使用
 
 ***
 
@@ -673,3 +673,10 @@ without removal of independent filtering
 **minReplicatesForReplace: the minimum number of replicates required in order to use ‘replaceOutliers’ on a sample. If there are samples with so many replicates, the model will be refit after these replacing outliers, flagged by Cook's distance. Set to ‘Inf’ in order to never replace outliers.**
 
 这是只有当所有counts都为0是，p values才设为NA。
+
+
+
+
+
+
+
