@@ -290,9 +290,46 @@ Sys.sleep(2)防止频繁访问被网站拉黑，休眠2秒
 
 #### XML
 
+![image-20191016231954125](https://tva1.sinaimg.cn/large/006y8mN6ly1g80gbifcj7j31hc0u0qcv.jpg)
 
+缺点，在window下对中文界面支持不理想
 
+##### 下载表格
 
+![image-20191016232020699](https://tva1.sinaimg.cn/large/006y8mN6ly1g80gbyryoyj31hc0u07j8.jpg)
+
+在readHTMLTable(doc)加入参数header= F，可避免页眉解析错误导致的解析失败。中文界面解析失败，选择英文界面解析。
+
+或通过getBinaryURL()直接将整个页面下载下来，保存为"xxx.xls"，抓取中文界面。
+
+##### XPath
+
+通过网页中路径抓取信息
+
+![image-20191016232611540](https://tva1.sinaimg.cn/large/006y8mN6ly1g80gi22w9ij31hc0u014f.jpg)
+
+![image-20191017225618278](https://tva1.sinaimg.cn/large/006y8mN6ly1g81l99mnjbj30pc06w0ud.jpg)
+
+##### 试一试
+
+根据Xpath规则和网页信息，设置对应的选择条件，抓去对应信息
+
+url <- "https://www.w3school.com.cn/example/xdom/books.xml"
+
+doc <- xmlParse(url)
+
+#####添加谓语
+
+getNodeSet(doc,"/bookstore/book[1]")  ##获得根节点外的第一个节点信息
+getNodeSet(doc,"/bookstore/[position() < 3]")  ##获取前两本
+getNodeSet(doc,"/bookstore/book[last()]")  ##最后一本
+getNodeSet(doc, "//title[@lang]")  ##对应属性
+
+例如：
+
+![image-20191017230524986](https://tva1.sinaimg.cn/large/006y8mN6ly1g81liqk4ggj31hc0u0qf7.jpg)
+
+**打开网页源代码，查看目的信息的规则，设置对应的匹配信息；针对无法读到或读到乱码信息，可以重设header信息，再次尝试；多页面可以参考网页地址更替规律，使用循环函数来读取多页**
 
 
 
