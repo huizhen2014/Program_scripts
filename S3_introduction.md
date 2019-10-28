@@ -102,4 +102,61 @@ very artifical example
 
 ![image-20191027215836209](https://tva1.sinaimg.cn/large/006y8mN6gy1g8d3scdigsj31900bcmyn.jpg)
 
-31 min
+第一件事就是查看数据结构，查找错误原因，str()
+
+* Drawbacks
+
+当function面对不兼容的objects类别时，将会强制转变类别格式来采用funciton
+
+* Using Method Dispath for Flow Control
+
+![image-20191028192822396](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e52c0tu8j30re0e4401.jpg)
+
+Using method dispath:
+
+首先构建generic function：
+
+![image-20191028193224820](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e56i89pfj30qw05kq3s.jpg)
+
+调用之前的increment.a/increment.b：
+
+![image-20191028193324097](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e57k4ugqj30re03qaab.jpg)
+
+可以根据条件，构建多种class判断
+
+使用dispath方式速度慢
+
+![image-20191028193845823](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e5d439amj30rg05sjs8.jpg)
+
+* Two Views
+
+![image-20191028194206326](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e5gl2zx6j313m046dg5.jpg)
+
+* Example: Method Foucs
+
+![image-20191028194322686](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e5hww65xj313y08w0v4.jpg)
+
+![image-20191028194410951](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e5iqul45j314m0kkdjw.jpg)
+
+根据不同的objects的class采用不同的functions
+
+![image-20191028194628584](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e5l52eduj313y0bstb2.jpg)
+
+对functions构建不同objects的class的dispath，分别处理
+
+* Example: Object Focus
+
+![image-20191028195003710](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e5ovgtv1j314a0d2goe.jpg)
+
+![image-20191028195202896](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e5qxcgxqj314y02uglv.jpg)
+
+![image-20191028195140691](https://tva1.sinaimg.cn/large/006y8mN6gy1g8e5qjtr0hj31440eidih.jpg)
+
+根据对象的不同，调整function的输出。
+
+
+
+
+
+
+
