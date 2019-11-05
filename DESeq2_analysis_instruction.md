@@ -370,7 +370,7 @@ unbiased by the information about experimental groups, for example to perform sa
 
 `sampleDists <- dist(t(assay(rld)))`
 
-dist函数使用特使的方法计算返回data matrix的行之间距离: dist(x, method="euclidean", diag=F, upper=F, p=2)
+dist函数使用特殊的方法计算返回data matrix的行之间距离: dist(x, method="euclidean", diag=F, upper=F, p=2)
 
 也可以使用plot(hclust(dist(t(assay(rld)))))来获得基于距离的树状图。
 
