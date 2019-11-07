@@ -40,7 +40,25 @@ To be continued~
 
 ![image-20190930110921343](https://tva1.sinaimg.cn/large/006y8mN6gy1g7hdafv7fpj31200ekq5e.jpg)
 
+##### [搭配ggplot2使用][https://www.cnblogs.com/shaocf/p/9600340.html]
 
+首先计算所需颜色数目
+
+`colorCount <- length(unique(mtcars$hp))`
+
+将调色板Set1插入到以上数目颜色中，供后续使用，构建函数getPalette
+
+`getPalette <- colorRampPalette(brewer.pal(12,"Set3"))` #12取决于"Set3"
+
+绘制
+
+`ggplot(mtcars) + geom_bar(aes(factor(hp))+fill=getPalette(colourCount)) + `
+
+`scale_fill_muanul(values=getPalette(colourCount))+`
+
+`theme(legend.position="right")`
+
+![image-20191107123555955](https://tva1.sinaimg.cn/large/006y8mN6gy1g8pdc8fqzgj30jw08bwf8.jpg)
 
 
 
