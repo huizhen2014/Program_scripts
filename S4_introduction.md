@@ -68,7 +68,7 @@ generic functions and methods work similarly to S3, but dispath is based on the 
 
 **The `setGeneric` function is called to initialize a generic function as preparation for defining some methods for that function.**
 
-函数`setGeneric`提供两种方式创建新的generic：
+函数`setGeneric`提供两种方式创建**新的generic**：
 
 ![image-20191029123139561](https://tva1.sinaimg.cn/large/006y8mN6gy1g8eyn0uvtxj30v206i755.jpg)
 

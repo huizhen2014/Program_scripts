@@ -264,7 +264,7 @@ library(igraph)/detach(package:igraph)
 
 2. nbinom, norm, pois, unif 负二项式分布，正态分布，柏松分布，均匀分布
 
-3. plot(norm(100),dnorm(rnorm(100))) 绘制分布函数图
+3. plot(rnorm(100),dnorm(rnorm(100))) 绘制分布函数图
 
 4. set.seed(num) 设立随机种子，实现结果重复
 

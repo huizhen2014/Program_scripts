@@ -4,7 +4,7 @@ GO的一个主要用途就是针对一组gene进行富集分析。给定的一�
 
 给定注释信息，我们可以将gene分为属于此类和非此类两组，就可以得到一个2x2的列联表做独立性分析，针对列联表就可以采用卡方检测和fisher‘s exact test，卡方检验只是近似估计值，特别是当sample size活expected all count比较小时，计算不够准确。fisher‘s exact test，使用超几何分布计算p值，比较准确。
 
-例如共M个gene，其中N个属于该分类，那么抽取n个gene(来自同一个样本挑选出来用于富集分析的gene)，求其中有k个gene属于该分类的p值。
+**例如共N个gene，其中M个属于该分类，那么抽取n个gene(来自同一个样本挑选出来用于富集分析的gene)，求其中有k个gene属于该分类的p值。**
 
 ![image-20190604161233580](http://ww2.sinaimg.cn/large/006tNc79gy1g3p6xksu95j30es03cdfy.jpg)
 
