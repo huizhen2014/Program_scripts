@@ -92,7 +92,7 @@ should be sufficient for a mammalian genome.
 
 针对校正阶段:
 
-`corOutCoverage` 控制校正后reads覆盖度的产出. 默认为40X, 但是针对不同情况, 实际产出为30X至35X的reads产出.
+**`corOutCoverage` 控制校正后reads覆盖度的产出. 默认为40X, 但是针对不同情况, 实际产出为30X至35X的reads产出(根据测序数据量和基因组大小决定).**
 
 `corMinCoverage`, 宽松地控制校正reads的质量. 校正的reads作为其他reads的一致性reads而产出; 该值为一致性序列产出的最小覆盖度. 默认值根据输入read的覆盖度决定: 低于30X的输入为0X,高于30X的为4X.
 
@@ -162,7 +162,7 @@ Canu输出3个组装了的输出序列: <prefix>.conitgs.fasta, <prefix>.unitigs
 
 #### My genome is AT(or GC)rich, do I need to adjust parameters? What about highly repetitive genomes?
 
-针对细菌基因组, 无需采用任何参数(一般而言).
+**针对细菌基因组, 无需采用任何参数(一般而言).**
 
 针对具有显著AT/GC比率倾斜的重复性基因组, the Jaccard estimate used by MHAP is biased. 设置`corMaxEvidenceErate=0.15`足以校正偏差.
 
