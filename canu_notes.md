@@ -150,7 +150,7 @@ Canu输出3个组装了的输出序列: <prefix>.conitgs.fasta, <prefix>.unitigs
 
 #### Why do I get less corrected read data than I asked for?
 
-由于校正阶段, 一些嵌合reads由于不充分证据来生成校正后reads而被过滤掉. 一般而言, 会带来25%的reads丢失. 设置`corMinCoverage=0`将会产出所有reads, 即使时低质量的reads. Canu将会在组装阶段前的过滤阶段过滤掉这些reads.
+由于校正阶段, 一些嵌合reads由于不充分证据来生成校正后reads而被过滤掉. 一般而言, 会带来25%的reads丢失. 设置`corMinCoverage=0`将会产出所有reads, 即使低质量的reads. Canu将会在组装阶段前的过滤阶段过滤掉这些reads.
 
 #### What circular element is duplicated/has overlap?
 
@@ -262,7 +262,9 @@ canu运行中, 输出状态信息, 执行日志, 和一些分析. 大多以前�
 
 ***
 
+##### Miscellaneous
 
+![image-20191203081932754](https://tva1.sinaimg.cn/large/006tNbRwgy1g9j81i1qu9j317006wta4.jpg)
 
 
 

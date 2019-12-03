@@ -189,7 +189,7 @@ fsa_ol_filter [optioins] overlaps filtered_overlaps
 用于从过滤后的重叠和校正后reads构建contigs. 算法类似FALCON:
 
 ```bash
-fsa_assenble [optioins] filtered_overlaps
+fsa_assemble [optioins] filtered_overlaps
 ```
 
 * --min_length=INT, 最小reads长度(默认0)

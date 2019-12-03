@@ -202,7 +202,7 @@ RS_Modification_and_Motif_Analysis.1 分析流程生成二个报告和四个数�
 
 * Source 分析软件'kinModCall'
 
-* Type 修饰类型'modified_base'为为定义的碱基.
+* Type 修饰类型'modified_base'为未定义的碱基.
 
 * Start 修饰起点
 
