@@ -227,6 +227,50 @@ Reference classes(or RC for short) are the newest OO system in R, introduced  in
 
 ![image-20191117233605849](https://tva1.sinaimg.cn/large/006y8mN6ly1g91gm7vgyoj30zu02sdgm.jpg)
 
+`<<-`, 另一种修改name和value的binding的方式. 常规命名值, `<-`会在当前环境创建一个新变量. `<<-`不会在当前环境创建新变量, 而是向上在启父环境中修改已经存在的变量, 若`<<-`没有发现存在的变量, 将在global环境创建一个:
+
+![image-20191204230909950](https://tva1.sinaimg.cn/large/006tNbRwly1g9l3dfofoej30yu0ceaay.jpg)
+
+因此: name <<- value 等价于 assign("name",value,inherits=TRUE)
+
+Delayed bindings
+
+构建并存储一个promise用于评估表达始, 而不是立即赋给表达始一个结果, 使用pryr包中的`%<d-%`实现:
+
+![image-20191204231722216](https://tva1.sinaimg.cn/large/006tNbRwly1g9l3lz682sj30t407igmi.jpg)
+
+Active bindings
+
+每次访问该值名称是重新计算该值`%<a-%`:
+
+![image-20191204231952846](https://tva1.sinaimg.cn/large/006tNbRwly1g9l3okv7w3j30s204wjrp.jpg)
+
+#### Chapter 8 Debugging, condition handling and defensive programming
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

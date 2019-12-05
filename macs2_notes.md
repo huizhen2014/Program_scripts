@@ -61,17 +61,19 @@ macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 
 -g / --gsize 根据实际情况设置该参数, 用于指定比对基因组大小或有效基因组大小. 由于存在重复序列, 因此实际基因组大小会比原始大小要小, 约等其基因组大小的90%或70%. 可使用k-mer工具(jellyfish)来计算有效基因组长度, 些许差异不会带来很大影响...
 
--s / --tsize 测序标签(sequencing tags)的大小, 若未指定, MACS使用前10个序列来判断标签长度大小
+-s / --tsize 测序标签(sequencing tags)的大小, 若未指定, MACS使用前10个序列来判断标签长度大小(uniquely mapped read)
 
 -q / --qvalue 显著性区域的q-value(minimum FDR)阈值, 默认为0.05. Q-values是使用Benjamini-Hochberg处理p-values得来的
 
 -p / --pvalue p-value阈值, 未指定, 将使用p-value而不是q-value
 
+-m / --mfold MFOLD MFOLD 选择富集差异位于该范围内的区域用于构建model, 预测d值. 默认为5 50;可选-m 10 30 
+
 --min-length / --max-gap 用于指定peak的最小长度和合并两个临近区域之间允许的最大gap长度. 默认采用预测的片段长度为min-length, max-gap为reads长度. 针对BROAD peak calling, 尝试大的值例如500bp, 也可以使用‘--cutoff-analysis’加默认设置, 选择合理的min-length值
 
---nolambda 使用该参数时, MACS使用backgroud lambda作为local lambda. 这意味着MACS不会考虑peak candidate区域local bias
+--nolambda 使用该参数时, MACS使用backgroud lambda作为local lambda. 这意味着MACS不会考虑peak candidate区域local bias(泊松分布,期望和方差均为$\lambda$)
 
---slocal, --llocal These two parameters control which two levels of regions will be checked around the peak regions to calculate the maximum lambda as local lambda. By default, MACS will considers 1000bp for small local region(--slocal), and 10000bps for large local region(--llocal) which captures the bias from a long-range like an open chromatin domain. You can tweak these according to your project. Remember that if the region is set too small, a shrp spike in the input data may kill a significant peak. 
+--slocal, --llocal These two parameters control which two levels of regions will be checked around the peak regions to calculate the maximum lambda as local lambda. By default, MACS will considers 1000bp for small local region(--slocal), and 10000bps for large local region(--llocal) which captures the bias from a long-range like an open chromatin domain. **You can tweak these according to your project. Remember that if the region is set too small, a sharp spike in the input data may kill a significant peak. **
 
 --nomodel 使用该参数, MACS将绕开构建shifting model 环节
 
@@ -145,7 +147,7 @@ macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 
 ![peaks_d](https://tva1.sinaimg.cn/large/006tNbRwgy1g9ky13cirtj30c30903za.jpg)
 
-
+***
 
 
 
