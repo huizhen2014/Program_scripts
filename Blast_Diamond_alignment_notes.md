@@ -36,7 +36,7 @@ btop: 简述比对情况，数字表示匹配；GA表示G变成了A；-表示gap
 
 `blastn -evalue 1e-5 -max_target_seqs 1 -db databases/blaKPC-2 -query query.fasta -outfmt "6 qseqid qstart qend sseqid sstart send length pident mismatch gapopen bitscore evalue btop" > query_kp-2.blastn `
 
-3. tblastx，在蛋白数据库搜索DNA序列
+3. tblastx，在蛋白数据库搜索DNA序列(nucletode vs nucletide by peptides)
 
 首先同样构建nucl数据库，然后再构建一个prot数据库
 
@@ -44,9 +44,11 @@ btop: 简述比对情况，数字表示匹配；GA表示G变成了A；-表示gap
 
 最后比对，参数同blastn
 
--db_genecode，指定转录方法，微生物为11
+-query_genecode, 指定query转录方式，微生物为11
 
-`tblastx -evalue 1e-3 -db databases/blaKPC-2 -query_gencode 11 -db_gencode 11 -query query.fasta -max_target_seqs 5 -outfmt "6 qseqid qstart qend sseqid sstart send length pident mismatch gapopen bitscore evalue btop" > query_kpc-2.tblastx`
+-db_genecode，指定subject转录方法，微生物为11
+
+`tblastx -evalue 1e-3 -db databases/blaKPC-2 -query_gencode 11 -db_gencode 11 -query query.fasta -max_target_seqs 5 -outfmt "6 qseqid qlen qstart qend sseqid slen sstart send length pident mismatch gapopen bitscore evalue btop" > query_kpc-2.tblastx`
 
 #### Diamond
 

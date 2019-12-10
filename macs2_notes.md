@@ -149,9 +149,63 @@ macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 
 ***
 
+#### [Evaluating ChIP-seq data][ChIP-seq guidelines and practices of the ENCODE and modENCODE consortia ]
+
+##### Browser inspection and previously known sites
+
+使用IGV查看, 尽管无法定量, 但是对于一个已知的结合位点, 相对于对照的read分布可用来检查. 真实的信号将显示一个非对称的reads比对分布. 可利用该方法检查有限个最强的信号位点.
+
+##### Library complexity
+
+NRF: 数据集中nonredundant mapped reads的比例
+
+![image-20191209155055528](https://tva1.sinaimg.cn/large/006tNbRwgy1g9qit0e7cxj30uh09imzp.jpg)
+
+##### Measuring global ChIP enrichment(FRiP)
+
+一般而言, 只有少部分reads比对到了显著性富集区域. 因此, 比对到峰区域的reads比例为一简单的指控指标, 称为: fraction of reads in peaks, FRiP. **一般而言, FRiP值和所检出区域正比且线性相关,  使用MACS默认参数检验哺乳动物时, FRiP富集比例在1%以上.** 但是, 高于该阈值并不意味着实验成功, 低于该阈值也不意味着实验失败.
+
+![image-20191209151406638](https://tva1.sinaimg.cn/large/006tNbRwgy1g9qhqpf8klj30el0d443k.jpg)
+
+##### Cross-correlation analysis
+
+ChIP-seq一个有用的质控指标是检出峰独立性且是链交叉相关的(strand cross-correlation). 也就是说, 显著性富集位点富集的DNA序列tags标签(富集区域的reads)是以结合位点为中心, 同时分布比对到正负链的. 因此, 该质控标准基于基因组范围上tags的密度来量化其片段的聚集(IP clustering). 其计算为Crick链和Watson链的Person线性相关性.
+
+![image-20191209100409383](https://tva1.sinaimg.cn/large/006tNbRwgy1g9q8s8ap1yj30ey08fmy8.jpg)
+
+It is computated as the Person linear correlation between the Crick and the Waston strand, after shifting Waston by $k$ base pairs. **This typically produces two peaks when cross-correlation is plotted against the shift value: a peak of enrichment corresponding to the predominant fragment length and a peak corresponding to the read length("phantom" peak).**
+
+**Reads are shifted in the direction of the strand they map to by an increasing number of base pairs and the Person correlaiton between the per-position read count vectors for each strand is calculated.** 也就是每个链每个位置的read count的向量之间的相关性系数:
+
+链移动为0时: Person=0.539
+
+![NSC_1](https://tva1.sinaimg.cn/large/006tNbRwgy1g9qdyma2kvj30u00fedgf.jpg)
+
+链位移5bp时: Person=0.931
+
+![NSC_2](https://tva1.sinaimg.cn/large/006tNbRwgy1g9qdzciovvj30u00f7gm7.jpg)
+
+fragment-length cross-correlation peak 和 background cross-correlation(normalized strand coefficient, NSC)标准化后的比例, fragment-length peak and the read-length peak(relative strand correlation, RSC)标准化后比例, 是ChIP-Seq有力的信噪比指标. 高质量的测序数据集倾向于较大的fragment-length peak 比 read-length peak. 
+
+![image-20191209101744860](https://tva1.sinaimg.cn/large/006tNbRwgy1g9q96c90ecj30oh09ljvg.jpg)
+
+**ENCODE: NSC > 1.05 and RSC > 0.8 for point source TFs.**
+
+##### Consistency of replicates: Analysis using IDR
+
+DR, irreproducible discovery rate
+
+给定一对重复数据集, 它们检出的峰可以根据显著性(p-value, q-value), ChIP-to-input enrichment, 或者每个峰的reads覆盖度排序(be ranked). 假如两个重复样本位于相同的生物条件下, 最显著性的峰(likely to be genuine signals) 应该具有最高的一致性, 而低显著性的峰(likely to be noise), 应表现出低的一致性. 
+
+![image-20191209114209730](https://tva1.sinaimg.cn/large/006tNbRwgy1g9qbm6e9j3j30mq07dn23.jpg)
+
+This consistency transition provides an internal indicator of the change from signal to noise and suggests how many peaks have been reliably detected.
+
+**Increased consistency comes from the fact that IDR uses information from replicates, whereas the FDR is computed on each replicate independently.**
 
 
 
+  
 
 
 

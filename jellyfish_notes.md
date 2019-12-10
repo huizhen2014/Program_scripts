@@ -163,6 +163,14 @@ lines(dataframe19[1:100,],type= "l")
 
 ![Rplot](https://tva1.sinaimg.cn/large/006tNbRwgy1g9m4ozvzrfj30dt0do0su.jpg)
 
+对应泊松分布:
+
+![image-20191206161939523](https://tva1.sinaimg.cn/large/006tNbRwgy1g9n2ryr732j30ey01dt8t.jpg)
+
+![Jellyfish_k_mers_vs_possion_distribution](https://tva1.sinaimg.cn/large/006tNbRwgy1g9n2tfp8nmj30dt0dojrx.jpg)
+
+
+
 
 
 

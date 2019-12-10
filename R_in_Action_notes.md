@@ -39,6 +39,7 @@
 * Sys.getenv("HOME")，获得用户home目录
 * Sys.getenv("R_HOME")，获得R的home目录：
 * install.packages("./GO.db_3.3.0.tar.gz",type="source",repos = NULL)安装本地下载包
+* View() 以可修改表格形式查看对象, invoke a Data Viewer
 
 ####特殊字符
 
@@ -602,5 +603,7 @@ extract the characters on either side of the vowel
 
 ***
 
+![image-20191206172611944](https://tva1.sinaimg.cn/large/006tNbRwgy1g9n4p7hrntj30j30bwjsp.jpg)
 
+![image-20191206172631892](https://tva1.sinaimg.cn/large/006tNbRwgy1g9n4pjzs0mj30iz08a758.jpg)
 
