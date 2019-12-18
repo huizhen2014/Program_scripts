@@ -203,9 +203,87 @@ This consistency transition provides an internal indicator of the change from si
 
 **Increased consistency comes from the fact that IDR uses information from replicates, whereas the FDR is computed on each replicate independently.**
 
+***
+
+#### [phantompeakqualtools][https://github.com/kundajelab/phantompeakqualtools]
+
+该package用于计算来自ChIP-seq/DNase-seq/FAIRE-seq/MNase-seq数据的富集信息和质量值. 同时也可用于获得稳定的predominant fragment长度评估或者特征性tag shift值(or characteristic tag shift values).
+
+该套程序用于处理tagAlign或BAM格式的illumina单端测序read数据，可用于:
+
+1. 基于strand cross-correlation peak, 计算片段长度(prdominant insert-size length)
+2. 基于相对phantom峰计算数据质量
+3. Call Peaks and regions for punctate binding datasets
+
+##### Run run_spp.R
+
+`Rscript run_spp.R <options>`
+
+#####参数
+
+必须参数:
+
+`-c=<ChIP_alignFile>` tagAlign/BAM 文件的全路径和名称(文件名后缀必须为tagAlign.gz, tagAlign, bam, bam.gz)
+
+用于peak calling的必须参数:
+
+`-i=<Input_alignFile>` 同上
+
+可选参数:
+
+`-s=<min>:<step>:<max>` 用于评估cross-correlation的链shift值, 默认为: -500:5:1500
+
+`-speak=<strPeak>` 用户定义的cross-correlation peak strandshift
+
+`-x=<min>:<max>` 排除的strand shifts(主要为了避免phantom peak的区域), 默认为: 10(readlen+10)
+
+`-p=<nodes>` 并行处理节点数目, 默认为:0
+
+`-fdr=<falseDiscoveryRate>` 用于peak calling的错误检出率
+
+`-npeak=<numPeaks>` 检出peaks数目阈值
+
+`-tmpdir=<tmpdir>` 临时文件夹
+
+`-filtchr=<chrnamePattern>`  用于去除比对到特异染色体的tags的patterns  e.g._will remove all tags that map to chromosomes with _ in their name
+
+输出选项:
+
+`-odir=<outputDirectory>` 输出文件夹目录
+
+`-savn=<narrowpeakfilename>` NarrowPeak 文件名称(固定峰宽)
+
+`-savn` 
+
+`-savr=<regionpeakfilename>` RegionPeak 文件名(围绕峰尖的富集区域的不同宽度的峰)
+
+`-savr`
+
+`-savd=<rdatafile>` 保存Rdata文件
+
+`-savd`
+
+`-savp=<plotdatafile>` 保存cross-correlaton图
+
+`-savp`
+
+`-out<resultfile>` 将peakshift/phantomPeak结果附加到该文件
+
+`-rf` 如果plot/rdata/narrowPeak文件存在, 覆盖之; 否则会报错终止
+
+`-clean` 在读取原始chip和指控文件后删除. CAUTION: Use only if the script calling `run_spp.R` is creating temporary files
+
+##### 用法
+
+1. 评估strand cross-correlation peak/显著片段长度或质量值. `-out=<outFile>`将会输出, 同时包含多个重要特征值的数据集将附加其中
+
+```shell
+Rscript run_spp.R -c=<tagAlign/BAMfile> -savp -out=<outFile>
+```
+
+  ![image-20191218210501174](https://tva1.sinaimg.cn/large/006tNbRwgy1ga16gm0p5yj31a70u0q9m.jpg)
 
 
-  
 
 
 

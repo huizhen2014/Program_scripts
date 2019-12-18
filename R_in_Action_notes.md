@@ -61,7 +61,11 @@ is.na()/is.finite()/is.nan()
 
 (v1>2)&&(v2>3)  '&&' boolean AND,ditto
 
+![image-20191218191549115](https://tva1.sinaimg.cn/large/006tNbRwgy1ga13ayr4ptj314008odh9.jpg)
+
 library(igraph)/detach(package:igraph)
+
+
 
 #### 创建数据集
 
@@ -606,4 +610,234 @@ extract the characters on either side of the vowel
 ![image-20191206172611944](https://tva1.sinaimg.cn/large/006tNbRwgy1g9n4p7hrntj30j30bwjsp.jpg)
 
 ![image-20191206172631892](https://tva1.sinaimg.cn/large/006tNbRwgy1g9n4pjzs0mj30iz08a758.jpg)
+
+***
+
+#### Efficient R Programming
+
+* Startup Files
+
+`.Renviron`为环境变量。所包含的设置和操作系统相关，包含查询额外的程序的路径，和用户指定的变量
+
+`.Rprofile`为文本文件，是R每次启动时运行的R codes。
+
+当R启动时，首先搜索`.Renviron`，然后搜索`.Rprofile`文件。可通过`R --no-environ`取消执行`.Renviron`文件
+
+starup files存在与3个重要路径: `R_HOME`（R.home())，R安装路径；`HOME`为用户home路径；R当前的工作路径(getwd())。
+
+![image-20191217122214838](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zlqc0bubj30h405n0th.jpg)
+
+可在project的根目录创建该project特异性的`.Rprofile`文件：
+
+![image-20191217122540977](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zltwx6ewj31ga03m3zx.jpg)
+
+该例子在用户home路径创建了`.Rprofile`文件，`.Renviron`同之。
+
+* .Rprofile file
+
+![image-20191217130022844](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zmu0mpc5j30q504s0tx.jpg)
+
+.Rprofile和.Renviron中的内容仅且在每个R session中运行一次，因此其中选项可以在随后的操作中修改；例如修改换行带来的+号：`options(continue=" ")`
+
+通过查看例子和文档了解设置: `help("Startup")`, `?options`
+
+**miscellaneous**，fortunes包提供名言警句，因此可在每次开始一个session时打印一次：
+
+![image-20191217132144871](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zng8syjwj30g705sjs7.jpg)
+
+其中`interactive`用于检测R是否在一个交互式终端使用，使用`try`调用`fortune`函数。若`fortunes` 不可用，则避免报告错误，继续接下来操作。通过使用`::`可避免将`fortunes`包添加到attached包列表。
+
+最后，使用`require`装载包，若未安装，则`require`函数返回`FALSE`和警告信息。
+
+在`.Rprofile`中添加‘helper'函数或重新定义现存函数以便快速访问
+
+![image-20191217135013556](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zo9vlqajj30g306rjsg.jpg)
+
+在`.Rprofile`中创建隐藏环境，当使用`ls()`时，`.Rprofile`中的functions会显示，使得当前工作环境杂乱(clutter-up)；同时当`rm(list=ls())`时，`.Rprofile`中functions也将会被删除。使用隐藏的对象和环境来解决该问题
+
+![image-20191217143410179](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zpjlqmj8j30wc07m75w.jpg)
+
+* .Renviron file
+
+用于保存系统变量。和`.Rprofile`一样，先查看全局`.Renviron`文件，然后查看本地版本。
+
+使用`.Renviron`用于指定`R_LIBS`路径，决定了新的packages将会安装在哪里
+
+![image-20191217144138327](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zprd2sonj30vy05ymy8.jpg)
+
+使用函数`Sys.getenv()`查看所有当前环境变量设置
+
+使用`Sys.setenv()`设置或取消当前环境变量
+
+![image-20191217144358793](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zptt5ul4j313s02e0tg.jpg)
+
+**miscellaneous**，`TMPDIR=/data/R_tmp`，当R运行时，构建临时拷贝文件
+
+`R_COMPILE_PKGS=3`	 byte compile all packages
+
+`R_LIBS_SITE=/usr/lib/R/site-library:/usr/lib/R/library`，查询packages的路径
+
+`R_DEFAULT_PACKAGES=utils,grDevices,graphics,stats,methods`需要载入的默认包
+
+* Efficient programming
+
+Speeding up code using the **compiler** packages and multiple **CPUs**
+
+**R编程的金标准是使可能快的方式来访问潜在的C/Fortran规则，越少的函数操作越好。**
+
+比较三种构建向量方式
+
+`method1 = function(n){vec = NULL;for(i in 1:n)vec=c(vec,i);vectorized}`
+
+`method2 = function(n){vec=numeric(n);for(i in 1:n)vec[i]=i;vec}`
+
+`method3 = function(n)1:n`
+
+![image-20191217162631717](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zssi1m97j30n605xgm3.jpg)
+
+**Remember the golden rule: access the underlying C/Fortran code as quickly as possible**
+
+输入输出格式一致性：**Type consistency: when programming it is helpful if the return value from a function always takes the same form**
+
+并非所有的R函数都遵循输入输出格式一致性，`sapply`和`[.data.frame]`不能实现一致性，函数`lapply`和`vapply`可以实现一致性。
+
+当我们创建函数时，常希望函数针对当前情况给出反馈信息，例如，是否存在缺失的参数，或者数字计算失败等。
+
+致命错误：**stop**
+
+当调用函数`stop`时，执行终止，此时函数无法继续执行。
+
+`try(expr, silent=FALSE, outFile=getOption("try.outFile",default=stderr()))`
+
+用于回收错误信息
+
+![image-20191217165935303](https://tva1.sinaimg.cn/large/006tNbRwgy1g9ztqwtnraj30yk09yzlu.jpg)
+
+因此可以根据返回值设置下一步操作
+
+`if(class(bad) == "try-error") Do something`
+
+警告错误：**warning**
+
+使用`warning`函数即可生成警告信息。当警告产生时，表明出现潜在的问题。例如，`mean(NULL)`返回`NA`同时还有警告信息
+
+![image-20191217170421913](https://tva1.sinaimg.cn/large/006tNbRwgy1g9ztvvd8k7j30yi04ct98.jpg)
+
+使用`suppressWarnings(mean(NULL))`隐藏警告信息
+
+![image-20191217170534949](https://tva1.sinaimg.cn/large/006tNbRwgy1g9ztx4u7gej30ys04m74s.jpg)
+
+信息类输出：**message** 和 **cat**
+
+包中存在输出有用信息的`message`函数，类似警告信息，可使用`suppressMessages`抑制该信息输出；另一个就是`cat`函数，同`print/show`方式
+
+不可见返回值：`invisible`函数允许用户返回一个不可见的对象拷贝值。This is particularly useful for functions that return values which can be assigned ,but are not printed when they are not assigned.
+
+![image-20191217173559799](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zussi446j30yk0jwjtx.jpg)
+
+当调用该函数时，图形中拟合线不可见，但是当将函数assign給一个值时，该值当输出将包含`lm`拟合曲线公示值
+
+因子：**Factors**
+
+因子可用于存储分类变量。分类变量常保存为数字，且数字对应有其解释。
+
+例如：**Months of the year**
+
+![image-20191217194715651](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zyld2zwvj30y605e75a.jpg)
+
+例如：**Graphics**
+
+同months，避免默认根据字母顺序排序
+
+![image-20191217194934097](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zynror49j314802wjrw.jpg)
+
+例如：**data input**
+
+使用`read.csv()`读取文件时，列的字符自动转换为factors，可通过使用`stringsAsFactors=FAlSE`避免
+
+闭包：**Function closures**
+
+![image-20191217203345992](https://tva1.sinaimg.cn/large/006tNbRwgy1g9zzxqz9i3j30yk0bq3zg.jpg)
+
+`simple_counter`函数返回一个函数
+
+`sc`的闭包环境不是`.GlobalEnv`，而是`sc`的绑定环境
+
+`sc`拥有一个可以存储/缓存值的环境
+
+`<<-`操作符用于改变`sc`环境中的对象`no`的值
+
+* Efficient workflow
+
+Importing data: 通过下载或使用`read.csv`直接打开
+
+![image-20191218185323794](https://tva1.sinaimg.cn/large/006tNbRwgy1ga12no7qiwj30ix03fq3j.jpg)
+
+Fast data reading: 基本的R' 文本读取函数`read.delim`；使用函数`fread`的`data.table`途径；提供`read_csv`等`read_*`函数的`readr`包
+
+针对小于1MB的文件，`read.delim`快与`read_csv`和`fread`，而对于大于`100MB`的文件，`fread`和`read_csv`远快与`read.delim`
+
+Data processing with dplyr: `dplyr`； `%>%`
+
+![image-20191218190331736](https://tva1.sinaimg.cn/large/006tNbRwgy1ga12y6xmnlj313o0g6n0c.jpg)
+
+Data processing with data.table：`data.table`
+
+* Efficient visualisation
+
+![image-20191218190658224](https://tva1.sinaimg.cn/large/006tNbRwgy1ga131r2rg5j30ws07vq3r.jpg)
+
+* Efficient performance
+
+`ifelse(test, yes, no)`
+
+`sort() / order()`
+
+`sort(t, decreasing=TRUE) == rev(sort(x))`
+
+`which(x == min(x)) == which.max/which.min`
+
+**`as.numeric(levels(f))[f] == as.numeric(as.character(f))`** 去因子水平
+
+`is.na() / anyNA()` 查询是否含有缺失值
+
+Parallel computing: `parallel` 包
+
+`library("parallel")`
+
+`no_of_cores = detectCores()`
+
+`lapply, sapply, apply`
+
+![image-20191218192110706](https://tva1.sinaimg.cn/large/006tNbRwgy1ga13gj40d1j3138038t9j.jpg)
+
+* Efficient Learning
+
+`?plot`
+
+`example(plot)`
+
+`??regression`
+
+`help.search("regression")`
+
+**reading R source code**
+
+默认的下载地址都在国外，所以一般来说下载速度十分慢。但其实在国内都有相关的镜像，可以用来下载相关包
+
+Rstudio直接在Tools-->Global Options-->Packages-->CRAN mirror 选项中选择一个距离你最近的国内镜像就行，如China (Shanghai) [https] - Tongji University。这样以后下载包就都从这个站点下载了
+
+***
+
+
+
+
+
+
+
+
+
+
+
+
 
