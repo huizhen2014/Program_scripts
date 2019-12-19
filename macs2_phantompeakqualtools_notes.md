@@ -169,7 +169,7 @@ NRF: 数据集中nonredundant mapped reads的比例
 
 ##### Cross-correlation analysis
 
-ChIP-seq一个有用的质控指标是检出峰独立性且是链交叉相关的(strand cross-correlation). 也就是说, 显著性富集位点富集的DNA序列tags标签(富集区域的reads)是以结合位点为中心, 同时分布比对到正负链的. 因此, 该质控标准基于基因组范围上tags的密度来量化其片段的聚集(IP clustering). 其计算为Crick链和Watson链的Person线性相关性.
+ChIP-seq一个有用的质控指标是检出峰具有独立性且是链交叉相关的(strand cross-correlation). 也就是说, 显著性富集位点富集的DNA序列tags标签(富集区域的reads)是以结合位点为中心, 同时分别比对到正负链的. 因此, 该质控标准基于基因组范围上tags的密度来量化其片段的聚集(IP clustering). 其计算为Crick链和Watson链的Person线性相关性.
 
 ![image-20191209100409383](https://tva1.sinaimg.cn/large/006tNbRwgy1g9q8s8ap1yj30ey08fmy8.jpg)
 
@@ -283,15 +283,55 @@ Rscript run_spp.R -c=<tagAlign/BAMfile> -savp -out=<outFile>
 
   ![image-20191218210501174](https://tva1.sinaimg.cn/large/006tNbRwgy1ga16gm0p5yj31a70u0q9m.jpg)
 
+输出处于最大cross-correlation值90%内的三个最大local maximal locations. 在几乎所有的情况, 列表中的top(第一个)值代表显著性片段长度. If you want to keep only the top value simply run:
 
+```shell
+sed -r 's/,[^\t]+//g' <outFile> > <newOutFile>
+```
 
+NSC值范围为最小的1到一个更大的数值. 1.1为一个重要阈值. NSC值远小于1.1(<1.05)的数据倾向于拥有偏低的信号/噪音值, 或更少的峰数目(this could be biological eg. a factor that truly binds only a few sites in a particular tissue type OR it could be due to poor quality)
 
+RSC值范围从0到较大的正数值. 1为重要的阈值. RSC值显著低于1(<0.8)倾向于拥有低的信号/噪音值. 偏低值可能是由于ChIP失败或差的质量值, 低的read序列质量以因此带来很多错配, 较低的测序深度(significantly below saturation). 像NSC一样, 更少的结合位点的生物上可证实的数据也会带来更低的RSC值.
 
+Qtag为RSC的阈值版本.
 
+2. Peak calling
 
+```shell
+Rscript run_spp.R -c=<ChIP_tagalign/BAM_file> -i=<control_tagalign/BAM_file> -fdr=<fdr> -odir=<peak_call_output_dir> -savr -savp -savd -rf
+Rscript run_spp.R -c=<ChIP_tagalign/BAM_file> -i=<control_tagalign/BAM_file> -npeak=<npeaks> -odir=<peak_call_output_dir> -savr -savp -savd -rf
+```
 
+3. For IDR analysis you want to call a large number of peaks(relaxed threshold) so that the IDR model has access to a sufficient noise component.
 
+```shell
+Rscript run_spp.R -c=<ChIP_tagalign/BAM_file> -i=<control_tagalign/BAM_file> -npeak=300000 -odir=<peak_call_output_dir> -savr -savp -rf -out=<resultFile>
+```
 
+Notes:
+
+* 无比过滤掉多重比对reads, 大量数目该reads将会严重影响phantom峰的系数和峰检出结果
+* For the IDR(Irreproducible Discovery Rate) rescue strategy, one needs to pool reads from replicates and then shuffle and subsample the mapped reads to create two balanced pseudoReplicates. This is much easier to implement on tagAlign/BED read-mapping files using the unix 'shuf' command. So it is recommended to use the tagAlign format.
+* 大多数情况, 可简单使用最大报告的strand correlation peak作为显著片段长度. 然而, 建议手动查看cross-correlation plot确保所选的最大峰不是错误的.
+* 如果文库片段的选择存在问题, 那么数据的cross-correlation轮廓会有多个强cross-correlation峰.
+
+##### 输入文件
+
+TagAlign files: 为文本格式的BED3+3比对格式, 包含6个tab分隔的列:
+
+![image-20191219184527569](https://tva1.sinaimg.cn/large/006tNbRwgy1ga281r3tbcj31040f8tbn.jpg)
+
+针对IDR rescue 分析, 需要使用shuffled比对文件并且subsample. 因此在使用TagAlign格式时会简单, 使用unix的shuf命令. 因此, 推荐使用TagAlign格式.
+
+ ##### 转换BAM为TAGALIGN文件
+
+去除未必对, 低质量和多重比对reads后:
+
+```shell
+samtools view -F 0x0204 -o - <bamFile> | awk 'BEGIN{OFS="\t"}{if (and($2,16) > 0) {print $3,($4-1),($4-1+length($10)),"N","1000","-"} else {print $3,($4-1),($4-1+length($10)),"N","1000","+"} }' | gzip -c > <gzip_TagAlignFileName>
+```
+
+***
 
 
 
