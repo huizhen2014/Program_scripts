@@ -284,17 +284,19 @@ library(igraph)/detach(package:igraph)
 
 3. grep(pattern, x, ignore.case=FALSE,value = FALSE,fixed=FALSE) 在x中搜素某种模式。fixed=F, pattern为正则。返回匹配下标, invert=T, 表示反向查询。
 
-4. sub(pattern, replacement, x, ignore.case=F, fixed=F) 在x中搜索pattern, 并以文本replacement将其替换。fixed=T, pattern为文本字符:
+4. regexpr(pattern, text, ignore.case=FALSE, perl=FALSE,fixed=FALSE)在文本中搜索，返回第一个匹配的位置，未匹配返回-1
+
+5. sub(pattern, replacement, x, ignore.case=F, fixed=F) 在x中搜索pattern, 并以文本replacement将其替换。fixed=T, pattern为文本字符:
 
    `sub("(.*treated).*","\\1",sampleFiles)`
 
-5. strsplit(x, split,fixed=F) 在split处分割字符向量x中的元素。若fixed=F, 则pattern为正则。返回一个list。unlist(y)[2], sapply(y, "[",2)
+6. strsplit(x, split,fixed=F) 在split处分割字符向量x中的元素。若fixed=F, 则pattern为正则。返回一个list。unlist(y)[2], sapply(y, "[",2)
 
-6. paste(…,sep="") paste("x",1:3,sep=""); paste("x",1:3,sep="m")
+7. paste(…,sep="") paste("x",1:3,sep=""); paste("x",1:3,sep="m")
 
-7. paste(list[[1]],collapse=",") 变为长度为1的标量
+8. paste(list[[1]],collapse=",") 变为长度为1的标量
 
-8. seq(from,to,by) seq(1,10,2)
+9. seq(from,to,by) seq(1,10,2)
 
    seq.int(from,to,by)
 
@@ -302,7 +304,7 @@ library(igraph)/detach(package:igraph)
 
    seq_len(leng.out)
 
-9. rep(x,n) rep(1:3,2) c(1,2,3,1,2,3,)
+10. rep(x,n) rep(1:3,2) c(1,2,3,1,2,3,)
 
    rep(1:4,each=2) == rep(1:4,c(2,2,2,2))
 
@@ -310,13 +312,13 @@ library(igraph)/detach(package:igraph)
 
    rep_len(1:3,8) 1,2,3,1,2,3,1,2
 
-10. tcut(x,n) 将连续变量x分割为有着n个水平的因子, ordered_result=T创建一个有序因子
+11. tcut(x,n) 将连续变量x分割为有着n个水平的因子, ordered_result=T创建一个有序因子
 
-11. pretty(x,n) 创建美观分割点，通过选取n+1个等间距的取整值，将一个连续变量x分割为n个区间
+12. pretty(x,n) 创建美观分割点，通过选取n+1个等间距的取整值，将一个连续变量x分割为n个区间
 
-12. cat(…,file="my file",append=F) 链接…中对象，并将其输出到屏幕上或文件中(如果声明了一个的话) cat("Hello","Jane","\n")
+13. cat(…,file="my file",append=F) 链接…中对象，并将其输出到屏幕上或文件中(如果声明了一个的话) cat("Hello","Jane","\n")
 
-13. apply(矩阵或数据框，MARGIN,FUN,…）
+14. apply(矩阵或数据框，MARGIN,FUN,…）
 
     apply(mydata,1,mean，trim=0.2)
 
