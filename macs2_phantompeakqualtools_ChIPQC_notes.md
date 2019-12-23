@@ -337,4 +337,103 @@ samtools view -F 0x0204 -o - <bamFile> | awk 'BEGIN{OFS="\t"}{if (and($2,16) > 0
 
 ***
 
+####[ChIPQC][http://www.bioconductor.org/packages/release/bioc/html/ChIPQC.html]
+
+简单生成ChIP-seq实验或者样本的QC报告:
+
+`samples` 包含样本sheet
+
+![image-20191219192648852](https://tva1.sinaimg.cn/large/006tNbRwgy1ga6xhmphwyj30t202yaa2.jpg)
+
+默认条件下, HTML报告以及相关图片将会输出至子目录, `ChIPQCreport`, [例如][http://chipqc.starkhome.com/Reports/tamoxifen/ChIPQC.html]
+
+或者单个bam文件
+
+![image-20191219193007340](https://tva1.sinaimg.cn/large/006tNbRwgy1ga6xhpmdllj317p04cmxe.jpg)
+
+1. Experiment sample sheet
+
+第一步时构建样本sheet, 描述ChIP-seq实验. 可以是一个数据框或保存为一个csv文件. 同样该实验可以使用DiffBind包构建为DBA对象
+
+![image-20191219193447425](https://tva1.sinaimg.cn/large/006tNbRwgy1ga6xhs55hij31cs07wgnt.jpg)
+
+该样本sheet详述了实验数据, 同时也包含文件路径, 比对reads和called peaks. 另外, 若为csv格式文件, 可直接传递給`ChIPQC`
+
+2. Constructing a `ChIPQCexperiment` object
+
+`ChIPQC`接受一个样本sheet和一些可选参数, 针对每个样本计算质量值. It does this using the BiocParallel package, which by default will run in parallel, using all available cores on your machine.
+
+`annotation` 指明分析的基因组
+
+`chromosomes`指明需分析计算的染色体
+
+`mapQCth` 表明过滤比对质量的阈值, 默认为15
+
+`blacklist` 为一个文件或`GRanges`对象, 表示将这些区域的reads过滤掉
+
+`exampleExp <- ChIPQC(samples, annotation="hg19")`
+
+3. Quality metrics summary
+
+![image-20191219195839121](https://tva1.sinaimg.cn/large/006tNbRwgy1ga6xht8w0pj30zc0fc416.jpg)
+
+第一行描述样本数量, 以下信息可通过函数`QCmetrics(exampleExp)`获得
+
+![image-20191219200627117](https://tva1.sinaimg.cn/large/006tNbRwgy1ga6xhnwg8oj30ya07q75z.jpg)
+
+`Dup%`: 至少包含一个其他read比对到基因组确切位置的read比率(The percentage of reads that map to the exact position in the genome as at least one other read is the reported). 上图, 可见重复率具有很大的变异, **好的ChIPs质量数据,期待狭窄地结合的转录因子拥有很高的富集度的区域, 该区域将包含来自相同位置的片段. 当因子具有很高的结合性时, 就会产生具有生物学意义的'duplicate'片段.**
+
+**期待看到指控样本表现出更低的duplicate率(5%), ChIP样本拥有较高的比率(15-20%), 但是不会过高(>50%). 过高的duplicate率可能由于不均一的PCR扩增.**
+
+read长度, 源于bam文件数据, 随后为评估的平均片段长度. 片段长度是通过chipseq包, 系统性相互朝向地shift每条链上的reads直到实现最小的基因组覆盖度(estimated by methods in implemented in the chipseq package by systematically shifting the reads on each strand towards each other until minimum genome coverage is achived). 
+
+`RelCC`为`RelativeCC`, 通过比较maximum cross coverage peak(at the shift size corresponding to the fragment length)和 the cross coverage at a shift size corresponding to the read length, 较高的值代表好的实验(一般大于等于1)
+
+**The fragment length is estimated from the data by systematically shifting the reads on each strand towards each other until the highest degree of cross-vocerage is obtained**
+
+**RelativeCC一般较高的值(一般为2或更大)表明好的富集结果**
+
+`SSD` 为htSeq Tools采用的另一个富集证据. It is computed by looking at the standard deviation of signal pile-up along the genome normalised to the total number of reads. 富集的样本典型性拥有显著性pile-up区域, 因此更高的SSD值越能代表好的富集结果.
+
+**SSD值接近1一般对应较差的富集样本, 然而成功的ChIPs值一般为1.5, 较高的富集样本的SSD值可以为2或更高**
+
+`RiP%` 代表了跨越called peak的reads的百分率(也称为FRIP). 可认为是'signal-to-noise' 比值, 表示来自结合位置的片段reads比上背景reads. `RiP%`值针对ChIPs一般在5%或更高表示富集成功.
+
+**RiP%针对ChIPs为15%或更高方反应成功的富集**
+
+`RiBL%` 为reads落在blacklist区域的reads比率. 来自blacklisted的信号能够混淆peak callers和片段长度评估...
+
+![image-20191219204038509](https://tva1.sinaimg.cn/large/006tNbRwgy1ga6xhonmtuj30oh079t9r.jpg)
+
+4. Generating a summary QC report for experimental sample groups
+
+`ChIPQCreport(exampleExp)`
+
+[Report][http://ChIPQC.starkhome.com/ Reports/exampleExp/ChIPQC.html.]
+
+***
+
+[Detail][https://rdrr.io/bioc/ChIPQC/man/ChIPQC.html]
+
+ChIPQC(experiment, annotation, chromosomes, samples, consensus=FALSE, bCount=FALSE, mapQCth=15, blacklist=NULL, profileWin=400, fragmentLength=125, shifts=1:300,...)
+
+![image-20191223193334248](https://tva1.sinaimg.cn/large/006tNbRwgy1ga6xhrdskxj30z10pwq7y.jpg)
+
+* annotation 基因组及版本，或之前定义的(by QCannotation)
+
+![image-20191223193528467](https://tva1.sinaimg.cn/large/006tNbRwgy1ga6xhu19vej30vx0dg0u8.jpg)
+
+或构建自己的注释信息
+
+* chromosomes 需计算QC的染色体, 若未指明, 则仅计算第一条染色体，如果为NULL, 则计算所有. ("chr18")
+* samples list或ChIPsampe对象
+* consensus 若consensus为GRanges对象, 那么在构建peak-based metrics, 所有样本均使用该peakset. 如果consensus=TRUE, 那么一个consensus peakset将会生成且用于所有样本, consensus peakset通过合并所有提供的peaksets中重叠的peaks, 保留了至少两个样本包含重叠的peaks, 取消该选项, 设置consensus=FALSE. 此时, 只会计算提供了peaksets的样本, controls没有提供peakset将不会计算
+* bCount if TRUE, the peak scores for all samples will be based on read counts using dba.count using a consensus peakset.
+* mapQCth 整数, 表示比对质量阈值
+* blacklist GRangs对象或指定的bed文件包含不进行分析的基因组区域
+* profileWin 整数, 表明碱基单位的宽度, 用于peak profiles. Peaks will be centered on their summits, and include half the window size upstream and half downstream of this point
+* fragmnetLength 整数, 期待的文库片段长度
+* shifts 当计算最佳的shift大小时所尝试一个向量值
+
+***
 
