@@ -187,6 +187,8 @@ It is computated as the Person linear correlation between the Crick and the Wast
 
 fragment-length cross-correlation peak 和 background cross-correlation (normalized strand coefficient, NSC)标准化后的比例, fragment-length peak and the read-length peak(relative strand correlation, RSC)标准化后比例, 是ChIP-Seq有力的信噪比指标. 高质量的测序数据集倾向于较大的fragment-length peak 比 read-length peak. 
 
+![image-20191231143002897](https://tva1.sinaimg.cn/large/006tNbRwgy1gafw3nkze7j30yu0lotft.jpg)
+
 **NSC是最大交叉相关值除以背景交叉相关的比率(所有可能的链转移的最小交叉相关值)**
 
 **RSC是片段长度相关值减去背景相关值除以phantom-peak相关值减去背景相关值**

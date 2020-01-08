@@ -42,9 +42,11 @@ To be continued~
 
 ##### [搭配ggplot2使用][https://www.cnblogs.com/shaocf/p/9600340.html]
 
+RColorBrewer为我们提供了一种通过使用构造函数colorRampPalette插入现有调色板来生成更大调色板的方法。它生成实际工作的函数：它们通过插入现有的调色板来构建具有任意数量颜色的调色板。要将调色板Set1插入到22种颜色（颜色数量存储在colourCount变量中，以供后续示例）
+
 首先计算所需颜色数目
 
-`colorCount <- length(unique(mtcars$hp))`
+`colourCount <- length(unique(mtcars$hp))`
 
 将调色板Set1插入到以上数目颜色中，供后续使用，构建函数getPalette
 
@@ -52,7 +54,7 @@ To be continued~
 
 绘制
 
-`ggplot(mtcars) + geom_bar(aes(factor(hp))+fill=getPalette(colourCount)) + `
+`ggplot(mtcars) + geom_bar(aes(factor(hp)),fill=getPalette(colourCount)) + `
 
 `scale_fill_muanul(values=getPalette(colourCount))+`
 

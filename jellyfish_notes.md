@@ -54,11 +54,9 @@ jellyfish count -t 8 -C -m 19 -s 5G -o 19mer_out --min-qual-char=? /common/Tutor
 
 -s -size=unit32 Hash size/memory allocation : 
 
-```
-Hash 的大小。最好设置的值大于总的独特的(distinct)k-mer数,这样生成的文件只
-有一个。若该值不够大，则会生成多个hash文件，以数字区分文件名。如果基因组大小为G，每
-个reads有一个错误，总共有n条reads，则该值可以设置为『(G + k*n)/0.8』。该值识别 
-M 和 G
+```linux
+例如, 测序错误率为e( illumina reads, e ~ 1%), 评估的基因组大小为G, 覆盖度为c, 那么期待的k-mers数目为G+G*c*e*k
+不同于jellyfish 1, 该-s参数仅是个估计量. 加入指定的size太小而无法匹配所有的k-mers, 该hash size将自动增加或部分结果将会输出到硬盘且最终自动合并
 ```
 
 -o -output=string 输出文件名
@@ -169,9 +167,33 @@ lines(dataframe19[1:100,],type= "l")
 
 ![Jellyfish_k_mers_vs_possion_distribution](https://tva1.sinaimg.cn/large/006tNbRwgy1g9n2tfp8nmj30dt0dojrx.jpg)
 
+##### 2. Counting K-mers in a genome
 
+针对实际的基因组或者组装完成的基因组, k-mer和其反向互补序列是不相等的, 因此使用`-C`是没有意义的. **此外, hash的大小可以直接设置为基因组大小. **
 
+jellyfish提供两种方式计算高频的k-mers(仅包含k-mers数目大于1), 该方法显著减少内存使用. 两种方法都是基于Bloom filters. 第一种为one pass method, 提供部分比例k-mers的大概计数, 第二种方法提供精确计数. 两种方式中, 大部分低比例的k-mers都没有报出.
 
+##### One pass method
+
+使用`--bf-size`选项, 应为数据集中期待的总共的k-mer数目, `--size argument`应为出现至少一次的k-mers的数目:
+
+`jellyfish count -m 25 -s 3G --bf-size 100G -t 16 homo_sapiens.fa`
+
+这里将会适当地使用30x覆盖度的人基因组reads, 计算25-mers数目. The approximate memory usage is 9 bits per k-mer in the Bloom filter.
+
+每个k-mer的计数结果(jellyfish dump/jellyfish query)将比实际少1, 例如, count 2 k-mer将为1
+
+缺点就是一些比例的k-mer不应该报告出来(count为1).
+
+##### Two pass method
+
+首先使用`jellyfish bc`构建reads的Bloom counter, 然后使用`jellyfish count`命令计算
+
+`jellyfish bc -m 25 -s 100G -t 16 -o homo_sapiens.bc homo_sapiens.fa`
+
+`jellyfish count -m 25 -s 3G -t 16 --bc homo_sapiens.bc homo_sapiens.fa`
+
+该方法有点是计算所有correct的k-mers计数, 大部分count 1的k-mer不会报告; 缺点就是需要解析所有reads两次.
 
 
 

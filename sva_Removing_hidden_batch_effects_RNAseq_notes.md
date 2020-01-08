@@ -2,11 +2,11 @@
 
 **[批次效应][Tackling the widespread and critical impact of batch effects in high-throughput data]就是在同一条件下部分测量数据表现出了不同的趋势(qualitatively different behavior), 同时该差异趋势和生物学或变量无关(unrelated to the biological or scientific variables). 例如, 相同实验的不同部分发生在的不同操作时间, 或者由不同的实验人员负责, 使用了不同的试剂批号, 芯片或设备.**
 
-用于生物研究的许多技术, 包括高通量测序, microarrays, bead chips, mass spectrometers等, 通过专业人员操作以实现准确的测量结果. 当实验过程中的这些条件发生了改变, 许多测量得到量化值将会收到生物学和非生物学因素影响. **批次效应的发生是由于实验室条件, 试剂批号和人员的不同所导致的.**
+用于生物研究的许多技术, 包括高通量测序, microarrays, bead chips, mass spectrometers等, 通过专业人员操作以实现准确的测量结果. 当实验过程中的这些条件发生了改变, 许多测量得到量化值将会受到生物学和非生物学因素影响. **批次效应的发生是由于实验室条件, 试剂批号和人员的不同所导致的.**
 
 标准化(normalization)是用于针对个体样本朝着整体方向调整的分析技术, 因此个体之间可以适当的比较. 标准化步骤是基因表达分析的标准流程.
 
-但是标准化过程不会去除批次差异, 批次效应影响特殊的基因集, 同时可能以不同的方式影响不同的基因. 在一些情况下, 由于批次和其他技术效应破坏了标准化的假设思想, 这些标准化过程可能甚至加剧了高通量坚持的批次效应.
+但是标准化过程不会去除批次差异, 批次效应影响特殊的基因集, 同时可能以不同的方式影响不同的基因. 在一些情况下, 由于批次和其他技术效应破坏了标准化的假设思想, 这些标准化过程可能甚至加剧了高通量检测的批次效应.
 
 #### 去批次效应方法
 
@@ -20,13 +20,13 @@ Distance weighted discrimination(DWD)
 
 Surrogate Variable Analysis
 
-sva包用于去除高通量测序中效应和其他非目的性变化. sva针对高维度数据集识别并构建代理变量(surrogate variable)。代理变量直接和高维度数据共变化构建(covariated constructed, 例如, 基因表达/RNA测序/甲基化/脑成像数据), 然后用于随后分析来调整未知的, 非模型的, 或隐藏的噪音. 
+sva包用于去除高通量测序中批次效应和其他非目的性变化. sva针对高维度数据集识别并构建代理变量(surrogate variable)。代理变量直接和高维度数据共变化构建(covariated constructed, 例如, 基因表达/RNA测序/甲基化/脑成像数据), 然后用于随后分析来调整未知的, 非模型的, 或隐藏的噪音. 
 
 sva通过三种方式去除人工效应(artifacts): 针对高通量实验未知来源的变化识别并评估代理变量; 直接使用ComBat去除批次效应; 通过已知的质控探针去除批次效应.
 
 ##### Setting up the data
 
-首先恰当地设置数据和构建模型矩阵. 该数据矩阵应包含features(genes, transcripts, voxels)行和样本列信息, 为典型的基因表达分析计数矩阵. sva假设存在需要考虑的两种类型变量: adjustment 变量和 interested 变量. 例如基因表达研究中, 设置cancer vs. control为感兴趣变量, 而患者年量, 性别, 数据产生时间等为调整变量. 
+首先恰当设置数据和构建模型矩阵. 该数据矩阵应包含features(genes, transcripts, voxels)行和样本列信息, 是典型的基因表达分析计数矩阵. sva假设存在需要考虑的两种类型变量: adjustment 变量和 interested 变量. 例如基因表达研究中, 设置cancer vs. control为感兴趣变量, 而患者年量, 性别, 数据产生时间等为调整变量. 
 
 需要构建两个矩阵, 'full model'和'null model', 'null model‘ 为包含所有调整变量但不含感兴趣变量的矩阵, 'full model'为包含感兴趣变量和调整变量的矩阵. 其假设思想为, 分析感兴趣变量和基因表达的相关性, 同时使用调整标量进行调整. 使用`model.matrix`构建模型矩阵.
 
@@ -52,7 +52,7 @@ sva通过三种方式去除人工效应(artifacts): 针对高通量实验未知�
 
 ![image-20191227110028145](https://tva1.sinaimg.cn/large/006tNbRwgy1gab3kbphc0j30iv04eaah.jpg)
 
-空矩阵'null model'仅包含调整参数. 因为不调整分析中的其他变量, 所以仅包截距项
+空矩阵'null model'仅包含调整参数. 因为不校正分析过程中的其他变量, 所以仅包截距项
 
 `mod0 <- model.matrix(~1, data=pheno)`
 
@@ -70,7 +70,7 @@ sva通过三种方式去除人工效应(artifacts): 针对高通量实验未知�
 
 `n.sv     2`
 
-使用sva函数评估代替变量. `sva`用于评估来自microarray数据的人工影响, `svaseq`用于评估来自RNA-seq count-based的人工影响(sva, svaseq, this function is the implementation of the iteratively re-weighted least squares approach for estimating surrogate variables), `ComBat`用于去除来自microarry的已知批次效应, `fsva`用于针对prediction problems去除批次效应
+**使用sva函数评估代替变量. `sva`用于评估来自microarray数据的人工影响, `svaseq`用于评估来自RNA-seq count-based的人工影响(sva, svaseq, this function is the implementation of the iteratively re-weighted least squares approach for estimating surrogate variables), `ComBat`用于去除来自microarry的已知批次效应, `fsva`用于针对prediction problems去除批次效应**
 
 ![image-20191227123042591](https://tva1.sinaimg.cn/large/006tNbRwgy1gab667tvuej30h001ldfy.jpg)
 
@@ -112,7 +112,11 @@ sva通过三种方式去除人工效应(artifacts): 针对高通量实验未知�
 
 `pValuesSv <- f.pvalue(edata,modSv,mod0Sv)`
 
-`aValuesSv <- p.adjust(pValuesSv, method="BH")`
+`qvaluesSv <- p.adjust(pValuesSv, method="BH")`
+
+![image-20191228140518716](https://tva1.sinaimg.cn/large/006tNbRwgy1gaceiygc1lj30h5023weh.jpg)
+
+**Now these are the adjusted P-values and Q-values accounting for surrogagte variables**
 
 ***
 
@@ -140,13 +144,13 @@ sva通过三种方式去除人工效应(artifacts): 针对高通量实验未知�
 
 ##### Applying the ComBat function to adjust for known batches
 
-**`ComBat`使用经验贝叶斯模型调整已知的批次效应(an empirical Bayesian framework), 同时可以通过设置`par.prior=FALSE`选项使用noparametric empirical Bayesian adjustments. 此外, 通过设置`prior.plots=TRUE`选型给出参数评估图, 其中.黑色表针对经验批次相应密度的核心评估, 红色为参数评估, 通过该图可以确保评估的合理性.**
+**`ComBat`使用经验贝叶斯模型调整来自microarray的已知的批次效应(an empirical Bayesian framework)数据, 同时可以通过设置`par.prior=FALSE`选项使用noparametric empirical Bayesian adjustments. 此外, 通过设置`prior.plots=TRUE`选型给出参数评估图, 其中.黑色表针对经验批次相应密度的核心评估, 红色为参数评估, 通过该图可以确保评估的合理性.**
 
  因此, 首先得知道数据中的批次变量
 
 `batch <- pheno$batch`
 
-和`sva`一样, 构建包含感兴趣变量的调整变量(adjustment variables)模型矩阵. 这里在构建模型矩阵时不需要包含批次, 该批次将在包含在后续`ComBat`函数中. 该例子中不存在其他的调整变量, 因此简单拟合截距项
+和`sva`一样, 构建包含调整变量(adjustment variables)模型矩阵(just as with sva, we then need to create a model matrix for the adjsutment variables, including the variable fo interest). 这里在构建模型矩阵时不需要包含批次, 该批次将在包含在后续`ComBat`函数中. 该例子中不存在其他的调整变量, 因此简单拟合截距项
 
 `modcombat <- model.matrix(~1, data=pheno)`
 
@@ -198,13 +202,145 @@ sva通过三种方式去除人工效应(artifacts): 针对高通量实验未知�
 
 在一些情况下, 潜在的差异可能是重要的生物学变异来源. 假如分析的目标在于识别一个或多个亚组中的杂合性, `sva`函数将不适用. 例如, 假设期待肿瘤样本代表两个不同的亚型, 但是存于未知的亚组. 假如, 这些亚组对表达影响很高, 那么其中一个或多个评估的代理变量可能和该亚组高度相关.
 
-相反, 直接调整仅去除已知的批次变量效应. 使用该过程时所有潜在的生物学变异将保留在数据中. 换言之, 假如样本来自不同的环境, 那么该效应依然存在数据中. 假如来自环境, 实验等重要的杂合性来源没有去除, 将会增加家阳性率.
+相反, 直接调整仅去除已知的批次变量效应. 使用该过程时所有潜在的生物学变异将保留在数据中. 换言之, 假如样本来自不同的环境, 那么该效应依然存在数据中. 假如来自环境, 实验等重要的杂合性来源没有去除, 将会增加假阳性率.
 
-##### Applying the fsva function to remove batch effects for prediction
+***
 
-略
+##### ~~Applying the fsva function to remove batch effects for prediction~~
+
+例如在使用microarray做种群水平的表达差异分析时, 有些情况是用于预测. 这时候, 数据集一般由一个训练集和检测集组成(a training set and a test set). 对于训练集中的每一个样本, outcome/class是已知的, 但是潜在来源的变异是未知的. 对于检测集中的样本, outcomt/class或者潜在变异都是未知的.
+
+'Frozen' 代理变量分析可用于去除检测集中的潜在变异.
+
+`set.seed(12345)`
+
+`trainIndicator <- sample(1:57, size=30, replace=FALSE)`
+
+`testIndicator <- (1:57)[-trainIndicator]`
+
+`trainData <- edata[, trainIndicator]`
+
+`testData <- edata[, testIndicator]`
+
+`trainPheno <- pheno[trainIndicator,]`
+
+`testPheno <- pheno[testIndicator,]`
+
+使用`pamr`包在训练数据中训练预测模型, 在检测数据中训练检测模型
+
+![image-20191228124133136](https://tva1.sinaimg.cn/large/006tNbRwgy1gacc3thuzyj30ha050q3k.jpg)
+
+使用`sva`函数计算训练集的代理变量
+
+![image-20191228124345698](https://tva1.sinaimg.cn/large/006tNbRwgy1gacc63lbn8j30hf02hjrs.jpg)
+
+使用`fsva`函数调整训练数据和检测数据. 训练集使用计算的代理变量调整, 检测集使用‘frozen’代理变量算法调整.
+
+![image-20191228124724343](https://tva1.sinaimg.cn/large/006tNbRwgy1gacc9whwn1j30hc05gdgm.jpg)
+
+***
 
 ##### sva for sequencing (svaseq)
+
+起初, 我们使用识别函数用于来自接近对称的/连续的数据. 而对测序数据而言, 是由计数表示的, 因此更恰当的模型可能要使用log函数. 因此, 第一步, 我们将使用log(g + c)来转换基因表达数据, c为一个小的正数, 这里设置为1
+
+首先过滤掉低计数基因, 识别潜在的control基因
+
+![image-20191228130249959](https://tva1.sinaimg.cn/large/006tNbRwgy1gaccpy5n8hj30h1029jrf.jpg)
+
+`library(zebrafishRNASeq)`
+
+`data(zfGenes)`
+
+`filter <- apply(zfGenes, 1, function(x)length(x[x>5])>=2)`
+
+`fitlered <- zfGenes[filter,]`
+
+`genes <- rownames(filtered)[grep["^ENS",rownames(filtered)]]`
+
+`controls <- grepl("^ERCC",rownames(filtered))`
+
+`group <- as.factor(rep(c("Ctl","Trt"),each =3))`
+
+`dat0 <- as.matrix(filtered)`
+
+使用`svaseq`函数评估潜在的因子. 该例子中由于样本数目较少(n=6), 设置`n.sv=1`. 但一般可用`svaseq`去评估潜在因子数目
+
+`## Set null and alternative models(ignore batch)`
+
+`mod1 <- model.matrix(~group)`
+
+`mod0 <- cbind(mod1[,1])`
+
+`svaseq <- svaseq(dat0, mod1, mod0, n.sv=1)$sv`
+
+![image-20191228131644806](https://tva1.sinaimg.cn/large/006tNbRwgy1gacd4fdsbrj30h806mt9u.jpg)
+
+`plot(svseq, pch=19, col="blue")`
+
+最初, 我们引入一个算法来评估仅被未知的人为因素所影响的基因. 随后, Gagnon-Bartsch和其同事使用一些技术上的或者实验上的指控探针来识别仅被人为因素所影响的基因. 因此, 监督型sva使用已知的探针来评估代理变量.
+
+`sup_svseq <- svaseq(dat0, mod1, mod0, controls=controls,n.sv=1)$sv`
+
+`plot(sup_svseq,svseq,pch=19,col="blue")`
+
+![image-20191228134306005](https://tva1.sinaimg.cn/large/006tNbRwgy1gacdvu975qj30cg09ajrk.jpg)
+
+这里传递了`controls`参数, 为一个0和1的向量值, 代表被批次影响而不被条件所影响的基因.
+
+***
+
+#### [DESeq2 & sva][http://master.bioconductor.org/packages/release/workflows/vignettes/rnaseqGene/inst/doc/rnaseqGene.html]
+
+RNA-seq workflow: gene-level exploratory analysis and differential expression
+
+8. Removing hidden batch effects
+
+假设不知道有多少细胞系用于实验, 仅知道处理组使用了地塞米松处理(dexamethasone). 因此不同细胞系所带了的计数影响为潜在的非目的性的变异, 可能影响数据集中的多个或所有基因.
+
+`library(sva)`
+
+获得标准化技术矩阵, 同时满足每行所有样本基因数目均值大于1
+
+由于不知道潜在的细胞系信息, 因此构建一个`full model`矩阵包含地塞米松变量(dex)和一个`null model`矩阵仅包含截距项. 最后, 假设我们想要评估两个代理变量.
+
+`dat <- counts(dds, normalized=TRUE)`
+
+`idx <- rowMeans(dat) > 1`
+
+`dat <- dat[idx, ]`
+
+`mod <- model.matrix(~dex, colData(dds))`
+
+`mod0 <- model.matrix(~1, colData(dds))`
+
+`svseq <- svaseq(dat, mod, mod0, n.sv=2)`
+
+由于已知细胞系数目,查看SVA方法去除批次效应的程序
+
+`par(mfrow=c(2,1), mar=c(3,5,3,1))`
+
+`for(i in  1:2){stripchart(svseq$sv[,i] ~ dds$cell, vertical=TRUE, main=paste0("SV",i)); abline(h=0)}`
+
+![image-20191228154438887](https://tva1.sinaimg.cn/large/006tNbRwgy1gachebrkbkj30uf0eyjsq.jpg)
+
+使用SVA根据代理变量去除批次相应, 向DESeqDataSet对象列添加这两个代理变量, 然后加入模型设计中(design)
+
+`ddssva <- dds`
+
+`ddssva$SV1 <- svseq$sv[,1]`
+
+`ddssva$SV2 <- svseq$sv[,2]`
+
+`design(ddssva) <- ~SV1 + SV2 +dex`
+
+然后使用DESeq生成含有代理变量调整后的结果
+
+
+
+
+
+
 
 
 
