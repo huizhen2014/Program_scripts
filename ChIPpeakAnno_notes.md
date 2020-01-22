@@ -24,7 +24,7 @@ ChIPpeakAnno一个重要功能就是根据已知的基因组特征注释peaks, �
 
 `data(TSS.human.GRCh38)`
 
-`macs.anno <- annotationPeakInBatch(macsOutput, AnnotationData=TSS.human.GRCh.38)`
+`macs.anno <- annotatePeakInBatch(macsOutput, AnnotationData=TSS.human.GRCh.38)`
 
 加入基因symbol
 
@@ -118,7 +118,7 @@ ChIPpeakAnno一个重要功能就是根据已知的基因组特征注释peaks, �
 
 **绘制峰跨越外显子, 内含子, 增强子(enhancer), proximal promoter, 5' UTR, 3' UTR的分布图**
 
-`if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){aCR <- assignChromosomeRegion(gr1, nucleotideLevel=FALSE, percedence=c("Promoters","immediateDownstream","fiveUTRs","threeUTRs","Exons","Introns"),TxDb=TxDb.Hsapiens.UCSC.hg19.knownGene)`
+`if(require(TxDb.Hsapiens.UCSC.hg19.knownGene)){aCR <- assignChromosomeRegion(gr1, nucleotideLevel=FALSE, precedence=c("Promoters","immediateDownstream","fiveUTRs","threeUTRs","Exons","Introns"),TxDb=TxDb.Hsapiens.UCSC.hg19.knownGene)`
 
 `barplot(aCR$percentage)}`
 
@@ -126,11 +126,37 @@ ChIPpeakAnno一个重要功能就是根据已知的基因组特征注释peaks, �
 
 4. Detailed Use Cases and Scenarios
 
+##### 获得峰周围序列
 
+![006y8mN6gy1g6t2rhwum5j30zi09wgow](https://tva1.sinaimg.cn/large/006tNbRwgy1gaw5wzb2b8j30zi09wwf5.jpg)
 
+`library(BSgenome.H10407.NCBI.01)`
 
+`seq <- getAllPeakSequence(overlaps, upstream=20,downstream=20,genome=Hsapiens)`
 
+`write2FASTA(seq, "test.fa")`
 
+需要注意的是, `overlaps`中的strand不包含方向:
+
+![image-20200114162154254](https://tva1.sinaimg.cn/large/006tNbRwgy1gaw60borcnj30mh043jsk.jpg)
+
+因此可以先简单修改strand值, 在获得序列(或使用`getSeq`):
+
+`strand(h_ns_macs2_anno) <- h_ns_macs2_anno$feature_strand`
+
+`seq1 <- getAllPeakSequence(h_ns_macs2_anno,genome=BSgenome.H10407.NCBI.01,upstream = 50,downstream = 50)`
+
+or
+
+![image-20200114162739921](https://tva1.sinaimg.cn/large/006tNbRwgy1gaw66b2zlaj30jy048dgr.jpg)
+
+最后输出
+
+`write2FASTA(seq1, "test1.fa")`
+
+`writeXStringSet(seq2, "test2.fa")`	
+
+***
 
 ##### Mischellaneous
 
@@ -234,9 +260,9 @@ seed文件(the masked BSgenome data package, 2nd targe package)和包含纯序�
 
 ![image-20200102222449664](https://tva1.sinaimg.cn/large/006tNbRwgy1gail28pef6j313u0oa0zd.jpg)
 
+***
 
-
-
+**或直接通过从NCBI注释信息提取的注释data.frame, 手动构建用于ChIPpeakAnno的GRange文件**
 
 
 

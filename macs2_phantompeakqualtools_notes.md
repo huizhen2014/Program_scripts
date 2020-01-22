@@ -79,7 +79,11 @@ macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 
 --extsize 当设置--nomodel时, MACS使用该参数向reads的5‘-3’方向延伸至fix-sized fragments. 例如, 针对转录因子的结合区域的大小为200bp, 同时想要取消MACS构建model, 该参数可被设置为200. 该选项只有当设置--nomodel时才有效, 或当MACS构建model失败同时--fix-bimodal选项开启
 
---shift  这里可以选择任意shift bp长度. 当使用非0时需要酌情处理(other than the default value, 0). 当`--nomodel`设置时, MACS使用该值去除ends(5'), 接着使用`-extsize`从5‘到3’方向延伸(when --nomodel is set, MACS will use this value to move cutting ends(5') then apply `--extsize` from 5‘ to 3' direction to extend them to fragments. When this value is negative, ends will be moved toward 3'-5' direction, otherwise 5'-3' direction). 推荐在使用ChIP-Seq数据时保持默认值0), or -1 * half of EXTSIZE together with `--extsize` option for detecting enriched cutting loci such as certain DNAsel-Seq datasets. Note, you can't set values other than 0 if the format is BAMPE or BEDPE for paired-end data. The dafult is 0
+--shift  这里可以选择任意shift bp长度. 当使用非0时需要酌情处理(other than the default value, 0). 当`--nomodel`设置时, MACS使用该值moving cutting ends(5')(应该是sheared DNA位置, sequenced read), 接着使用`-extsize`从5‘到3’方向延伸(when --nomodel is set, MACS will use this value to move cutting ends(5') then apply `--extsize` from 5‘ to 3' direction to extend them to fixed-fragments. When this value is negative, ends will be moved toward 3'-5' direction, otherwise 5'-3' direction). 推荐在使用ChIP-Seq数据时保持默认值0), or -1 * half of EXTSIZE together with `--extsize` option for detecting enriched cutting loci such as certain DNAsel-Seq datasets. Note, you can't set values other than 0 if the format is BAMPE or BEDPE for paired-end data. The dafult is 0
+
+![image-20200111235457633](https://tva1.sinaimg.cn/large/006tNbRwgy1gat28sp0ggj31g80bc41n.jpg)
+
+--bw BW 用于选择区域计算fragment size的band宽度, 为用于模型构建步骤中sliding窗口长度的一半, 仅用于构建shifting model, 也就是值得是打断的片段长度. 不建议修改该值, 默认为:300
 
 --keep-dup 在相同位置(相同的方向和相同的链), MACS将保留的duplicate tags数目. 默认时在相同位置保留一个, default:1
 
@@ -134,6 +138,140 @@ macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 2. `bdgpeakcall`可用于`*_treat_pvalue.bdg`或其他bdgcmp/bedGraph文件生成的文件, 根据指定阈值, 最大gap距离, 最小峰长度来检出峰. bdgbroadcall和bdgpeakcall用法类似, 只是输出BED12格式的`_broad_peaks.bed`
 3. 差异检出工具`bdgdiff`, 可用于4个bedGraph文件, 包含treatment1/control1, treatment2/control2, treatment1/treatment2, treatment2/treatment1 比值. 根据最短长度, 最大gap和阈值输出一致性和唯一位置
 4. You can combine subcommands to do a step-by-step peak calling. Read detail at [MACS2 wikipage][https://github.com/taoliu/MACS/wiki/Advanced%3A-Call-peaks-using-MACS2-subcommands]
+
+#### [Advanced: Call peaks using MACS2 subcommands][https://github.com/taoliu/MACS/wiki/Advanced%3A-Call-peaks-using-MACS2-subcommands]
+
+`CTCF_ChIP_200K.bed.gz`, `CTCF_Control_200K.bed.gz`  可在MACS2 github仓库下载
+
+下面流程不针对paired-end reads
+
+##### Step1: Filter duplicates
+
+默认最大允许的duplicated reads为1, `--keep-dup=1`
+
+`macs2 filterdup -i CTCF_ChIP_200k.bed.gz --keep-dup=1 -o CTCF_ChIP_200K_filterdup.bed`
+
+`macs2 filterdup -i CTCF_Control_200K.bed.gz --keep-dup=1 -o CTCF_Control_200K_filterdup.bed`
+
+##### Step2: Decide the fragment length d
+
+测序reads长度仅是DNA片段长度(插入序列)的一个末端, 需要评估该DNA长度来获得实际的富集情况. 该例子中, 预测的fragment length d为254bp
+
+`macs2 predicted -i CTCF_ChIP_200K_filterdup.bed -g hs -m 5 50`
+
+如果不想通过该延伸reads的方法获得DNA长度, 或对DNA长度有很好的估计, 可以跳过这一步
+
+##### Step3: Extend ChIP sample to get ChIP coverage track
+
+针对ChIP样本, 根据第二步评估的片段长度, 使用`pileup`生成BEDGRAPH格式的pileup track.
+
+`pileup`步骤默认从5‘到3‘方向延伸reads, 如果处理一些DNAse-Seq data, 或者认为cutting site(应该是sheared DNA位置, sequenced read), 被短序列reads检测到的, 正好位于感兴趣片段的中间, 可以使用`-B`选项将reads向两边延伸
+
+`macs2 pileup -i CTCF_ChIP_200K_filterdup.bed -o CTCF_ChIP_200K_filterdup.pileup.bdg --extsize 254`
+
+文件`CTCF_ChIP_200K_filterdup.pileup.bdg`文件包含ChIP样本fragment pileup信号
+
+#####Step4: Build local bias track from control
+
+默认, MACS2 `callpeak` 函数通过选取围绕的1kb(set by --slocal), 10kb(set by --llocal), fragment length d的大小来自之前预测结果(`predicted`), 整个基因组背景选取最大的bias来计算local bias.
+
+###### The d backgroud
+
+一般而言, 为构建背景信息噪音track, 需要使用`pileup`函数向两个方向延伸control reads. 因为, 来自control 样本的cutting site包含的噪音代表了围绕它的一个区域(The idea is that the cutting site from control sample contains the noise representign a region surrounding it). 选取d/2长度
+
+`macs2 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 127 -o d_bg.bdg`
+
+文件`d_bg.bdg`包含来自control样本的d 背景
+
+###### The slocal background
+
+默认选取1kb窗口构建构建背景噪音track. 简单想象每一个测序的reads代表一个1kb围绕的噪音
+
+`macs2 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 500 -o 1k_bg.bdg`
+
+这里500位1k的一半. 然而ChIP信号track是通过将read延伸d 片段长度构建, 这里将1kb噪音乘以d/slocal, 254/1000=0.254
+
+`macs2 bdgopt -i 1k_bd.bdg -m multiple -p 0.254 -o 1k_bg_norm.bdg`
+
+###### The llocal background
+
+来自更大区域的背景噪音可使用同上步相同步骤完成, llocal大小为10kb
+
+`macs2 pileup -i CTCF_Control_200K_filterdup.bed -B --extsize 5000 -o 10k_bg.bdg`
+
+`macs2 dbgopt -i 10k_bg.bdg -m multiply -p 0.0254 -o 10k_bg_norm.bdg`
+
+###### The genome background
+
+全基因组背景可计算:
+
+`the_number_of_control_reads * fragment_length/genome_size`, 该例子中为: `199867 * 254 / 2700000000 ~= 0.0188023`
+
+###### Combine and generate the maximum background noise
+
+选取slocal(1k)和llocal(10k)背景间的最大(maximum)
+
+`macs2 bdgcmp -m max -t 1k_bg_norm.bdg -c 10k_bg_norm.bdg -o 1k_10k_bg_norm.bdg`
+
+接着, 通过和d背景比较选取最大(maximum)
+
+`macs2 bdgcmp -m max -t 1k_10k_bg_norm.bdg -c d_bg.bdg -o d_1k_10k_db_norm.bdg`
+
+最后, 使用`bdgopt`合并基因组背景
+
+`macs2 bdgopt -i d_1k_10k_bg_norm.bdg -m max -p 0.0188023 -o local_bias_raw.bdg` 
+
+这里得到的文件`local_bias_raw.bdg`为BEDGRAPH文件, 包含了来自control样本的原始local bias
+
+##### Step5: Scale the ChIP and control to the same sequencing depth
+
+为比较ChIP和control信号, ChIP pileup和control lambda需要scale到相同的测序深度. `callpeak`默认是将大的样本scale到小的样本深度. 这样可保证噪音不会扩大, 提高最终结果的特异性. 
+
+该例子中, ChIP和control过滤后duplication得到的reads数目为199583和199867. 因此, control bias需要scale down, 199583/199867=0.99858
+
+`macs2 bdgopt -i local_bias_raw.bdg -m multiply -p 0.99858 -o local_lambda.bdg`
+
+输出文件命名为`local_lambda.bdg`, 因为该文件中的值可被认为是lambda(期待值), 可通过泊松分布和ChIP信号比较
+
+##### Compare ChIP and local lambda to get the scores in pvalue or qvalue
+
+使用某一统计模型, 根据ChIP信号和local lambda, 检测富集区域, 预测peaks
+
+`macs2 bdgcmp -t CTCF_ChIP_200k_filterdup.pileup.bdg -c local_lambda.bdg -m qpois -o CTCF_ChIP_200K_qvalue.bdg`
+
+或者
+
+`macs2 bdgcmp -t CTCF_ChIP_200k_filterdup.pileup.bdg -c local_bias.bdg -m ppois -o CTCF_ChIP_200k_pvalue.bdg`
+
+文件`CTCF_ChIP_200K_pvalue.bdg`和`CTCF_ChIP_200K_qvalue.bdg`包含了来自local 泊松检测的`-log10(p-values)`和`-log10(q-values)`. 这意味着, 每个碱基位置的ChIP信号将会使用泊松模型比较对应的local lambda.
+
+##### Step7: Call peaks on score track using a cutoff
+
+根据明确阈值选择peak区域. 这里使用`bdgpeakcall`函数检出narrow peak, 使用`bdgbroadcall`函数检出broad peak. 
+
+首先, 假如两个区域都超过了阈值, 但是区域间值较低, 假如间隔区域足够小, 则应该将两个相邻区域合并成为一个更大的区域. 该值设置为read长度, 因为read长度代表了数据集的分辨率. 针对`bdgpeakcall`, 需要使用`-g`选项设置第一步获得read长度或查看原始数据 
+
+第二, 无需检出太多小的peaks, 因此设置了最小的peak长度. 自动使用片段长度d最为最小的peak长度, 这里通过指定`-l`来表示d 长度
+
+最后, 设置cutoff值. 输出文件中的值时`-log10格式`, 因此若需cutoff为0.05, 那么-log10转换后值约为1.3. 
+
+`macs2 bdgpeakcall -i CTCF_ChIP_200K_qvalue.bdg -c 1.301 -l 245 -g 100 -o CTCF_ChIP_200K_peaks.bed`
+
+输出为narrowPeak 格式文件(典型的BED文件), 包含peak区域和峰尖位置
+
+***
+
+##### [github issue][https://github.com/taoliu/MACS/issues/353]
+
+![image-20200117100554146](https://tva1.sinaimg.cn/large/006tNbRwgy1gazc0130yyj30io05vwg2.jpg)
+
+1. subsample the ChIP data/ set a higher number for `keep-up` option 
+
+With the current situtation, 5M/50bp, about 50 fold coverage, subsample only 1/50 of data and redo
+
+2. check the experiment/data works, since the complexity is strangely low
+
+***
 
 #### Miscellaneous
 
@@ -227,7 +365,7 @@ This consistency transition provides an internal indicator of the change from si
 
 #####参数
 
-必须参数:
+用于质控必须参数:
 
 `-c=<ChIP_alignFile>` tagAlign/BAM 文件的全路径和名称(文件名后缀必须为tagAlign.gz, tagAlign, bam, bam.gz)
 
@@ -277,7 +415,7 @@ This consistency transition provides an internal indicator of the change from si
 
 `-rf` 如果plot/rdata/narrowPeak文件存在, 覆盖之; 否则会报错终止
 
-`-clean` 在读取原始chip和指控文件后删除. CAUTION: Use only if the script calling `run_spp.R` is creating temporary files
+`-clean` 在读取原始chip和质控文件后删除. CAUTION: Use only if the script calling `run_spp.R` is creating temporary files
 
 ##### 用法
 
@@ -316,7 +454,7 @@ Rscript run_spp.R -c=<ChIP_tagalign/BAM_file> -i=<control_tagalign/BAM_file> -np
 
 Notes:
 
-* 无比过滤掉多重比对reads, 大量数目该reads将会严重影响phantom峰的系数和峰检出结果
+* 务必过滤掉多重比对reads, 大量数目该reads将会严重影响phantom峰的系数和峰检出结果
 * For the IDR(Irreproducible Discovery Rate) rescue strategy, one needs to pool reads from replicates and then shuffle and subsample the mapped reads to create two balanced pseudoReplicates. This is much easier to implement on tagAlign/BED read-mapping files using the unix 'shuf' command. So it is recommended to use the tagAlign format.
 * 大多数情况, 可简单使用最大报告的strand correlation peak作为显著片段长度. 然而, 建议手动查看cross-correlation plot确保所选的最大峰不是错误的.
 * 如果文库片段的选择存在问题, 那么数据的cross-correlation轮廓会有多个强cross-correlation峰.
@@ -367,7 +505,7 @@ samtools view -F 0x0204 -o - <bamFile> | awk 'BEGIN{OFS="\t"}{if (and($2,16) > 0
 
 `annotation` 指明分析的基因组
 
-`chromosomes`指明需分析计算的染色体
+`chromosomes`指明需分析计算的染色体, 默认第一个; 选择`NULL`表示所有
 
 `mapQCth` 表明过滤比对质量的阈值, 默认为15
 

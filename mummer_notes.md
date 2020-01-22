@@ -202,7 +202,7 @@ promer输出类似nucmer输出，空白表错配，"+"表相似(positive alignme
 
 常用于分析delta输出，用于展示位置，一致性等信息。
 
-`show-coors [options] <delta file>`
+`show-coords [options] <delta file>`
 
 -c选项显示覆盖度，-l选项显示线序列长度，在比对两组装contigs时可帮助查看是否比对跨越整个contig
 
@@ -244,7 +244,7 @@ promer输出类似nucmer输出，空白表错配，"+"表相似(positive alignme
 
 * show-tiling
 
-构建query contigs比对到ref序列的tiling路径，将决定每个query contig的最佳比对位置。由于每个contig将被tiled一次，因此重复区域将该分析过程带来困难。
+构建query contigs比对到ref序列的tiling路径，将决定每个query contig的最佳比对位置。由于每个contig将被tiled一次，因此重复区域将给该分析过程带来困难。
 
 `show-tiling [options] <delta file>`
 
