@@ -83,7 +83,7 @@ macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 
 ![image-20200111235457633](https://tva1.sinaimg.cn/large/006tNbRwgy1gat28sp0ggj31g80bc41n.jpg)
 
---bw BW 用于选择区域计算fragment size的band宽度, 为用于模型构建步骤中sliding窗口长度的一半, 仅用于构建shifting model, 也就是值得是打断的片段长度. 不建议修改该值, 默认为:300
+--bw BW 用于选择区域计算fragment size的band宽度(**the window : roughly twice the size of the sheared chromatin across the genome**), 为用于模型构建步骤中sliding窗口长度的一半, 仅用于构建shifting model, 也就是打断的片段长度. 不建议修改该值, 默认为:300
 
 --keep-dup 在相同位置(相同的方向和相同的链), MACS将保留的duplicate tags数目. 默认时在相同位置保留一个, default:1
 
@@ -270,6 +270,11 @@ macs2 randsample -i the_BAMPE_file.bam -f BAMPE -p 100 -o the_BEDPE_file.bed
 With the current situtation, 5M/50bp, about 50 fold coverage, subsample only 1/50 of data and redo
 
 2. check the experiment/data works, since the complexity is strangely low
+
+![image-20200202135023893](https://tva1.sinaimg.cn/large/006tNbRwgy1gbi0ek9gsuj31120jywkt.jpg)
+
+1. `--bw` is used for shiftin model, such the DNAse-Seq, and exerts the similar function as `--extsize` in nomodel fashion. 
+2. It's trustful to adopt the nomodel and `--extsize` a fixed value across the analysis by knowing the approximate shared fragment length.
 
 ***
 
