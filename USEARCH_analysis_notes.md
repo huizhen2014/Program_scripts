@@ -289,7 +289,7 @@ denoising的主要缺陷是, species在不同个体间常具有差异, 并且par
 
 Estimating microbial diversity
 
-单个样本的多样性([alpha diversity][https://www.drive5.com/usearch/manual/alpha_diversity.html])通常使用矩阵例如Shannon index和Chao1 estimator计算, 然而成对样本之间的差异([beta diversity][https://www.drive5.com/usearch/manual/beta_diversity.html])则使用来自Jaccard distance或Bray-Curtis dissimilarity计算的矩阵表示. 这些矩阵都是通过OTU频率计算而来的, 例如 unweighted UniFrac(called unifrac_binary in usearch)使用presence/absence only, 在存在任何非0的值时将一个count记做1.
+单个样本的多样性([alpha diversity][https://www.drive5.com/usearch/manual/alpha_diversity.html])通常使用metric例如Shannon index和Chao1 estimator计算, 然而成对样本之间的差异([beta diversity][https://www.drive5.com/usearch/manual/beta_diversity.html])则使用来自Jaccard distance或Bray-Curtis dissimilarity计算的metric表示. 这些metric都是通过OTU频率计算而来的, 例如 unweighted UniFrac(called unifrac_binary in usearch)使用presence/absence only, 在存在任何非0的值时将一个count记做1.
 
 OTU frequency dose not correlate with species frequency
 
@@ -297,7 +297,7 @@ OTU frequency dose not correlate with species frequency
 
 Cross-talk degrades presence/absence
 
-有些多样性矩阵使用OTU的存在与否, 而不是其频率. 在usearch分析中, 这样的矩阵称之为'binary', 因为其count值会被考虑为0或1. 针对扩增子reads, 由于样本是多重的, 存在与否并不能够真实测量, 因为[cross-talk][https://www.drive5.com/usearch/manual/crosstalk.html]常导致reads不能被真实的分配到样本(假如该OTU不存在时). 当样本来自不同的环境时, 该问题尤为严重(例如, 人类肠道或老鼠肠道).
+有些多样性metric使用OTU的存在与否, 而不是其频率. 在usearch分析中, 这样的metric称之为'binary', 因为其count值会被考虑为0或1. 针对扩增子reads, 由于样本是多重的, 存在与否并不能够真实测量, 因为[cross-talk][https://www.drive5.com/usearch/manual/crosstalk.html]常导致reads不能被真实的分配到样本(假如该OTU不存在时). 当样本来自不同的环境时, 该问题尤为严重(例如, 人类肠道或老鼠肠道).
 
 singleton counts are especially suspect
 
@@ -441,7 +441,7 @@ dqt: 差异碱基数目; parent: 嵌合体位置
 
 6. 针对97% OTUs构建OTU表格
 
-通过比对reads到OTUs构建OTU表格, 推荐在生成该表格后使用otutab_rare命令根据相同数目的reads对所有样本进行标准化(normalize all samples to the same number of reads)
+通过比对reads到OTUs构建OTU表格, 推荐在生成该表格后使用[otutab_rare][http://www.drive5.com/usearch/manual/cmd_otutab_rare.html]命令根据相同数目的reads对所有样本进行标准化(normalize all samples to the same number of reads)
 
 `usearch -otutab`
 
@@ -459,11 +459,347 @@ OTU数据集为一套OTU序列或ZOTU序列(denoised sequences). 数据集必须
 
 `-notmatchedfq` 指定输出包含没有分配到OTU的fastq序列的文件名称
 
-`usearch -otutab merged.fa -otus outs.fa -strand plus -otutabout otutab.txt `
+`usearch -otutab merged.fa -otus otus.fa -strand plus -otutabout otutab.txt `
 
 7. 对ZOTUs构建OTU表格
 
-`usearch -otutab merged.fa -zouts zotus.fa -strand plus -otutabout zotutab.txt`
+`usearch -otutab merged.fa -zotus zotus.fa -strand plus -otutabout zotutab.txt`
+
+8. [otutab_rare][http://www.drive5.com/usearch/manual/cmd_otutab_rare.html] command
+
+该命令对一个OTU表格进行标准化处理, 使得每个样本在不重复取样情况下使用固定的随机数目的reads来重塑OTU表格. 该策略相对于已经舍弃的方法otutab_norm, 更准确地保留了每个样本的丰度分布. 推荐使用命令来标准化样本, 使之互相之间可以比较.
+
+输入和输出都为[QIIME classic format][http://www.drive5.com/usearch/manual/qiime_classic.html], 使用`-sample_size`指定每个样本的reads数目, 没有默认值, 含有小于该sample_size read的样本舍弃.
+
+使用`-randseed`指定随机数目seed, 该命令用于获得重复性结果
+
+`usearch -otutab_rare otutab.txt -sample_size 5000 -output otutab_5k.txt`
+
+***
+
+#### Diversity
+
+![image-20200207144114787](https://tva1.sinaimg.cn/large/0082zybpgy1gbntz1iddij313004mjsh.jpg)
+
+##### OTU table
+
+OTU中的read counts常被认为在生态中观察到的物种的情况.  BIOM格式更加复杂, 但是罕有实际用途. 可使用[otutab2biom][http://www.drive5.com/usearch/manual/cmd_otutab2biom.html]命令构建BIOM文件, 但是QIIME不支持. QIIME classic format:
+
+![image-20200206175203041](/Users/carlos/Library/Application Support/typora-user-images/image-20200206175203041.png)
+
+##### [Estimating microbial diversity][http://www.drive5.com/usearch/manual/otu_count_interpret.html]
+
+单个样本的多样性(alpha diversity)一般使用Shannon index和the Chao1 estimator矩阵来测量, 然而成对样本之间的变异(beta diversity)一般使用Jaccard distance或Bray-Curtis dissimilarity矩阵表示. 许多此类metric, 包括Shannon, Chao1, Jaccard和Bray-Curtis, 都是从OTU频率计算而来的. 其他metric, 例如, unweighted UniFrac(成为unifrac_binary in usearch)仅使用存在/不存在来描述情况.
+
+##### OTU frequency does not correlate with species frequency
+
+实际上, OTU frequencies have low correlation with species frequencies. 这意味着, 丰度最高的OTU, 常并不包含丰度最高的species.
+
+##### Cross-talk degrades presence/absence
+
+由于cross-talk, 来自多重index的样本, 使用presence/absence时, 不能可信地表示样本情况, 因为reads可能错误地分配到一个样本
+
+##### Singleton counts are especially suspect
+
+即使使用97%的OTU或ZOTU, 很多OTU的也常为 singleton, 因为总的count分配到了多个样本中.  小的count更可能是假的, 尤其是singletons, 或者因为OTU本身就是假的, 或着由于cross-talk
+
+##### Traditonal diversity metrics are invalid or hard to interptet
+
+根据上面描述的问题, 根据OTU计算而来的metric, 其中很多多样性metric是无效的, 没有意义的或很难解释的. 
+
+#### Recommended alpha and beta diversity metrics
+
+##### Alpha diversity metric
+
+对于扩增子序列, presence/absence尤其半信半疑的结果, 因此使用presence/absence的metric, richness和unweighted UniFrac不应该使用来表示多样性改变. 小的counts相对于高的counts更不可信, 因为它们可能是由于cross-talk或假的OTUs带来的. 因为, 推荐使用具有矩阵with put lower weight on low-frequency OTUs, 例如Shannon entropy 或 Simpson. 使用Simpson时, 其值可能被单个高频率的OTU所主导, 同时这也值得怀疑, 因为高丰度可能是由于偏差(例如, 有些species拥有10个16S拷贝,而其他可能仅有1个或2个拷贝). 相反, 假如没有高丰度的OTU,  这也可能是由于人为错误导致(例如, 样本实际上被单个specie所主导, 同时其引物包含了错误, 其PCR过程很大程度上被抑制了). 
+
+**这里建议一般使用Shannon entropy作为alpha多样性变化的标准, 即使没有偏差其差异也是很难解释. Shannon entropy的改变可以是因为OTUs的数目的改变, 频率分布形状的改变, 或者两者共同的改变. 其差异的改变可通过查看每个group的频率分布的理解.**
+
+##### Beta diversity metric
+
+UniFrac 作者声称: justification for its tree-based design is that OTUs with higher sequence similarity should be treated as more similar when comparing samples bacause they then to fill similar ecological niches. 
+
+**QIIME生成的OTUs, 一般是含有很多噪音的, 有必要使用UniFrac来抑制由于噪音带来的差异. 然而, 针对UPARSE或UNOISE生成的更准确的OTUs, 这里认为UniFrac对于是beta多样性分析是一个坏的选择, 因为针对高序列相似度的OTUs而言, 其分辨率很低. 即使OTUs满足类似的niches, 这样的差异也缺失具有生物显著性的. 这里, 推荐使用weighted Jaccard矩阵.**
+
+***
+
+#### Alpha diversity
+
+Alpha多样性表示为单个生态环境或样本中的多样性. 最近的测量标准为richness, species(或OTUs)在一个样本中的数目. 其他metric考虑OTUs的丰度(频率),  例如, 对于较低丰度的OTUs给予较低的权重. 其丰度分布可使用[octave plot][http://www.drive5.com/usearch/manual/octave_plot.html]查看.
+
+##### Interpretation
+
+牢记一点很重要, [NGS扩增子测序不能可信的描述OTUs的频率或存在与否][http://www.drive5.com/usearch/manual/otu_count_interpret.html], 因此针对传统生物学而开发的alpha多样性的生物学意义是不明晰/错误/难以解释.
+
+##### Estimators
+
+因为有些罕有的species无法在数据中观察到. alpha多样性estimator用于通过观察到的reads来推测community中specie的数目. 最为人知NGS OTUs的estimator为Chao1. 这里的观点, 如果使用丰度阈值, estimators不能实际地应用到NGS OTUs中, 因为罕有species会被过滤掉.
+
+##### Rarefaction
+
+Rarefaction的目的在于获得一个指示, 是否获得了足够的reads从而得到一个好的alpha多样性评估metric. 通过构建[Rarefaction curve][http://www.drive5.com/usearch/manual/rare.html]来展示通过增加reads给meric带来的改变. 如果曲线汇聚到一个水平的渐近线, 表明进一步增加观测(reads)对当前metric没有什么影响. 
+
+##### Units of measurement
+
+让人困惑的是, alpha多样性metric常使用不同单位. 有时其意义不明显(entropy!?), 同时不同单位的metric无法互相比较. 
+
+##### Effective number of OTUs
+
+使用不熟悉单位的metric, 不能通过转换成[effective number of species][http://www.drive5.com/usearch/manual/eff_nr_species.html]来解释和比较
+
+#### alpha_div command
+
+该命令用于计算OTU表格中的每个样本的alpha多样性metric. 其OTU表格必须为QIIME classic format
+
+同时可食用[alpha_div_sig][http://www.drive5.com/usearch/manual/cmd_alpha_div_sig.html]命令计算不同groups间metric的统计显著性改变
+
+`-metric`选项指定一个或多个metric名称(逗号分隔). 默认为使用多个流行的metric计算
+
+`-output`指定输出表格, 行为样本名称, 列为metric内容
+
+计算默认metric
+
+`usearch -alpha_div otutable.txt -output alpha.txt`
+
+计算Gini-Simpson index
+
+`usearch -alpha_div otutable.txt -output gini.txt -metrics mini_simpson`
+
+计算Chao1 and Berger-Parker indexes
+
+`usearch -alpha_div otutable.txt -output alpha.txt -metrics chao1, barger_parker`
+
+#### alpha_div_rare command
+
+alpha_div_rare命令用于计算alpha多样性metric的rarefraction curve
+
+需要注意的是, 该命令当前并不用于舍弃sigletons. 其实际作用值得怀疑, 因为其他来源的错误可能更重要, 所以rarefraction分析对于标志基因OTUs的作用尚不明确. 
+
+输入OTU表格为QIIME classic format
+
+`-metric`选项指定metric名称, 默认为richness. 指定metric通过从OTU表格中随机抽取样本来计算, 依次为1%, 2%...99%, 100%的reads.
+
+`-method`  指定采用的subsampling方法, 默认为: [fast subsampling][http://www.drive5.com/usearch/manual/cmd_otutab_rare.html]
+
+`-output` 指定输出文件tabbed 文本文件
+
+`usearch -alpha_div_rare otutab.txt -output rare.txt`
+
+####alpha_div_sig command
+
+该命令用于计算一个或多个alpha diversity metrics groups(healthy/sick)之间差异的统计显著性.
+
+`-meta`选项指定[metadata file][http://www.drive5.com/usearch/manual/metadata_file.html], 该选项必须
+
+![image-20200206223730005](https://tva1.sinaimg.cn/large/006tNbRwgy1gbn24aqbc0j30vs05sq30.jpg)
+
+`-metrics`指定一个或多个metric名称, 以逗号分隔, 默认为所有metrics
+
+注意, 计算多重metric显著性需要[multiple test correction][https://en.wikipedia.org/wiki/Bonferroni_correction]
+
+`-tabbedout` 指定tabbed文本输出文件
+
+![image-20200207114931218](https://tva1.sinaimg.cn/large/0082zybpgy1gbnp0dc70sj30ry0ac76a.jpg)
+
+第一列为metric名称; 第二列metadata分类; 第三列为显著性符号; 第四列为metadata分类; 第五个为P-value
+
+第三列显著性符号意义:
+
+![image-20200207115006885](https://tva1.sinaimg.cn/large/0082zybpgy1gbnp0x0oqoj310i06awfy.jpg)
+
+计算Gini-Simpson index差异显著性
+
+`usearch -alpah_div_sig otutable.txt -meta meta.txt -tabbedout sig.txt -metrics gini_simpson`
+
+计算Chao1和Berger-Parker indexes的差异显著性
+
+`usearch -alpha_div_sig otutable.txt -meta meta.txt -atbbedout sig.txt -metrics chao1, berger_parker`
+
+计算所有metric的差异显著性
+
+`usearch -alpha_div_sig otutable.txt -meta meta.txt -tabbedout sig.txt `
+
+#### Octave plots for visualizing alpha diversity
+
+Octave图是用于展示一个或一组样本的OTU丰度分布的直方图, 该方法用于可视查看alpha 多样性分布.丰度按照OTUs的数目来分不到不同的bins中. 每个bin定义为一定范围的丰度, 且每个bin所包含OTUs范围数目是前一个bin的两倍数目. 例如, 第一bin为丰度为singleton的OTU数目, 第二个bin为丰度为2和3的OTUs数目, 第三个bin为丰度为4到7的OTUs的数目. 这种分布确保了logarithmic scale, bins在图上均匀分布且拥有相同大小.
+
+因此X轴坐标值具有两个意义: 最小丰度值和丰度范围
+
+![image-20200207130139706](https://tva1.sinaimg.cn/large/0082zybpgy1gbnr3eymlij316g0mytd8.jpg)
+
+默认由于cross-talk导致的OTU错误可通过颜色指明出来. Cross-talk颜色通过[UNCROSS2][http://www.drive5.com/usearch/manual/uncross2_algo.html]值来决定, 可指定`-noxtalk`来关闭该值
+
+若提供了OTUs的[distance matrix][http://www.drive5.com/usearch/manual/distmx.html], 那么低丰度的OTUs, 由于非常类似的dominant OTU, 可能通过颜色指示为假的OTU. 该distance matrix可通过[calc_distmx][http://www.drive5.com/usearch/manual/cmd_calc_distmx.html]命令使用OTU序列fasta文件生成.
+
+次级OTU表格可通过`-otutab_with_singles`选项指定. 该表格应使用和第一个OTU表格相同的步骤完成, 除了保留singleton unique sequences但第一个OTU表格舍弃该类序列. 这意味着第一个表格(singletons discarded, otutab_octave选项参数)给出了每个bin中较低的OTUs数目, 第二个表格(singletons included, otutab_with_singles选项参数)给出了每个bin中较高的OTUs数目. 因此, 真实的多样性应该存在于这两者之间. 根据singletons获得的过量多样性由灰色颜色表明.
+
+`-htmlout/-svgout` 输出格式
+
+`usearch -otutab_octave otutab.txt -distmxin distmx.txt -otutab_with_singles otutab_singles.txt -htmlout octave.html -svgout octave.svg`
+
+#### calc_distmx command
+
+根据输入的fasta/fastq格式文件计算[distance matrix][http://www.drive5.com/usearch/manual/distmx.html], 通过`-tabbedout`选项指定输出名
+
+distance value范围从0到1(一致性到没有相似性), 同时Clusters可通过cluster_aggd命令从distance matrix生成. 可设置`-distmx_brute`选项使得所有成对序列进行比对计算. 序列之间的距离计算为:1-[fractional identity][http://www.drive5.com/usearch/manual/identity.html]
+
+![image-20200207141728928](https://tva1.sinaimg.cn/large/0082zybpgy1gbntaazhmvj30wo072q3q.jpg)
+
+`-maxdist`指定最大距离输出范围
+
+`-termdist` 指定终止搜索的一致性阈值, 范围从0.0到1.0; 0.0意味着完全的一致性序列
+
+例如, 如果一对序列的distance>maxdist, 该计算终止. 因为U-sorted order并不能和一致性完美匹配, 因此应设置的termdist值略小于最大距离值(maxdist). 若希望所有大于80%一致性的序列对出现在matrix中, 可设置参数`-maxdist 0.2` , `-termdist 0.3`(80%一致性距离, 70%的一致性终止搜索)
+
+`usearch -calc_distmx seqs.fa -tabbedout mx.txt -maxdist 0.2 -termdist 0.3`
+
+`usearch -calc_distmx seqs.fa -tabbedout dist.tree -format phylip_lower_triangular`
+
+***
+
+接上文octave plot
+
+1. 生成包含singleton unique sequences的OTU及OUT table
+
+`usearch -cluster_otus uniques.fa -relabel Otu -otus otus_singleton.fa -uparseout otu.reprot -minsize 1 `
+
+`usearch -otutab merged.fa -otus otus_singleton.fa -strand plus -otutabout otutab_singleton.txt `
+
+2. 计算OUTs.fa的distance matrix
+
+`usearch -calc_distmx uniques.fa -tabbedout mx.txt -maxdist 0.2 -termdist 0.3`
+
+3. 生成ocatve plots
+
+`usearch -otutab_octave otutab.txt -distmxin distmx.txt -otutab_with_singles otutab_singleton.txt -htmlout octave.html -svgout octave.svg`
+
+***
+
+#### Beta diversity
+
+beta多样性比较两个样本. 一般而言, 通过计算得到一数值来表明样本间的相似性或差异性. 该数值范围从0到1.
+
+一组样本之间的成对比较可以通过distance matrix展示, 在usearch分析中, beta多样性常为差异测量, 而不是相似性测量值, 因此, 增加值表明更低的相似性和更远的距离. 
+
+可通过`beta_div`命令将相似性样本聚集, 自动生成树结构图; 或者通过`cluster_aggd`命令聚集由`beta_div`或其他第三方软件生成的distance matrix来获得样本树状结构图(clac_distmx for sequences/beta_div for OTU table/cluster_aggd for tree from the distance matrix).
+
+`beta_div`命令通过一个OTU表格计算一个或多个beta diversity metrics. 
+
+`-metrics` 指定逗号分隔的一个或多个metrics, 默认使用所有支持的metric. 针对每个metric, 生成3个输出文件: distance matrix/sorted distance matrix/tree
+
+![image-20200207180546968](https://tva1.sinaimg.cn/large/0082zybpgy1gbnzvudsw4j312m0g040n.jpg)
+
+`-filename_prefix` 指定输出文件名前缀, 一般为目录名称, 以slash或backslash结尾, 且该目录需已经存在
+
+`-mx_suffix/-sorted_mx_suffix/-tree_suffix` 指定后缀名称; 默认为.txt/.sorted.txt/.tree
+
+计算所有支持的beta metrics并输出到目录'/results/beta'
+
+`usearch -beta_div otutable.txt -filename_prefix /results/beta`
+
+计算Jaccard metric且输出当当前目录
+
+`usearch -beta_div otutable.txt -metrics jaccard`
+
+***
+
+#### Taxonomy
+
+##### Recommended taxonomy databases
+
+使用小的权威的分类数据库, 推荐使用权威的分类序列, 例如最近的RDP训练集或LTP发布的16S数据库; 大的数据库的分类注释信息不够可信, 例如, SILVA/Greengenes/full RDP databases, 大部分是由16S序列预测而来的. 其中大概5分之1是错误的, probably because the guide trees have pervasive branching order errors. 
+
+##### [SINTAX downloads][http://www.drive5.com/usearch/manual/sintax_downloads.html]
+
+![image-20200207185701435](https://tva1.sinaimg.cn/large/0082zybpgy1gbo1d6rj1mj313g0hk0xe.jpg)
+
+##### SINTAX algorithm
+
+SINTAX算法用于预测标记基因reads的分类信息, 例如16S/ITS. 针对所有预测的ranks, 提供bootstap置信值. 该算法类似[RDP Naive Bayesian Classifier algorithm][http://www.drive5.com/usearch/manual/nbc_algo.html], 除了使用k-mer相似性来识别top taxonomy, 而不是Bayesian poseriors, 因此无需训练. 不推荐使用SILVA/Greengenes作为分类参考数据库, 因为该数据库拥有高度错误率, 接近1/5的分类注释都是错误.
+
+##### [Can SINTAX predict species?][http://www.drive5.com/usearch/manual/sintax_species.html]
+
+根据RDP training set with species names, 若使用`sintax`命令, 将会获得具有bootstrap置信度的species预测结果. 同时应对预测结果持怀疑态度, 以为可能, 也是常见的, 获得一个具有高bootstap值的不正确的预测结果, 该结果也会发生在genus,但是speices上最常见.
+
+若使用短的标签例如V4, 则很容易出现两个或多个species拥有一样的标签序列, 那么就不可能识别species. 但是, 该清醒也不会根据当前数据库检测到, 因为大量species都没有被命名也就不可能出现在RDP training set中.
+
+若根据sparse reference数据库, 使用‘top-hit' 分类软件例如SINTAX/RDP, 那么可能遇到over-classification的问题. 例如, 假如top hit为95%的一致性, 那么可能属于不同的species, second-best hit较低, 90%的一致性, 那么SINTAX/RDP的bootstrapping重复选取query序列中一个sub-sample of words(8-mers), 在仅考虑该subsample情况下检测top taxonomy...
+
+![image-20200207191837865](https://tva1.sinaimg.cn/large/0082zybpgy1gbo1zn9toej30xa0k278k.jpg)
+
+##### [sintax command][http://www.drive5.com/usearch/manual/cmd_sintax.html]
+
+sintax命令使用SINTAX算法预测fasta/fastq格式的query序列的分类注释信息, 使用命令`-sintax_summary`命令获得tabbed文本用于作图
+
+搜索的数据库必须含有[taxonomy annotations][http://www.drive5.com/usearch/manual/tax_annot.html], 使用命令`makeudb_sintax`命令也可用于构建[UDB database][http://www.drive5.com/usearch/manual/udb_files.html]
+
+taxonomy annotation指定参考数据库中的序列的taxonomy名称:
+
+![image-20200207205328660](https://tva1.sinaimg.cn/large/0082zybpgy1gbo4qc7j0jj313402wmxe.jpg)
+
+名称前的单个letter指定其taxonomic level: k:Kingdom, d:Domain, p:Phylum, c:Class, o:Order, f:Family, g:Genus, s:Species
+
+UDB文件为包含序列和其k-mer index的数据文件. UDB文件由`makeudb_usearch/makeudb_ublast/makeudb_sintax`命令构建, `udb2fasta`命令可用于将UDB文件转换为FASTA文件, [**FASTA文件中的序列标签必须包含taxonomy annotaions**][http://www.drive5.com/usearch/manual/cmd_makeudb_sintax.html]
+
+`-makeudb_sintax`现推荐被`-makeudb_usearch`取代; 其index paramters默认设置用于`usearch_global`和`usearch_local`使用, 也可通过指定[index paramters][http://www.drive5.com/usearch/manual/indexing_options.html]来取代默认设置
+
+`usearch -makeudb_usearch rdp_16s.fa -output rep_16s.udb`
+
+或者
+
+`usearch -makeudb_usearch db.fasta -output db.udb -wordlength 12 -dbstep 4`
+
+`-tabbedout`指定输出文件名, 文件前三列为query sequence label/predicted bootstrap value/strand, 若指定了预测阈值`-sintax_cutoff`, 则保留足够高的置信度ranks(taxonomic level), 再次打印出来. On V4 reads, using a cutoff of 0.8 gives predictions with similar accuracy to RDP at 80% bootstrap cutoff. 
+
+`-stand` 必须指定
+
+`usearch -sintax reads.fastq -db 16s.udb -tabbedout reads.sintax -strand both -sintax_cutoff 0.8`
+
+或
+
+`usearch -sintax otus.fa -db rdp_16s.udp -tabbedout otus.sintax.table -strand plus -sintax_cutoff 0.8`
+
+![image-20200207224217428](https://tva1.sinaimg.cn/large/0082zybpgy1gbo7vjubjnj310o05ugp0.jpg)
+
+通过`sintax_summary`命令输出sintax预测结果的summary report. 输入为`sintax`输出文件, `-rank`指定rank,例如p为phylum; 同时可指定OTU表格文件, 该OTU identifiers需和sintax输出文件名称一致; 若sintx输出文件发现size annotations, 将会用于计算频率(size=1;size=5;...).
+
+`usearch -sintax_summary sintax.txt -output phylum_summary.txt -rank p`
+
+或者
+
+`usearch -sintax_summary otus.sintax.table -output phylum_summary.txt -rank p -otutabin otutab.txt`
+
+![image-20200207222909987](https://tva1.sinaimg.cn/large/0082zybpgy1gbo7hw2mk9j31320a2786.jpg)
+
+#### Naive Bayesian Classifier algorithm
+
+RDP Naive Bayesian Classifier(NBC)算法是第一个发布用于自动rRNA taxonomy预测方法. 目前已经公布了多个算法, 包括sintax, 但是没有一个算法的准确性能够明确高于NBC.
+
+#####nbc_tax command
+
+`nbc_tax`预测非常类似于RDP提供的Java预测程序
+
+`-tabbedout`指定输出文件, 前3列为: query sequence label/prediction with bootstrap values/strand, 若使用`-sintax_cutoff`指定了预测阈值, 那么会根据阈值集ranks再次输出三列高置信度信息. 同时也可使用`sintax_summary`命令来生成summary reprot(需指定strand信息).
+
+`usearch -nbc_tax otus.fa -db rdp_16s_v16.fa -strand plus -tabbedout nbc_tax.table`
+
+`usearch -sintax_summary nbc_tax.table -output phylum_summary.txt -rank p -otutabin otutab.txt`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
