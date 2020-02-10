@@ -48,7 +48,9 @@ UCLUST的基本步骤根据识别的centroids比较输入序列. 大多数USEARC
 
 针对双端reads, 可通过assembler(`fastq_mergepairs`来合并reads并重新计算合并位置的碱基的Q值, 若两碱基一致, 则该合并后碱基的Q值应更大, 反之, 更小(should be calculated as the posterior probability according to Bayes theorem where the P_e's from the forward and reverse read are the prior probabilities).
 
-**建议使用USEARCH的`fastq_mergepairs`合并双端reads, 因为其他软件无法正确计算posterior Q值, 包括PANDAseq, COPE, PEAR, fastq-join和FLASH.**
+**建议使用USEARCH的[fastq_mergepairs][https://drive5.com/usearch/manual/merge_pair.html]合并双端reads, 因为其他软件无法正确计算posterior Q值, 包括PANDAseq, COPE, PEAR, fastq-join和FLASH.**
+
+![image-20200208171623640](https://tva1.sinaimg.cn/large/0082zybpgy1gbp42r2flmj30yw0cut9x.jpg)
 
 ##### Abundance and amplification bias in amplicon sequencing
 
@@ -471,6 +473,8 @@ OTU数据集为一套OTU序列或ZOTU序列(denoised sequences). 数据集必须
 
 输入和输出都为[QIIME classic format][http://www.drive5.com/usearch/manual/qiime_classic.html], 使用`-sample_size`指定每个样本的reads数目, 没有默认值, 含有小于该sample_size read的样本舍弃.
 
+**尽可能保留多的count, 同时尽可能舍弃少的sample**
+
 使用`-randseed`指定随机数目seed, 该命令用于获得重复性结果
 
 `usearch -otutab_rare otutab.txt -sample_size 5000 -output otutab_5k.txt`
@@ -785,7 +789,41 @@ RDP Naive Bayesian Classifier(NBC)算法是第一个发布用于自动rRNA taxon
 
 `usearch -sintax_summary nbc_tax.table -output phylum_summary.txt -rank p -otutabin otutab.txt`
 
+***
 
+####Miscellaneous
+
+#### Validating merged reads to check for problems
+
+[merge reads programs][https://drive5.com/usearch/manual/merge_bench.html]
+
+[trouble-shooting fastq_mergepairs problems][https://drive5.com/usearch/manual/merge_troubleshoot.html]
+
+[reviewing a fastq_mergepairs reprot to check for problems][https://drive5.com/usearch/manual/merge_report.html]
+
+成对read的组装会出现两种类型错误: 假阴性和假阳性.
+
+##### Mergeing errors may not matter
+
+若使用UPARSE/UNOISE流程分析, 合并成对reads导致的错误可能无关紧要. 一般而言, 这类错误非常随机因此需要重视的是[singletons and should therefore be discard][https://drive5.com/usearch/manual/singletons.html], 且在构建OTUs前处理掉. 错误比对常拥有很多错配, 导致低的Q值出现, 以至于[expected errors][https://drive5.com/usearch/manual/exp_errs.html] > 1, 因此错误比对的reads将会在质量过滤阶段去除掉. 值得关注的错误仅在其频率足够高且拥有足够高的Q值, 因此会在带来错误的OTUs, 这时可以通过[quality control on your sequence][https://drive5.com/usearch/manual/exp_errs.html]来确认.
+
+1. False negatives
+
+假阴性为read对具有有效比对, 但是舍弃了. 假如获得了较低比率的合并reads, 同时有理由相信扩增插入序列足够短使得测序得到的成对reads能够重叠, 那么可能就会遇到假阴性问题. 这时就要查看[merge report][https://drive5.com/usearch/manual/merge_report.html]来确认最常见的舍弃reads对的原因. 最简答方法是通过设置`-fastqout_notmerged_fwd`和`-fastqout_notmerged_rev`来检查未能合并reads输出, 然后(若需要)使用`-fastx_subsample`来获得一小部分reads对去检查. 若出现多个不同原因, 可以采用[use the tabbout file][https://drive5.com/usearch/manual/merge_tabbed_check.html]来发现给定原因下合并失败的reads对, 针对这些example pairs来使用不同参数合并. 
+
+可使用[ublast][https://drive5.com/usearch/manual/merge_tabbed_check.html]来做比对独立的检测, 或者比对未成对的reads到全场序列的参考数据库(see [trouble-shooting problems with fastq mergepairs][https://drive5.com/usearch/manual/merge_troubleshoot.html] for more discussion). 
+
+2. False positives
+
+假阳性由错误的比对导致, 存在两个原因:
+
+a), 该对reads实际上并不重叠, 但是由于R1末端和R2反向互补序列的开端出现错误的相似性导致错误的比对
+
+b), 该对reads不重叠, 但是比对出错(too long or too short because it is offset compared to the correct position). 这在真正的重叠太短时倾向发生.
+
+检查假阳性的方法就是比对合并后的序列到full-length序列的参考数据库. 不正确的比对将会出现可见的gap. 假如成对的reads实际上不重叠, 那么比对将会在合并的序列中出现gap. 但是需要注意, gaps可能是有效的生物学插入或删除. 最清晰的例子就是, 该片段两短也就是gap两短都有很高的一致性, 尤其针对高度保守基因16S.
+
+在OUT流程中, 可以检查那些低丰度的OTUs, 因为问题常发生在这些序列.
 
 
 
