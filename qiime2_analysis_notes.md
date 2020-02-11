@@ -2,20 +2,6 @@
 
 ![image-20200121095209407](https://tva1.sinaimg.cn/large/006tNbRwgy1gb3y30b68zj30nl0cit9y.jpg)
 
-##### Demultiplexing
-
-![image-20200121111730080](https://tva1.sinaimg.cn/large/006tNbRwgy1gb40jv6egbj30yf0g7mzs.jpg)
-
-一般仅采用一个拆分选项: `q2-demux`/`q2-cutadapt`
-
-
-
-
-
-
-
-
-
 ***
 
 #### Moving picture tutorial
@@ -255,7 +241,325 @@ QIIME2的多样性分析可通过`q2-diversity`插件完成, 该插件支持alph
 
 ####8. Taxonomic analysis
 
-探索每个样本的分类学组成(taxonomic composition), 同时再一次关联到样本信息(sample metadata).
+探索每个样本的分类学组成(taxonomic composition), 同时关联到样本信息(sample metadata). 该过程的第一步是将`FeatureData`中的序列给予taxonomy名称. 这里使用pre-trained Naive Bayes classifier和`q2-feature-classifier`插件. 该classifier使用Greengenes 13_8 99% OTUs, 同时这里的序列根据本次分析的16S区域长度, 已经修剪为250bp(V4, 由515F/806R引物对扩增). 将该classifier应用到测序序列, 同时生成可视化比对情况.
+
+注意: 针对Taxonomic classifier, 需要根据样本制备和测序的情况来训练数据, 这其中包含用于扩增的引物和测序reads读长. 因此, 一般要根据[Trainning feature classifiers with q2-feature-classifier][https://docs.qiime2.org/2019.7/tutorials/feature-classifier/]来训练自己的taxonomic classifiers. 这里已经提供了一些通用的classifiers[data resources page][https://docs.qiime2.org/2019.7/data-resources/], 包括Siva-based 16S classifiers.
+
+gg-13-8-99-515-806-nb-classifier.qza: https://data.qiime2.org/2019.7/common/gg-13-8-99-515-806-nb-classifier.qza
+
+`qiime feature-classifier classify-sklearn \
+  --i-classifier gg-13-8-99-515-806-nb-classifier.qza \
+  --i-reads rep-seqs-deblur.qza \
+  --o-classification taxonomy.qza`
+
+`qiime metadata tabulate \
+  --m-input-file taxonomy.qza \
+  --o-visualization taxonomy.qzv`
+
+![image-20200211122028392](https://tva1.sinaimg.cn/large/0082zybpgy1gbscdw74vzj315o07cjsh.jpg)
+
+使用交互式条形图查看taxonomic composition
+
+`qiime taxa barplot \
+  --i-table table-deblur.qza \
+  --i-taxonomy taxonomy.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --o-visualization taxa-bar-plots.qzv`
+
+![image-20200211130432922](https://tva1.sinaimg.cn/large/0082zybpgy1gbsdnlakwpj318003gwes.jpg)
+
+#### 9. Differential abundance testing with ANCOM
+
+ANCOM可在样本分组中识别差异丰度的特征(features)(i.e. present in different abundances). 和任何生物信息学方法一样, 在使用ANCOM前需要了解其假设和局限性. 推荐在使用前阅读其文章[ANCOM paper][https://www.ncbi.nlm.nih.gov/pubmed/26028277]
+
+注意: microbiome analysis中的差异丰度检测是一个研究热点. QIIME2包括2个方法: `q2-gneiss`和`q2-composition`. 这里使用的是`q2-composition`, 另一个教程使用的是[gneiss][https://docs.qiime2.org/2019.7/tutorials/gneiss/]
+
+在QIIME2中, 通过插件`q2-composition`进行ANCOM分析. ANCOM假设不同的groups间存在少量的特征(features)改变(less than about 25%). 若期待更多的特征出现改变, 那就不要使用ANCOM, 将带来更多错误可能(an increasing in both Type I and Type II errors is possible). 
+
+由于我们期待不同的身体不会会出现许多特征(features)发生改变, 因此这里根据two subjects, 仅针对gut smaples做丰度差异分析. 
+
+首先构建仅包含gut sample的特征表格(feature table)
+
+`qiime feature-table filter-samples \
+  --i-table table-deblur.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --p-where "[body-site]='gut'" \
+  --o-filtered-table gut-table.qza`
+
+![image-20200211133809588](https://tva1.sinaimg.cn/large/0082zybpgy1gbsemn4rdtj318003m3ym.jpg)
+
+ANCOM针对`FeatureTable[Composition]`进行分析, 该软件基于特征的频率(which is based on frequencies of features on a per-sample basis), 但是不能包含频率为0的数据. 因此, 需先对`FeatureTable[Frequency]`做处理
+
+`qiime composition add-pseudocount \
+  --i-table gut-table.qza \
+  --o-composition-table comp-gut-table.qza`
+
+![image-20200211134144230](https://tva1.sinaimg.cn/large/0082zybpgy1gbseqc57pvj318a04074e.jpg)
+
+运行`subject`列来判断差异丰度feature
+
+`qiime composition ancom \
+  --i-table comp-gut-table.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --m-metadata-column subject \
+  --o-visualization ancom-subject.qzv`
+
+![image-20200211134508091](https://tva1.sinaimg.cn/large/0082zybpgy1gbseu0zt3xj317i0383yn.jpg)
+
+同时, 我们也想在特殊的taxonomic level上执行差异丰度检测. To do this, we can collapse the features in our `FeatureTable[Frequency]` at the taxonomic level of interest, and then re-run the above steps. 这里在genus水平查看feature情况
+
+`qiime taxa collapse \
+  --i-table gut-table.qza \
+  --i-taxonomy taxonomy.qza \
+  --p-level 6 \
+  --o-collapsed-table gut-table-l6.qza`
+
+`qiime composition add-pseudocount \
+  --i-table gut-table-l6.qza \
+  --o-composition-table comp-gut-table-l6.qza`
+
+`qiime composition ancom \
+  --i-table comp-gut-table-l6.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --m-metadata-column subject \
+  --o-visualization l6-ancom-subject.qzv`
+
+![image-20200211135305010](https://tva1.sinaimg.cn/large/0082zybpgy1gbsf23gk1tj317w07qmy9.jpg)
+
+***
+
+#### Miscellaneous
+
+#### 1. Filtering data
+
+过滤feature tables, sequences, distance matrices...
+
+`mkdir qiime2-filtering-tutorial`
+
+`cd qiime2-filtering-tutorial`
+
+下载流程数据
+
+Sample-metadata.tsv: https://data.qiime2.org/2019.7/tutorials/moving-pictures/sample_metadata.tsv
+
+table.qza: https://data.qiime2.org/2019.7/tutorials/filtering/table.qza
+
+distance-matrix.qza: https://data.qiime2.org/2019.7/tutorials/filtering/distance-matrix.qza
+
+taxonomy.qza: https://data.qiime2.org/2019.7/tutorials/filtering/taxonomy.qza
+
+sequences.qza: https://data.qiime2.org/2019.7/tutorials/filtering/sequences.qza
+
+##### Filtering feature tables
+
+从feature table中取出samples和features. Feature tables拥有两个坐标: sample axis和feature axis. 针对这两个坐标使用的方法为`filter-samples`和`filter-features`. 这两种方法都用在`q2-feature-table`插件中. 同时根据taxonomy信息可以用来从feature table过滤feature, 使用`q2-taxa`的`filter-table`方法.
+
+##### Total-frequency-based filtering
+
+Total-frequency的过滤可以根据频率过滤feature table中samples或features. 
+
+例如, 过滤sample frequencies中的outlier samples. 在许多16S 分析中, 针对一些samples, 仅获得少数序列(perhaps 10s), 可能由于低的样本biomass导致低的DNA提取量. 在这些情形中, 用户可能想根据最小的总的frequencies来去除一些样本(i.e. total number of sequences obtained for the sample).  这里选择1500, 低于1500的总frequency的samples将被过滤掉:
+
+`qiime feature-table filter-samples \
+  --i-table table.qza \
+  --p-min-frequency 1500 \
+  --o-filtered-table sample-frequency-filtered-table.qza`
+
+![image-20200211201730396](https://tva1.sinaimg.cn/large/0082zybpgy1gbsq6395orj31ty0d0407.jpg)
+
+同时也可根据feature来过滤, 过滤掉低丰度低features
+
+`qiime feature-table filter-features \
+  --i-table table.qza \
+  --p-min-frequency 10 \
+  --o-filtered-table feature-frequency-filtered-table.qza`
+
+以上过滤过程也可根据最大的total frequency过滤, `--p-max-frequency`, `--p-min-frequency`, `--p-max-frequency`, 且可合并使用过滤
+
+##### Contingency-based filtering(可能性过滤)
+
+Contingency-based过滤可以根据samples所包含的features, 或根据features所存在的samples来过滤.
+
+该过滤一般用于过滤仅存在一个或多个样本中的features, 该过滤依据是该features可能不是真正存在于biological diversity中, 而是由于PCR或测序错误导致的(例如, PCR chimeras). 例如, 过滤那些仅存在与1个样本的features:
+
+`qiime feature-table filter-features \
+  --i-table table.qza \
+  --p-min-samples 2 \
+  --o-filtered-table sample-contingency-filtered-table.qza`
+
+同样, 仅包含少数features的samples也可以过滤:
+
+`qiime feature-table filter-samples \
+  --i-table table.qza \
+  --p-min-features 10 \
+  --o-filtered-table feature-contingency-filtered-table.qza`
+
+以上两种contingency过滤也可联合使用, 或过滤那些过大的features/samples, `--p-max-features`, `--p-max-samples`
+
+##### Identifier-based filtering
+
+该过滤根据指定的samples/features IDs列表来保留对应的数据. 为根据IDs过滤, 应提供metadata file, `--m-metadata-file`参数. 过滤时仅保留第一列中的IDs信息, 所有其他列的信息都不会读取:
+
+首先根据IDs过滤要求, 构建metadata文件, 该文件包含表头信息:
+
+`echo SampleID > samples-to-keep.tsv
+echo L1S8 >> samples-to-keep.tsv
+echo L1S105 >> samples-to-keep.tsv`
+
+运行`filter-samples`
+
+`qiime feature-table filter-samples \
+  --i-table table.qza \
+  --m-metadata-file samples-to-keep.tsv \
+  --o-filtered-table id-filtered-table.qza`
+
+##### Metadata-based filtering
+
+Metadata-based过滤类似于identifier-based过滤, 不同的是不是根据提供的IDs来保留, 而是根据搜索标准来保留. 用户提供样本描述信息`--p-where`, 保留`--m-metadata-file`中的匹配samples(语法信息, SQLite [WHERE-clause][https://en.wikipedia.org/wiki/Where_(SQL)] syntax).
+
+`qiime feature-table filter-samples \
+  --i-table table.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --p-where "[subject]='subject-1'" \
+  --o-filtered-table subject-1-filtered-table.qza`
+
+若从单个metadata列中选择保留多个值, 使用`IN`来实现:
+
+`qiime feature-table filter-samples \
+  --i-table table.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --p-where "[body-site] IN ('left palm', 'right palm')" \
+  --o-filtered-table skin-filtered-table.qza`
+
+同时`--p-where`表达式可以使用`AND`和`OR`来结合多个列过滤, `AND` 表共同满足:
+
+`qiime feature-table filter-samples \
+  --i-table table.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --p-where "[subject]='subject-1' AND [body-site]='gut'" \
+  --o-filtered-table subject-1-gut-filtered-table.qza`
+
+`OR`表示满足一个即可:
+
+`qiime feature-table filter-samples \
+  --i-table table.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --p-where "[body-site]='gut' OR [reported-antibiotic-usage]='Yes'" \
+  --o-filtered-table gut-abx-positive-filtered-table.qza`
+
+还满足`AND NOT`描述:
+
+`qiime feature-table filter-samples \
+  --i-table table.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --p-where "[subject]='subject-1' AND NOT [body-site]='gut'" \
+  --o-filtered-table subject-1-non-gut-filtered-table.qza`
+
+##### Taxonomy-based filtering of tables and sequences
+
+基于分类学的过滤是非常常见的feature-metadata-based filtering, `filter-table`可用于简化该步骤. 过滤可以通过`--p-include`来保留指定的taxa或通过`--p-exclude`来排除指定的taxa.
+
+ 例如, 排除所有注释为`mitochondria`的所有featues, 当`--p-mode contains`(默认), 该搜索是大小写不敏感的, 因为`Mitochondria`同样搜索到:
+
+`qiime taxa filter-table \
+  --i-table table.qza \
+  --i-taxonomy taxonomy.qza \
+  --p-exclude mitochondria \
+  --o-filtered-table table-no-mitochondria.qza`
+
+根据taxonomic annotation, 删除多个搜索项目的features, 通过逗号分隔搜索条目, 例如去除包含`mitochondira`或`chloroplast`的features:
+
+`qiime taxa filter-table \
+  --i-table table.qza \
+  --i-taxonomy taxonomy.qza \
+  --p-exclude mitochondria,chloroplast \
+  --o-filtered-table table-no-mitochondria-no-chloroplast.qza`
+
+还可以通过`--p-include`来保留最低注释水平的features, 使用`p_`来表示注释到了phylum-level:
+
+`qiime taxa filter-table \
+  --i-table table.qza \
+  --i-taxonomy taxonomy.qza \
+  --p-include p__ \
+  --o-filtered-table table-with-phyla.qza`
+
+同时使用`--p-include`和`--p-exclude`参数来过滤:
+
+`qiime taxa filter-table \
+  --i-table table.qza \
+  --i-taxonomy taxonomy.qza \
+  --p-include p__ \
+  --p-exclude mitochondria,chloroplast \
+  --o-filtered-table table-with-phyla-no-mitochondria-no-chloroplast.qza`
+
+默认条件下, 根据`--p-include`和`--p-exclude`, 只要匹配的内容包含在taxonomic annotaion中就可实现过滤. 若希望搜索内容完全匹配, 则需要提供提供参数`--p-mode exact`(来表明搜索需要完全匹配方可), 同时该参数表明搜索内容是大小写敏感的.
+
+例如, 确切匹配到该搜索内容:
+
+`qiime taxa filter-table \
+  --i-table table.qza \
+  --i-taxonomy taxonomy.qza \
+  --p-mode exact \
+  --p-exclude "k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rickettsiales; f__mitochondria" \
+  --o-filtered-table table-no-mitochondria-exact.qza`
+
+Taxonomy-based过滤也可以通过`qiime feature-table filter-features`搭配参数`--p-where`来过滤.
+
+##### Filtering sequences
+
+`filtering-seqs`可以根据feature的taxonomic annotation来过滤`FeatureData[Sequence]`. 该过滤非常类似于`qiime taxa filter-table`. 例如, 保留所有包含phylum-levels annotation, 同时删除`mitochondira`或`chloroplast`的features:
+
+`qiime taxa filter-seqs \
+  --i-sequences sequences.qza \
+  --i-taxonomy taxonomy.qza \
+  --p-include p__ \
+  --p-exclude mitochondria,chloroplast \
+  --o-filtered-sequences sequences-with-phyla-no-mitochondria-no-chloroplast.qza`
+
+`q2-feature-table`可拥有`filter-seqs`方法, 可用于根据多种标准过滤序列, 其features包含在feature table中; **`q2-quality-control`中的`exclude-seqs`可用于过滤匹配参考序列或引物的序列**
+
+##### Filtering distance matrices
+
+通过`q2-diversity`的`filter-distance-matrix`根据distance matrix过滤样本. 该过滤同根据identifier或sample metadata过滤 feature table.
+
+例如, 根据identifiers来过滤distance matrix:
+
+`qiime diversity filter-distance-matrix \
+  --i-distance-matrix distance-matrix.qza \
+  --m-metadata-file samples-to-keep.tsv \
+  --o-filtered-distance-matrix identifier-filtered-distance-matrix.qza`
+
+根据sample metadata过滤:
+
+`qiime diversity filter-distance-matrix \
+  --i-distance-matrix distance-matrix.qza \
+  --m-metadata-file sample-metadata.tsv \
+  --p-where "[subject]='subject-2'" \
+  --o-filtered-distance-matrix subject-2-filtered-distance-matrix.qza`
+
+***
+
+#### 2. Training feature classifiers with q2-feature-classifier
+
+这里使用[Greengenes][http://qiime.org/home_static/dataFiles.html]参考序列训练[Naive Bayes classifier][https://scikit-learn.org/stable/modules/naive_bayes.html#multinomial-naive-bayes];  同时QIIME2 [data resources][https://docs.qiime2.org/2019.7/data-resources/]包含多个训练好的classifiers.
+
+##### Obtaining and importing reference data sets
+
+
+
+
+
+
+
+85_otus.fasta: https://data.qiime2.org/2019.7/tutorials/training-feature-classifiers/85_otus.fasta
+
+85_otu_taxonomy.txt: https://data.qiime2.org/2019.7/tutorials/training-feature-classifiers/85_otu_taxonomy.txt
+
+rep-seqs.qza: https://data.qiime2.org/2019.7/tutorials/training-feature-classifiers/rep-seqs.qza
+
+
+
+
 
 
 
