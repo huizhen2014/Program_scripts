@@ -1,5 +1,3 @@
-
-
 ###Anaconda
 
 ####Managing conda
@@ -18,7 +16,7 @@ Conda update conda
 
    删除环境
 
-   conda-env remove -n name -p path 
+   conda-env remove --name name 
 
    conda remove -n py36 --all
 

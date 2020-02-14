@@ -2,6 +2,129 @@
 
 ![image-20200121095209407](https://tva1.sinaimg.cn/large/006tNbRwgy1gb3y30b68zj30nl0cit9y.jpg)
 
+屏显帮助信息:
+
+`qiime --help`/`qiime demux --help`/`qiime demux emp-single --help`
+
+Artifacts(.qza)/visualization(.qzv)文件为包含了一个或多个数据文件的zip压缩文件, 可通过`unzip`来解压缩查看, 但是更好方式是使用`qiime tools exprot`命令导出为特定格式文件([exproting tutorial][https://docs.qiime2.org/2019.7/tutorials/exporting/]).
+
+1. 所有amplicon/metagenome 测序实验开始, 一般都是原始测序数据. 这可能是fastq数据, 包含DNA序列和对应质量值
+2. 必须拆分这些数据, 知道这些reads来自哪些样本
+3. 拆分后reads然后去噪音为amplicon sequence variats(ASVs)或聚类成为operational taxonomic units(OTUs), 以达成两个目的:
+   * 减少测序错误 
+   * 去除重复序列
+
+4. 得到的feature table和代表性序列是数据的关键信息. feature table为必要的样本观察矩阵, 例如, 数据集中每个样本的每个‘feature’(OTUs, ASVs, etc)的出现次数
+5. 针对feature table的分析包括:
+   * Taxonomic classification of sequences(存在哪些species)
+   * Alpha and beta diversity analysis, 或检测样本内和样本间的多阳性(样本的相似性)
+   * 很多多样性分析是根据个体features之间的系统发育相似性进行的. 假如测序的是系统发育树标志物(16S rRNA 基因), 可将这些序列比对来评估得到的features之间的系统发育关系
+   * 差异丰度测量可在不同的实验组内检测哪些features(OTUs, ASVs, taxa, etc)是显著性高/低表达的
+
+更多统计检测: many other statistical tests and plotting methods are at your finger tips
+
+##### [Common semantic types][https://docs.qiime2.org/2019.7/semantic-types/]
+
+`FeatureTable[Frequency]`: feature表格, 其中值通过counts的形式描述一个OTU在对应样本中的表示频率
+
+`FeatureTable[RelativeFrequency]`: feature表格, 其中值表示一个OUT在对应样本中的相对表达丰度, 其中每个样本中的值的和都为1.0
+
+`FeatureTable[PresenceAbsence]`: feature表格, 其中值表示一个OUT在对应样本中的存在/不存在情况
+
+`FeatureTable[Composition]`: feature表格, 每个值表明一个OUT在对应样本中的频率, 同时所有的频率都大于0
+
+`Phylogeny[Rooted]`: rooted系统发育树
+
+`Phylogeny[Unrooted]`: unrooted系统发育树
+
+`DistanceMatrix`: 距离矩阵
+
+`PCoAResults`: principal coordinate analysis(PCoA)结果
+
+`SampleData[AlphaDiversity]`: alpha多样性值, 每个值关联一单个样本(identifier)
+
+`SampleData[SequencesWithQuality]`: 具有质量值的序列, 每套序列都和一个样本(identifier)关联(例如, 拆分后的序列)
+
+`SampleData[PairedEndSequencesWithQuality]`: 具有质量值的双端序列, 每套序列都和一个样本(identifier)相关联(例如, 拆分后双端序列)
+
+`FeatureData[Taxonomy]`: 关联feature identifier的taxonomic信息
+
+`FeatureData[Sequence]`: 关联feature identifier的单个未比对序列(例如, 代表性序列)
+
+`FeatureData[AlignedSequence]`: 关联feature identifier的单个比对的序列, 该比对是针对所有其他feature identifier(例如, 若超过一个feature identifier存在, 表明出现多重序列比对)
+
+`FeatureData[PairedEndSequence]`: 关联feature identifier的双端测序序列
+
+`EMPSingleEndsSequences`: 未拆分的单端测序序列数据, 根据[Earth Microbiom Project sequencing protocol][http://www.earthmicrobiome.org/protocols-and-standards/]生成
+
+`EMPPairedEndSequences`: 同上, 未拆分的双端测序序列数据
+
+`TaxonomicClassifier`: 训练好的classifer, 可用于执行序列的分类学比对
+
+##### Clustering
+
+`q2-vsearch`采用三种不同的[OTU clustering strategies][http://qiime.org/tutorials/otu_picking.html]: de novo, closed reference, the open reference. 所有输入输入数据都应经过[基本的质量过滤][https://www.nature.com/articles/nmeth.2276], 随后进行[chimera][https://docs.qiime2.org/2019.7/tutorials/chimera/]过滤和[aggressive OTU][https://www.nature.com/articles/nmeth.2276]过滤
+
+![image-20200212144913750](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmatqc5tj31i20lok31.jpg)
+
+##### Taxonomy classification and taxonomic analyses
+
+探究样本中所包含的生物, 通过比较query序列(features, ASVs, OTUs)和包含已知分类组成的参考数据库. 
+
+`q2-feature-classifier`包含三种不同的分类方法. `classify-consensus-blast`和`classify-consensus-vsearch`都是基于比对的方式, 在N个top hits中发现一致性比对, 这两个方法直接根据`FeatureData[Taxonomy]`和`FeatureData[Sequence]`文件比对, 无需提前训练.
+
+`classify-sklearn`是基于机器学习的分类方法, 理论上可以采用[scikit-learn][http://scikit-learn.org/]中任何可行的方法. 这些classifier必须先训练. QIIME2也提供了多个提前训练好的[classifier][https://docs.qiime2.org/2019.7/data-resources/].
+
+以上三个方法都很不错, 其中`classify-sklearn`使用Naive Bayes classifer表现稍微好些
+
+![image-20200212145106257](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmcs64bzj31gc0qsdyf.jpg)
+
+##### Sequence alignment and phylogeny building
+
+![image-20200212145332560](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmfbejqfj315y0u0k19.jpg)
+
+##### Diversity analysis
+
+该分析可解决:
+
+样本中存在多少不同的species/OTUs/ASVs
+
+每个样本中存在什么程度的系统发育树多样性
+
+个体样本或成组样本的相似性或差异性
+
+微生物组成的差异和哪些因素相关(PH, 海拔, 血压, 身体部位...)
+
+**这些问题可通过alpha-/beta-divesity分析解决. Alpha多样性检测样本内的多样性. Beta多样性检测样本间的多样性或差异性. 可用这些信息来检测组内样本的alpha diversity, 表明哪些组是拥有更高/更低的species richness, 组间的beta diversity是否更大, 例如, 组内样本间相对于其他组内的样本相似度更高, 表明这些组成员主导了这些样本的微生物组成差异**
+
+`SampleData[AlphaDiversity]` artifacts, 包含feature 表格中的每个样本的alpha多样性评估, 是用于alpha多样性分析的主要文件.
+
+`DistanceMatrix` artifacts, 包含feature 表格中成对样本的距离/差异性值, 是用于beta多样性分析的主要文件.
+
+`PCoAResults` artifacts, 包含每个距离/差异性 metric的principal coordinates ordination结果, [principal coordinates analysis][https://mb3is.megx.net/gustame/dissimilarity-based-methods/principal-coordinates-analysis]是一个维度所见技术, 用于在2/3维空间查看样本差异性比较
+
+![image-20200212145410748](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmfz8qq8j313u0u0tn7.jpg)
+
+##### Fun with feature tables
+
+![image-20200212145458770](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmgt9hj9j316c0u0e0j.jpg)
+
+Analyze longitudinal data: `q2-longitudinal` is a plugin for performing statistical analyses of [longitudinal experiments][https://en.wikipedia.org/wiki/Longitudinal_study], 例如, where samples are collected from individual patients/subjects/sites repeatedly over time. This include longitudinal studies of alpha and beta diversity, and some really awesome, interactive plots.
+
+Predict the future/the past: `q2-sample-classifer`用于根据机器学习分析feature数据. 支持分类和回归模型. 通过该分析可以:
+
+* predict sample metadata as a function of feature data(例如, 使用粪便样本预测肿瘤易感性, 或在发酵前基于葡萄的微生物组成预测红酒质量)
+* identify features that are predictive of different sample characteristics
+* quantity rates of microbial maturation(在胎儿肠道中追踪微生物发展, 以及长期影响不良, 抗生素, 饮食, 和分娩方式的对微生物发展的影响)
+* perdict outliers and mislabeled sampels
+
+Differential abundance: 判断不同的分组的样本中哪些features是显著性多或少, 当前QIIME2支持多种不同差异丰度检测, 包括[ANCOM][https://docs.qiime2.org/2019.7/tutorials/moving-pictures/#ancom]和[q2-gnesis][https://docs.qiime2.org/2019.7/tutorials/gneiss/]
+
+Evaluate and control data quality: `q2-quality-control`用于评估和控制测序数据质量, 包含:
+
+* 检测不同生物信息学或分子方法多准确性, 或run与run之间多质量变化. 典型用于已知样本组成的分析, 例如, [mock communities][http://mockrobiota.caporasolab.us/]
+* 根据比对到参考数据的情况来过滤序列, 或一些包含了DNA的短的部分的参考序列(例如, primer sequences). 用于去除匹配特殊物种的序列, 非靶向序列, 或其他无意义序列.
+
 ***
 
 #### Moving picture tutorial
@@ -328,6 +451,74 @@ ANCOM针对`FeatureTable[Composition]`进行分析, 该软件基于特征的频�
 
 ***
 
+#### ["Atacama soli microbiome" tutorial][https://docs.qiime2.org/2019.7/tutorials/atacama-soils/#atacama-demux]
+
+sample-metadata.tsv: https://data.qiime2.org/2019.7/tutorials/atacama-soils/sample_metadata.tsv
+
+emp-paired-end-sequences/forward.fastq.gz: https://data.qiime2.org/2019.7/tutorials/atacama-soils/10p/forward.fastq.gz
+
+emp-paired-end-sequences/reverse.fastq.gz: https://data.qiime2.org/2019.7/tutorials/atacama-soils/10p/reverse.fastq.gz
+
+emp-paired-end-sequences/barcodes.fastq.gz: https://data.qiime2.org/2019.7/tutorials/atacama-soils/10p/barcodes.fastq.gz
+
+1. Paired-end read analysis commands
+
+`qiime tools import \
+   --type EMPPairedEndSequences \
+   --input-path emp-paired-end-sequences \
+   --output-path emp-paired-end-sequences.qza`
+
+拆分序列reads. 需要sample metadata文件, 同时指定包含样本barcodes的列. 该例子中, barcode reads是反向互补地包含在sample metadata文件中, 使用参数`--p-rev-comp-mapping-barcodes`
+
+`qiime demux emp-paired \
+  --m-barcodes-file sample-metadata.tsv \
+  --m-barcodes-column barcode-sequence \
+  --p-rev-comp-mapping-barcodes \
+  --i-seqs emp-paired-end-sequences.qza \
+  --o-per-sample-sequences demux.qza \
+  --o-error-correction-details demux-details.qza`
+
+`qiime demux summarize \
+  --i-data demux.qza \
+  --o-visualization demux.qzv`
+
+![image-20200212193346089](https://tva1.sinaimg.cn/large/0082zybpgy1gbtuiw2yndj317q07kmy5.jpg)
+
+![image-20200212200520254](https://tva1.sinaimg.cn/large/0082zybpgy1gbtvfsl7u0j31r80icwle.jpg)
+
+根据forward/reverse reads的质控图. 因为需要read足够长来满足双端read的重叠, 根据图示去除foward/reverse reads的前13bp, 但不修剪reads的末端序列, 避免减少read长度太多:
+
+`qiime dada2 denoise-paired \
+  --i-demultiplexed-seqs demux.qza \
+  --p-trim-left-f 13 \
+  --p-trim-left-r 13 \
+  --p-trunc-len-f 150 \
+  --p-trunc-len-r 150 \
+  --o-table table.qza \
+  --o-representative-sequences rep-seqs.qza \
+  --o-denoising-stats denoising-stats.qza`
+
+根据对应的sample-metadata信息, 获得对应统计信息:
+
+`qiime feature-table summarize \
+  --i-table table.qza \
+  --o-visualization table.qzv \
+  --m-sample-metadata-file sample-metadata.tsv`
+
+`qiime feature-table tabulate-seqs \
+  --i-data rep-seqs.qza \
+  --o-visualization rep-seqs.qzv`
+
+同时查看去噪音统计:
+
+`qiime metadata tabulate \
+  --m-input-file denoising-stats.qza \
+  --o-visualization denoising-stats.qzv`
+
+  至此, 剩下的步骤和单端reads数据一样, 可移步[the moving pictures tutorial][https://docs.qiime2.org/2019.7/tutorials/moving-pictures/]
+
+***
+
 #### Miscellaneous
 
 #### 1. Filtering data
@@ -545,17 +736,309 @@ Taxonomy-based过滤也可以通过`qiime feature-table filter-features`搭配�
 
 ##### Obtaining and importing reference data sets
 
+训练the classifier需要两个输入: 参考序列(the reference sequences)和相应的分类数据(the corresponding taxonomic classification). 
 
+为减少计算时间, 这里将使用小的[Greengenes][http://qiime.org/home_static/dataFiles.html] 13_8 85% OTU data set. 注意, 不要使用这里使用的85% OTU数据集用于真实的实验数据. 
 
+推荐使用信息更丰富的序列数据, 根据99%的序列相似度聚类的参考序列用于实际数据的分类. 完整的QIIME兼容的参考数据集: [data resources page][https://docs.qiime2.org/2019.10/data-resources/]
 
-
-
+**注意: 所有参考序列中的序列IDs必须存在于reference taxonomy. 若使用的参考序列集已经聚到了OTUs内, 需确保使用对应的reference taxonomy. 例如, 使用了Greengenes 99% OTU sequences, 就需要使用99% OTU taxonomy(确保IDs一致).**
 
 85_otus.fasta: https://data.qiime2.org/2019.7/tutorials/training-feature-classifiers/85_otus.fasta
 
 85_otu_taxonomy.txt: https://data.qiime2.org/2019.7/tutorials/training-feature-classifiers/85_otu_taxonomy.txt
 
 rep-seqs.qza: https://data.qiime2.org/2019.7/tutorials/training-feature-classifiers/rep-seqs.qza
+
+首先将以上下载数据导入到QIIME2 Artifacts. 因为Greengenes referecne taxonomy file(`85_otu_taxonomy.txt`)是tab分隔的, 不含表头的TSV文件, 这里需要指定`HeaderlessTSVTaxonomyFormat`, 因为默认的格式包含表头行.
+
+`qiime tools import \
+  --type 'FeatureData[Sequence]' \
+  --input-path 85_otus.fasta \
+  --output-path 85_otus.qza`
+
+`qiime tools import \
+  --type 'FeatureData[Taxonomy]' \
+  --input-format HeaderlessTSVTaxonomyFormat \
+  --input-path 85_otu_taxonomy.txt \
+  --output-path ref-taxonomy.qza`
+
+![image-20200212095808726](https://tva1.sinaimg.cn/large/0082zybpgy1gbtdw1nq5cj3172058q3i.jpg)
+
+##### Extract reference reads
+
+It has been shown that taxonomic classification accuracy of 16S rRNA gene sequences improves when a Naive Bayes classifier is trained on only the region of the target sequences that was sequenced([Werner et al., 2012][https://www.ncbi.nlm.nih.gov/pubmed/21716311]). 
+
+已知`Moving Pictures`教程中的测序reads为120bp单端测序, 扩增引物为515F/806R 引物对. 根据匹配的引物对信息和reads长度来从参考数据中提取对应信息:
+
+`qiime feature-classifier extract-reads \
+  --i-sequences 85_otus.qza \
+  --p-f-primer GTGCCAGCMGCCGCGGTAA \
+  --p-r-primer GGACTACHVGGGTWTCTAAT \
+  --p-trunc-len 120 \
+  --p-min-length 100 \
+  --p-max-length 400 \
+  --o-reads ref-seqs.qza`
+
+**注意: `--p-trunc-len`仅在query序列被修剪到相同长度或更短时, 用于修建参考序列. 成功合并了的双端测序序列一般在长度上会有不同, 单端测序若不截短到指定长度也不呈现不同长度. 针对双端reads和没有修建的单端reads, 推荐根据适当引物提取的的序列来训练classifier, 但是不进行修剪.**
+
+**注意: `min-lenght`和`max-length`参数用于排除过远偏离当前引物下的扩增产物分布. 这些过分偏离的扩增产物很可能是non-target hits应该被舍弃. 实际应用时, `min-length`参数在`trim-left`和`trunc-len`之后运行, `max-length`参数是在`trim-left`和`trunc-len`之前作用.**
+
+##### Train the classifier
+
+`qiime feature-classifier fit-classifier-naive-bayes \
+  --i-reference-reads ref-seqs.qza \
+  --i-reference-taxonomy ref-taxonomy.qza \
+  --o-classifier classifier.qza`
+
+##### Test the classifier
+
+`qiime feature-classifier classify-sklearn \
+  --i-classifier classifier.qza \
+  --i-reads rep-seqs.qza \
+  --o-classification taxonomy.qza`
+
+`qiime metadata tabulate \
+  --m-input-file taxonomy.qza \
+  --o-visualization taxonomy.qzv`
+
+![image-20200212105309907](https://tva1.sinaimg.cn/large/0082zybpgy1gbtfh7ad6vj317s072aat.jpg)
+
+##### Classification of fungal ITS sequences
+
+推荐使用full reference sequences来训练UNIT classifiers. 根据[UNITE reference database][https://unite.ut.ee/repository.php], 而不是根据引物位置提取或修剪的reads, 来训练fungal ITS classifiers. Furthermore, we recommend the “developer” sequences (located within the QIIME-compatible release download) because the standard versions of the sequences have already been trimmed to the ITS region (excluding portions of flanking rRNA genes that may be present in amplicons generated with standard ITS primers).
+
+***
+
+####3. Exporting data
+
+需要导出的数据必须为QIIME2 artifacts(i.e. `.qza`). 
+
+##### Exporting a feature table
+
+`FeatureTable[Frequency]` artifacts将会被导出为[BIO v2.1.0 formated file][http://biom-format.org/documentation/format_versions/biom-2.1.html].
+
+feature-table.qza: https://data.qiime2.org/2019.7/tutorials/exporting/feature-table.qza
+
+`qiime tools export \
+  --input-path feature-table.qza \
+  --output-path exported-feature-table`
+
+##### Exporting a phylogenetic tree
+
+`Phylogeny[Unrooted]` artifacts将会被导出为[newick formated file][http://scikit-bio.org/docs/latest/generated/skbio.io.format.newick.html].
+
+unrooted-tree.qza: https://data.qiime2.org/2019.7/tutorials/exporting/unrooted-tree.qza
+
+`qiime tools export \
+  --input-path unrooted-tree.qza \
+  --output-path exported-tree`
+
+##### Exporting versus extracting
+
+`qiime tools extract`, extracting an artifact 不同于 exporting an artifact. 在exporting an artifact时, 只有数据文件被导出到输出目录, extracting会提取出额外关于artifact的QIIME2' metadata, 例如, 包括artifact的出处. 同时, 该用于提取的目录必须已经存在.
+
+`mkdir extracted-feature-table
+qiime tools extract \
+  --input-path feature-table.qza \
+  --output-path extracted-feature-table`
+
+***
+
+#### 4. Improting data
+
+导入数据类型:
+
+* Sequence data with sequence quality information (i.e. FASTQ)
+* Sequence without quality information (i.e. FASTA)
+* Per-feature unaligned sequence data (i.e. representative FASTA sequences)
+* Per-feature aligned sequence data (i.e. aligned representative FASTA sequences)
+* Feature table data 
+* Phylogenetic trees
+* Other data types
+
+为使用QIIME2, 输入数据必须为QIIME2 artifacts(i.e. `.qza`)格式. 
+
+##### Sequence data with sequence quality information (i.e. FASTQ)
+
+不同类型FASTQ数据:
+
+* FASTQ data with the EMP Protocol format
+* FASTQ data with the Casava 1.8 dumultiplexed format
+* Any other kind of FASTQ data
+
+1. "EMP protocol" multiplexed single-end fastq
+
+ 单端'Earth Microbiom Project(EMP) protocol'格式reads应包含两个`fastq.gz`文件:
+
+* `fastq.gz`文件包含单端reads
+* `barcodes.fastq.gz`文件包含相关的barcode reads
+
+这两个`fastq.gz`中的内容顺序是对应的序列read和其barcode read(第一个barcode read对应第一个序列read, 第二个barcode read对应第二个序列read, 依次类推)
+
+`mkdir emp-single-end-sequences`
+
+![image-20200213102932977](https://tva1.sinaimg.cn/large/0082zybpgy1gbukezlrx6j319s03imy8.jpg)
+
+![image-20200213102915699](https://tva1.sinaimg.cn/large/0082zybpgy1gbukeoewhyj30n603ejrr.jpg)
+
+`qiime tools import \
+  --type EMPSingleEndSequences \
+  --input-path emp-single-end-sequences \
+  --output-path emp-single-end-sequences.qza`
+
+2. "EMP protocol" multiplexed paired-end fastq 
+
+拥有3个`fastq.gz`文件: 正向/反向/barcode reads
+
+方法同上"EMP protocol" single-end fastq
+
+3. Casava 1.8 single-end demultiplexed fastq
+
+[Casava 1.8 demultiplexed][http://illumina.bioinfo.ucr.edu/ht/documentation/data-analysis-docs/CASAVA-FASTQ.pdf/view] (single-end) 格式, 针对每个样本各一个`fastq.gz`文件. 文件名称包含样本identifier, `L2S357_15_L001_R1_001.fastq.gz`, 其下划线分隔的文件名称为:
+
+* 样本identifier
+* barcode序列或barcode identifier
+* lane数目
+* read方向(i.e. 只有R1, 因为单端reads)
+* the set number
+
+casava-18-single-end-demultiplexed.zip: https://data.qiime2.org/2019.7/tutorials/importing/casava-18-single-end-demultiplexed.zip
+
+`unzip -q casava-18-single-end-demultiplexed.zip`
+
+`qiime tools import \
+  --type 'SampleData[SequencesWithQuality]' \
+  --input-path casava-18-single-end-demultiplexed \
+  --input-format CasavaOneEightSingleLanePerSampleDirFmt \
+  --output-path demux-single-end.qza`
+
+4. Casava 1.8 paired-end demultiplexed fastq
+
+格式和方法同"Casava 1.8 single-end demultiplexd fastq"
+
+5. "Fastq manifest" formats
+
+如果不是EMP或Casava 格式, 那么要导入QIIME2, 首先就要构建'manifest file', 然后使用`qiime tools import`命令导入.
+
+首先构建一个text文件, 'manifest file', 对应样本identifiers到`fastq.gz`或`fastq`绝对文件路径(包含样本的序列和质量数据, fastq文件). 该manifest文件同样指明了`fastq.gz`或`fastq`文件中reads的方向.
+
+manifest文件是tab-分隔的文本文件(i.e. `.tsv`). 第一列定义了样本的ID, 第二列定义了正向reads文件的绝对路径, 第三列定义了对应反向reads文件的绝对路径(该绝对路径可包含环境变量, `$HOME/$PWD`).
+
+![image-20200213143242902](https://tva1.sinaimg.cn/large/0082zybpgy1gburfycvunj318606i0uf.jpg)
+
+单端fastq文件的manifest文件如下:
+
+![image-20200213143322742](https://tva1.sinaimg.cn/large/0082zybpgy1gburgn5xd2j317w042dgg.jpg)
+
+SingleEndFastqManifestPhred33V2
+
+se-33.zip: https://data.qiime2.org/2019.7/tutorials/importing/se-33.zip
+
+se-33-manifest: https://data.qiime2.org/2019.7/tutorials/importing/se-33-manifest
+
+`unzip -q se-33.zip`
+
+`qiime tools import \
+  --type 'SampleData[SequencesWithQuality]' \
+  --input-path se-33-manifest \
+  --output-path single-end-demux.qza \
+  --input-format SingleEndFastqManifestPhred33V2`
+
+PairedEndFastqManifestPhred64V2
+
+pe-64.zip: https://data.qiime2.org/2019.7/tutorials/importing/pe-64.zip
+
+pe-64-manifest: https://data.qiime2.org/2019.7/tutorials/importing/pe-64-manifest
+
+`unzip -q pe-64.zip`
+
+`qiime tools import \
+  --type 'SampleData[PairedEndSequencesWithQuality]' \
+  --input-path pe-64-manifest \
+  --output-path paired-end-demux.qza \
+  --input-format PairedEndFastqManifestPhred64V2`
+
+6. Sequences without quality information (i.e. FASTA)
+
+支持导入QIIME1 `seqs.fna`文件格式, 每个记录包含2行内容: header和sequence. 每个sequence必须仅且占一行. header中的ID格式为: `<sample-id>_<seq-id>`. `<sample-id>`为样本sequence所属的样本名称(ID), `<seq-id>`为样本内的sequence的名称(ID).
+
+![image-20200213144955408](https://tva1.sinaimg.cn/large/0082zybpgy1gburxy9c05j319q06uadt.jpg)
+
+7. Per-feature unaligned sequence data (i.e., representative fasta sequences)
+
+为比对的序列数据为FASTA格式文件, 包含为比对的DNA序列(i.e. , 不包含`-`或`.`符号). 该序列可以包含degenerate核酸字符, 例如`N`. 
+
+sequences.fna: https://data.qiime2.org/2019.7/tutorials/importing/sequences.fna
+
+`qiime tools import \
+  --input-path sequences.fna \
+  --output-path sequences.qza \
+  --type 'FeatureData[Sequence]'`
+
+8. Per-feature aligned sequence data (i.e. , aligned representative FASTA sequences)
+
+比对了的序列数据是通过包含了DNA序列比对到其他序列的FASTA格式文件导入而来的. 所有比对的序列必须一样长, 该序列可以包含`N`.
+
+aligned-sequences.fna: https://data.qiime2.org/2019.7/tutorials/importing/aligned-sequences.fna
+
+`qiime tools import \
+  --input-path aligned-sequences.fna \
+  --output-path aligned-sequences.qza \
+  --type 'FeatureData[AlignedSequence]'`
+
+![image-20200213150014482](https://tva1.sinaimg.cn/large/0082zybpgy1gbus8lfe61j30z80gcn3h.jpg)
+
+9. Feature table data
+
+导入pre-processed feature table
+
+[BIO v1.0.0][http://biom-format.org/documentation/format_versions/biom-1.0.html]
+
+feature-table-v100.biom: https://data.qiime2.org/2019.7/tutorials/importing/feature-table-v100.biom
+
+`qiime tools import \
+  --input-path feature-table-v100.biom \
+  --type 'FeatureTable[Frequency]' \
+  --input-format BIOMV100Format \
+  --output-path feature-table-1.qza`
+
+[BIOM v2.1.0][http://biom-format.org/documentation/format_versions/biom-2.1.html]
+
+feature-table-v210.biom: https://data.qiime2.org/2019.7/tutorials/importing/feature-table-v210.biom
+
+10. Phylogenetic trees
+
+Phylogenetic trees 是从newick 格式文件导入而来的.
+
+unrooted-tree.tre: https://data.qiime2.org/2019.7/tutorials/importing/unrooted-tree.tre
+
+`qiime tools import \
+  --input-path unrooted-tree.tre \
+  --output-path unrooted-tree.qza \
+  --type 'Phylogeny[Unrooted]'`
+
+11. Other data types
+
+查看帮助:
+
+`qiime tools import \
+  --show-importable-formats`
+
+![image-20200213151832444](https://tva1.sinaimg.cn/large/0082zybpgy1gbusrp8ovhj30mw066q3m.jpg)
+
+`qiime tools import \
+  --show-importable-types`
+
+![image-20200213151937863](https://tva1.sinaimg.cn/large/0082zybpgy1gbusstfygbj30r2068wf4.jpg)
+
+***
+
+
+
+
+
+
 
 
 
