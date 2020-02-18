@@ -748,7 +748,7 @@ property其实并不是函数, 而是一个类. 它的实例包含一些魔法�
 
 * 通用生成器
 
-生成器是包含了关键字yield的函数, 但被调用时不会执行函数体内的代码, 而是返回一个迭代器, 每次请求值, 都将执行生成器的代码, 直到遇到yield或return. yield意味着应生成一个值, 而return意味着生成器停止执行(即不再生成值, 仅当在生成器调用return时, 才能不提供任何参数).
+生成器是包含了关键字yield的函数, 但被调用时不会执行函数体内的代码, 而是返回一个迭代器, 每次请求值, 都将执行生成器的代码, 直到遇到yield或return. **yield意味着应生成一个值, 而return意味着生成器停止执行(即不再生成值, 仅当在生成器调用return时, 才能不提供任何参数).**
 
 生成器由两个单独部分组成: 生成器的函数和生成器的迭代器. 生成器的函数由def语句定义, 其中包含yield. 生成器的迭代器就是这个函数返回的结果.
 
@@ -765,6 +765,324 @@ property其实并不是函数, 而是一个类. 它的实例包含一些魔法�
 状态表示: 使用元组(或列表)来表示可能的解(或其一部分), 其中每个元素表示相应中皇后的所在位置(即列). 例如: state[0]==3, 表示第1行的皇后放置在第4列(从0计算).
 
 检测冲突: 函数conflict接受既有的皇后位置, 并确定下一个皇后的位置是否冲突:
+
+p296????
+
+总结:
+
+* 构造函数: 很多面向对象语言中都有构造函数, 对于你自己编写的每个类, 都可能需要为它实现一个构建函数. 构建函数名为`_init_`, 在对象构建后被自动调用.
+* 迭代器: 简单地说, 迭代器是包含方法`_next_`的对象, 可用于迭代一组值. 没有更多的值可供迭代时, 方法`_iter_`, 它返回一个像序列一样可用于for循环中的迭代器. 通常, 迭代器也是可迭代的, 即包含返回迭代器本身的方法`_iter_`.
+* 生成器: 生成器的函数是包含关键字yield的函数, 它在被调用时返回一个生成器, 即一种特殊的迭代器. 要与活动的生成器交互, 可使用方法send, throw和close.
+
+`iter(obj)`: 从可迭代对象创建一个迭代器
+
+`next(it)`: 让迭代器前进一步并返回下一个元素
+
+`property(fget, fset, fdel, doc)`: 返回一个特性; 所有参数都是可选的
+
+`super(class, obj)`: 返回一个超类的关联实例
+
+* 模块就是程序
+
+创建简单模块hello.py: `print("Hello, world!")`
+
+`import sys`; `sys.path.append("/dir/to/hello.py")`
+
+`import hello`: Hello, world!
+
+发现模块hello.py所在目录会出现一个名为`_pycache_`的子目录, 包含处理后的文件, Python能够更高效地处理它们. 重复导入不会执行代码, 因为模块不是用来执行操作的, 而是定义变量, 函数, 类等. 鉴于定义只需做一次, 因此导入模块多次和导入一次的效果相同.
+
+若一定要重新加载模块, 可使用模块importlib中的函数reload, 接受一个参数(需要重新加载的模块), 并返回重新加载的模块:
+
+`import importlib`
+
+`hello=importlib.reload(hello)`: Hello, world!
+
+* 模块使用来下定义的
+
+在模块中定义函数, 像处理模块那样, 让程序可用后, 可使用`python -m progname args`, 使用命令行参数args来执行程序progname
+
+![image-20200216213257410](https://tva1.sinaimg.cn/large/0082zybpgy1gbykg53gtfj31a004cdgd.jpg)
+
+![image-20200216213312729](https://tva1.sinaimg.cn/large/0082zybpgy1gbykgebkc6j30zy02u74u.jpg)
+
+可在模块中加入测试代码, 例如在`def hello():...`后加上`hello()`, 那么在`import`时, 若正确就会执行`hello()`. 但这不是一个好的结果, 若要避免, **关键是检查模块是否作为程序运行还是导入另一个程序**. 为此, 使用变量`__name__`
+
+![image-20200216213917276](https://tva1.sinaimg.cn/large/0082zybpgy1gbykmq240yj30zm04caaa.jpg)
+
+**在主程序(包括解释器的交互式提示符), 变量`__name__`的值为`__main__`; 而在导入的模块中, 该值被设置为该模块的名称.**
+
+![image-20200216214559910](https://tva1.sinaimg.cn/large/0082zybpgy1gbyktqvggcj30zm07ugm1.jpg)
+
+![image-20200216214630501](https://tva1.sinaimg.cn/large/0082zybpgy1gbyku8ltvgj30zq05qmyh.jpg)
+
+如果将该模块当程序运行, 将执行函数hello(), 若导入它, 则像其他普通模块一样; 同时使用了`if`函数, 可通过`hello4.test()`独立测试.
+
+* 让模块可用
+
+根据模块目录`sys.path`将模块放在正确的位置:
+
+![image-20200216215031814](https://tva1.sinaimg.cn/large/0082zybpgy1gbykyf0atnj311i0aajus.jpg)
+
+告诉解释器到哪里去查找
+
+`export PYTHONPATH=$PYTHONPATH:~/python`
+
+* 包
+
+为组织模块, 可将其编组为包(package). 包其实就是另一种模块, 但有趣的是他们可包含其他模块. 模块存储在扩展名为`.py`的文件中, **而包则是一个目录. 要被python视为包, 目录必须包含文件`__init__.py`.  如果像普通模块一样导入包, 文件`__init__.py`的内容就将是包的内容.** 例如
+
+![image-20200216220050204](https://tva1.sinaimg.cn/large/0082zybpgy1gbyl958m8kj311m04et97.jpg)
+
+那么, 若要将模块加入包中, 只需将模块文件放在包的目录中即可:
+
+![image-20200216220946319](https://tva1.sinaimg.cn/large/0082zybpgy1gbylig43maj311s064dhc.jpg)
+
+仅导入`constants`时, 仅能使用`___init__.py`中的值, 不能使用模块`hello2.py`, 需单独导入.
+
+* 模块包含什么
+
+要查明模块包含哪些东西, 可使用函数`dir`, 它列出对象的所属性(对于模块, 它列出所有的函数, 类, 变量等).  在这些名称中, 有几个以下划线打头, 根据约定, 这意味着它们并非供外部使用.
+
+![image-20200217094806810](https://tva1.sinaimg.cn/large/0082zybpgy1gbz5p1wbrmj31d606w405.jpg)
+
+`dir(copy)`返回清单中包含`__all__`, 为模块内部设置, 避免模块包含大量其他程序不需要变量, 函数和类, 若不设置`__all__` , 则会在`from copy import *`导入所有不以下划线打头的全局名称.
+
+* 使用help获得帮助
+
+`help(copy.copy)`/`help(copy)`
+
+`__doc__`模块文档字符串就是函数开头编写的字符串, 用于对函数进行说明, 而函数的属性`__doc__`可能包含这个字符串, 同时, 模块也可能有文档字符穿(位于模块的开头), 而类也可能如此(位于类的开头).
+
+![image-20200217191159179](https://tva1.sinaimg.cn/large/0082zybpgy1gbzlzrqauhj311w04smxu.jpg)
+
+![image-20200217094630920](https://tva1.sinaimg.cn/large/0082zybpgy1gbz5neis8dj31be0463z1.jpg)
+
+**`deepcopy(x)`创建x的属性的副本并依次类推; 而`copy(x)`只复制x, 并将副本的属性关联到x的属性值**
+
+* 使用源代码
+
+但要真正理解python语言, 可能需要了解一些不阅读源代码就无法了解的事情, 事实上, 要学习python, 阅读源代码时除手动编写代码外的最佳方式
+
+![image-20200217095550216](https://tva1.sinaimg.cn/large/0082zybpgy1gbz5x39ihdj31c802mq3d.jpg)
+
+* 标准库
+
+**模块sys**
+
+`argv`: 命令行参数, 包括脚本名
+
+`exit([arg])`: 退出当前程序, 可通过可选参数指定返回值或错误消息
+
+`modules`: 一个字典, 将模块名映射到加载的模块
+
+`path`: 一个列表, 包含要在其中查找模块的目录的名称
+
+`stdin`: 标准输入流, 一个类似于文件的对象
+
+`stdout`: 标准输出流, 一个类似于文件的对象
+
+`stderr`: 标准错误流, 一个类似于文件的对象
+
+**模块os, 可用于访问多个操作系统服务, 除此之外, os及其子模块os.path还包含多个查看, 创建和删除目录及文件的函数,  以及一些操作路径的函数(例如, os.path.split/os.path.join让你在大多数情况下都可以忽略os.pathsep)**
+
+`environ`: 包含环境变量的映射
+
+`system(command)`: 在子shell中执行操作系统命令
+
+`sep`: 路径中使用的分隔符
+
+`pathsep`: 分隔不同路径的分隔符
+
+`linesep`: 行分隔符('\n', '\r'或'\r\n')
+
+**模块time**
+
+元组(2008,1,21,12,2,56,0,21,0)表示2008年1月21日12时2分56秒, 星期一, 2008年的第21天(不考虑夏令时)
+
+**python日期元祖中的字段(索引从0开始): 年, 月, 日, 时, 分, 秒(0-61), 星期(0-6), 儒略日(1-366), 夏令时(0/1/-1)**
+
+模块time中的重要函数
+
+`asctime([tuple])`: 将时间元组转换为字符串
+
+`localtime([secs])`: 将秒数转换表示为当地时间的日期元组
+
+`mktime(tuple)`: 将时间元组转换为当地时间
+
+`sleep(secs)`: 休眠(什么都不做)secs秒
+
+`strptime(string[, format])`: 将字符串转换为时间元组
+
+`time()`: 当前时间(从新纪元开始后的秒数, 以UTC为准)
+
+![image-20200217133155323](https://tva1.sinaimg.cn/large/0082zybpgy1gbzc5xryrnj311q08e40q.jpg)
+
+**模块random**包含生成伪随机数的函数(其背后的系统时可预测的), 有助于编写模拟程序或生成随机输出的程序. 若要求真正的随机, 考虑使用模块os中的函数urandom.
+
+`random()`: 返回一个0-1(含)的随机实数
+
+`getrandbits(n)`: 以长整数方式返回n个随机的二进制位
+
+`uniform(a,b)`: 返回一个a-b(含)的随机实数
+
+`randrange([start],stop,[strp])`: 从range(start,stop,step)中随机地选择一个数
+
+`choice(seq)`: 从序列seq中随机地选择一个元素
+
+`shuffle(seq[, random])`: 就地打乱序列seq
+
+`sample(seq,n)`: 从序列seq中随机地选择n个值不同的元素
+
+![image-20200217182430401](https://tva1.sinaimg.cn/large/0082zybpgy1gbzkmdb8v2j310w08stal.jpg)
+
+![image-20200217183352260](https://tva1.sinaimg.cn/large/0082zybpgy1gbzkw40drcj314i042my2.jpg)
+
+`shuffle(deck)`; `while deck:input(deck.pop())`
+
+* 集合, 堆和双端队列
+
+以前集合是由模块sets中的Set类实现的, 较新的版本中, 集合是由内置类set实现, 可直接创建集合, 无需导入模块sets
+
+![image-20200217105009545](https://tva1.sinaimg.cn/large/0082zybpgy1gbz7hm7gvdj310q05kzl7.jpg)
+
+集合主要用于成员资格检查, 因此将忽略重复的元素, 与字典一样, 集合中元素的排列顺序是不确定的. 集合可用于各种标准集合操作, 如并集和交集, 为此可使用对整数执行按位操作的运算符(参考附录B)
+
+![image-20200217105303113](https://tva1.sinaimg.cn/large/0082zybpgy1gbz7kmexxfj310w05uaao.jpg)
+
+计算两个集合的并集的函数时, 可使用set中方法union的未关联版本, 搭配reduce使用(**接受的参数和map类似, 一个函数f, 一个list, 但是行为和map不同, reduce传入的函数f必须接受两个参数, reduce对list的每个元素反复调用函数f, 并返回最终结果值; map每次调用函数后, 返回包含返回值的列表, py2为列表, py3为迭代器**):
+
+![image-20200217111130427](https://tva1.sinaimg.cn/large/0082zybpgy1gbz83u3b91j311k06s75p.jpg)
+
+![image-20200217112343143](https://tva1.sinaimg.cn/large/0082zybpgy1gbz8gjknd1j311i0cwdhq.jpg)
+
+集合时可变的, 因此不能用作字典中的键. 另一个问题是, 集合只能包含不可变的值, 因此不能包含其他集合. 可使用frozenset类型, 它表示不可变的集合:
+
+![image-20200217130203240](https://tva1.sinaimg.cn/large/0082zybpgy1gbzbaujtxcj311o06uaay.jpg)
+
+堆(heap), 一种优先队列. 优先队列让你能够以任意球顺序添加对象, 并随时(可能是在两次添加对象之间)找出(并删除)最小的元素. 相比于列表方法min, 这样做的效率要高得多. 堆操作函数模块`heapq`, 包含6个函数:
+
+`heappush(heap,x)`: 将x压入堆中
+
+`heappop(heap)`: 从堆中弹出最小的元素
+
+`heapify(heap)`: 让列表具备堆特征
+
+`heapreplace(heap,x)`: 弹出最小的元素, 并将x压入堆中
+
+`nlargest(n,iter)`: 返回iter中n个最大的元素
+
+`nsmallest(n,iter)`: 返回iter中n个最小的元素
+
+**堆特征: 位于i处的元素总是大于位置`i//2`处的元素(反过来说就是小于位置`i*2`和`i*2 + 1`处的元素), 这是底层堆算法的基础, 称为堆特征(heap property).**
+
+在需要按添加元素的顺序进行删除时, 双端队列很有用. 在模块collections中, 包含类型deque以及其他几个集合(collection)类型. 和集合(set)一样, 双端队列也是从可迭代对象创建的:
+
+![image-20200217131737246](https://tva1.sinaimg.cn/large/0082zybpgy1gbzbr23c3wj31dk0gwn0o.jpg)
+
+**双端队列支持队首(左端)高效弹出和附加元素, 还可以高效地旋转元素(将元素向右或向左移, 并在到达一端时环绕到另一端); 此外还支持`extend`和`extendleft`, 注意用于`extendleft`的可迭代对象中的元素将按照相反的顺序出现在双端队列中.**
+
+![image-20200217132145937](https://tva1.sinaimg.cn/large/0082zybpgy1gbzbvev1qqj30za036q3a.jpg)
+
+* shelve和json
+
+对于模块shelve, 唯一感兴趣的函数`open`. 这个函数将一个文件名作为参数, 并返回一个`Shelf`对象, 供你用来存储数据. 可像操作普通字典那样操作(只是键必须为字符串), 操作完毕(并将所做的修改存盘)时, 可调用其他方法`close`.
+
+![image-20200217190350863](https://tva1.sinaimg.cn/large/0082zybpgy1gbzlrayfb4j312006ydgu.jpg)
+
+这里列表['a','b','c']被存储到了s的‘x'键下; 将‘d'附加到这个新列表末尾, 但这个修改后的版本未被存储; 最后再次获得原来版本, 其中没有'd'.
+
+要正确地修改使用模块shelve存储的对象, 必须将获取的副本赋给一个临时变量, 并在修改这个副本后再次存储:
+
+![image-20200217190734322](https://tva1.sinaimg.cn/large/0082zybpgy1gbzlv6gxn9j311m066dgj.jpg)
+
+另一个方法是, 将函数open的参数writeback设置为True, 使得shelf对象读取或赋给它的所有数据结构都将保存到内存(缓存)中, 并等到你关闭shelf对象(`temp.close()`)时才将它们写入磁盘(`t=open('test.dat',writeback=True)`).
+
+* re
+
+正则表达式是可匹配文本片段的模式. 最简单的正则表达式为普通字符串, 与它自己相匹配.
+
+通配符: 点好`.`除了换行符外和所有其他字符匹配, 仅匹配一个字符, 而不与零或两个字符匹配
+
+转义: 就是让特殊字符的行为与普通字符一样, `python\\.org`只与`python.org`匹配. **为表示模块re要求的单个反斜扛, 需要在字符串中书写两个反斜扛, 让解释器对其进行转义(包含两层转义: 解释器执行的转义和模块re执行的转义).** 也可以使用原始字符串`r'python\.org'`
+
+字符集: `[a-zA-Z0-9]`表示匹配大写字母, 小写字母和数字, 也只能匹配一个字符; 若要排除可在开头加上`^`: `[^abc]`表示匹配除a/b/c以外的其他任何字符; 同样, 对于右括号(])和连字符(-), 要么放在字符集开头, 要么使用反斜杠对其进行转义, 连字符也可放在末尾.
+
+二选一和子模式: 使用圆括号限定选择部分, 使用管道字符(|)隔开子模式, `p(ython|erl)`
+
+可选模式和重复模式: 通常在子模式后面加上问号, 可将其指定为可选的:
+
+`(pattern)?`: 一次或零次
+
+`(pattern)*`: 重复零次或1次或多次
+
+`(pattern)+`: 重复1或多次
+
+`(pattern){m,n}`: 重复m～n次
+
+字符串的开头和末尾: 脱字符(^)指定开头匹配; 指定字符串末尾匹配使用美元符号($)
+
+`compile(pattern[,flags])`: 根据包含正则表达式的字符串创建模式对象, 提高匹配效率
+
+`search(pattern, string[,flags])`: 在字符串中查找模式
+
+`match(pattern, string[,flags])`: 在字符串开头匹配模式, 仅匹配开头, 若完全匹配后加$符号
+
+`split(pattern, string[,maxsplit=0])`: 根据模式来分隔字符串
+
+`findall(pattern, string)`: 返回一个列表, 其中包含字符串中所有与模式匹配的子串
+
+`sub(pat, repl, string[,count=0])`: 将字符串中与模式pat匹配的子串都替换成repl
+
+`escape(string)`: 对字符串中所有的正则表达特殊字符都进行转义
+
+![image-20200217215214542](https://tva1.sinaimg.cn/large/0082zybpgy1gbzqmillx8j311g038mxo.jpg)
+
+![image-20200217215646316](https://tva1.sinaimg.cn/large/0082zybpgy1gbzqr80ntej311q02wq3i.jpg)
+
+**如果模式包含圆括号, 将在分割得到的子串之间插入括号中的内容**
+
+![image-20200217215905061](https://tva1.sinaimg.cn/large/0082zybpgy1gbzqtmqme9j310y024q33.jpg)
+
+函数re.sub从左往右将与模式匹配的子串替换为指定内容:
+
+![image-20200217220237761](https://tva1.sinaimg.cn/large/0082zybpgy1gbzqxbm8rvj311a03q3z2.jpg)
+
+re.escapes是一个工具函数, 对于字符串中所有可能被视为正则表达式运算符的字符进行转义:
+
+![image-20200217220349062](https://tva1.sinaimg.cn/large/0082zybpgy1gbzqyk5obuj312204udh6.jpg)
+
+匹配对象和编组: 查找与模式匹配的子串的函数都在找到时返回MatchObject对象. **这种对象包含与模式匹配的子串的信息, 还包括模式的哪部分与子串的哪部分匹配的信息, 这些子串部分称为编组(group). ** 编组就是放在圆括号内的子模式, 它们时根据左边的括号数编号的, 其中编组0指的是整个模式.
+
+![image-20200217221826441](https://tva1.sinaimg.cn/large/0082zybpgy1gbzrdrz5joj31fw0f2myy.jpg)
+
+re匹配对象的重要方法:
+
+`group([group1,...])`: 获得与给定子模式(编组)匹配的子串
+
+`start([group])`: 返回与给定编组匹配的子串的起始位置
+
+`end([group])`: 返回与给定编组匹配的子串的终止位置(与切片一样, 不包含终止位置)
+
+`span([group])`: 返回与给定编组匹配的子串的起始和终止位置
+
+![image-20200217222511134](https://tva1.sinaimg.cn/large/0082zybpgy1gbzrks9qwzj311y08gmy9.jpg)
+
+替换中的组号和函数: 若只是字符串替换, 也可使用字符串方法`replace(old, new[,count])`; 为利用sub函数的强大功能, 最简单的方法是在替换字符串中使用组号
+
+要让正则表达式容易理解, 一种方法是在调用模块re中的函数时使用标志VERBOSE. 这使得能在模式中添加空白(空格, 制表符, 换行符等), 而re将忽略它们, 除非将它放在字符类中或使用反斜杠对其进行转义, 在这样的正则表达式中, 你还可以添加注释:
+
+![image-20200217223215806](https://tva1.sinaimg.cn/large/0082zybpgy1gbzrs5g6yjj31f209ego2.jpg)
+
+p356
+
+
+
+
+
+
+
+
 
 
 

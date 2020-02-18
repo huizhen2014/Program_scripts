@@ -372,6 +372,28 @@ KEGG Module Gene Set Enrichment Analysis
 
 `mkk2 <- gseMKEE(geneList=geneList, organism='hsa')`
 
+***
+
+##### [KEGG简单富集分析][https://www.jianshu.com/p/8ee9a71d056e]
+
+1. 在[KAAS Job Request][https://www.genome.jp/kaas-bin/kaas_main]注释蛋白序列, 上传参考蛋白序列(来自NCBI/GENBANK), 选择物种, 选择BBH([bi-directional best hit][https://www.genome.jp/tools/kaas/])模式, 提交并通过获得蛋白对应的ko编号([k number][https://www.genome.jp/kegg/kegg3.html])
+
+![image-20200218000644129](https://tva1.sinaimg.cn/large/0082zybpgy1gbzuii4298j30xa05m0tk.jpg)
+
+2. 根据对应蛋白序列和其ko编号, 转换成差异基因和ko编号关系
+
+3. 完成以上准备后, 在[KO(KEGG ORGHOLOGY) Database][https://www.genome.jp/kegg/ko.html]网站, 提交已经获得的ko编号:
+
+![image-20200218000921639](https://tva1.sinaimg.cn/large/0082zybpgy1gbzul6p3rsj311q05awfi.jpg)
+
+4. 获得对应ko编号代谢注释通路信息
+
+![image-20200218001138670](https://tva1.sinaimg.cn/large/0082zybpgy1gbzunk4urqj31l00by0vi.jpg)
+
+5. 解析获得结果, 使用`enricher`做富集分析
+
+***
+
 7. MSigDb analsysi
 
 `data(geneList, package="DOSE")`

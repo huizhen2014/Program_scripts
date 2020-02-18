@@ -122,15 +122,15 @@ d <- debugGatherer() 接受调试信息，累加来自response的text信息
 
 temp <- getURL(url="www.baidu.com",debugfunction=d$update,verbose=TRUE) d以update形式保持更新，会叠加返回信息；verbose设置为TRUE时，保存调试信息，为FALSE则隐藏对应d信息。
 
-cat(d$value()[3]) 提交个服务器的头信息，注意使用cat输出，储存和打印的不同
+**cat(d$value()[3]) 提交个服务器的头信息，注意使用cat输出，储存和打印的不同(请求报头)**
 
 ![image-20191011183722526](https://tva1.sinaimg.cn/large/006y8mN6gy1g7ug1zulo7j30pu06m0tl.jpg)
 
-cat(d$value()[1]) 服务器的地址和端口号
+**cat(d$value()[1]) 服务器的地址和端口号**
 
 ![image-20191011183854971](https://tva1.sinaimg.cn/large/006y8mN6gy1g7ug3lk1u2j30pq05sdgw.jpg)
 
-cat(d$value()[2]) 服务器返回的头信息
+**cat(d$value()[2]) 服务器返回的头信息(消息报头)**
 
 ![image-20191011183944607](https://tva1.sinaimg.cn/large/006y8mN6gy1g7ug4gly7uj31mk0hen23.jpg)
 
@@ -138,13 +138,13 @@ names(d)
 
 ![image-20191011184330851](https://tva1.sinaimg.cn/large/006y8mN6gy1g7ug8dt14vj30gy01y3yk.jpg)
 
-update表示保持更新；value表示对应的值，reset表示情况
+update表示保持更新；value表示对应的值，reset表示清空
 
 d$reset() 清空d\$value()内容
 
 ![image-20191011184508107](https://tva1.sinaimg.cn/large/006y8mN6gy1g7uga2p9y4j30wc03a3yq.jpg)
 
-
+***
 
 查看服务器返回的头信息，列表形式
 
@@ -174,7 +174,7 @@ h$value() / cat(h\$value())
 
 ![image-20191011185805481](https://tva1.sinaimg.cn/large/006y8mN6gy1g7ugnjz00ej31g809aaek.jpg)
 
-
+***
 
 查看url请求的访问信息，使用句柄的方式查看，就是操作系统时执行每一操作过程中，会给每一窗口一个唯一的特定的句柄，通过句柄来操纵窗口
 
@@ -240,7 +240,7 @@ base64用于将口令中不兼容的字符转换为网页兼容字符，不是�
 
 ##### curl部分参数设置
 
-![image-20191014224345657](https://tva1.sinaimg.cn/large/006y8mN6ly1g7y41afw65j31hc0u0wmj.jpg)
+![006y8mN6ly1g7y41afw65j31hc0u0wmj](https://tva1.sinaimg.cn/large/0082zybpgy1gc0bgzg50rj31hc0u0tao.jpg)
 
 乱码可设置encoding为'UTF-8'/'GBK'
 
@@ -272,7 +272,7 @@ temp <- getBinaryURL(url)
 
 note <- file("120123.R",open="wb")
 
-write.Bin(temp,note)
+writeBin(temp,note)
 
 close(note)
 
@@ -330,6 +330,10 @@ getNodeSet(doc, "//title[@lang]")  ##对应属性
 ![image-20191017230524986](https://tva1.sinaimg.cn/large/006y8mN6ly1g81liqk4ggj31hc0u0qf7.jpg)
 
 **打开网页源代码，查看目的信息的规则，设置对应的匹配信息；针对无法读到或读到乱码信息，可以重设header信息，再次尝试；多页面可以参考网页地址更替规律，使用循环函数来读取多页**
+
+***
+
+![image-20200218110446357](https://tva1.sinaimg.cn/large/0082zybpgy1gc0dj4huc7j30yw0pa43c.jpg)
 
 
 
