@@ -44,7 +44,7 @@ KEGG MODULE database目前正改变为主要针对于代谢通路.
 2. 通过RM numbers识别的Reaction modules被合并到MODULE flat文件中, 供DBGET搜索系统使用. 在html文件中仍可查询到反应模型的实际内容.
 3. MODULE flat文件不再包含物种特异性的完整模型. 所有模型, 完整或不完整的, 和物种特异性的, 仍然可在module map界面查询到
 
-KEGG MODULE数据目前由KEGG modules, 由M number代表, 和KEGG reaction modules, 由RM number代表, 所组成. 它们是人工审核定义的基因集和反应集的功能单元. KEGG modules进一步划分为pathway modules和signature modules.
+**KEGG MODULE数据目前由KEGG modules, 由M number代表, 和KEGG reaction modules, 由RM number代表, 所组成. 它们是人工审核定义的基因集和反应集的功能单元. KEGG modules进一步划分为pathway modules和signature modules.**
 
 * pathway modules: 基因集, 包括分子复合体, 在代谢通路中的功能单元
 * signature modules: 表现出表型特征的基因集的功能单元
@@ -64,7 +64,7 @@ KO Assignment and KEGG Mapping: KEGG中的基因组注释包含两个独立的�
 
 Otholog annotaion(KO assignment): 储存在KO(KEGG Orthology)数据库中的分子功能包含了实验验证了的基因/蛋白的同系物; KEGG中的基因组的注释为关联基因组中基因到KO identifier(KO number).
 
-Network reconstruction(KEGG mapping): Functional othologs定义为KEGG pathway maps和其他分子网络, 均通过K number节点构建成网络; 通过KEGG mapping, 基因组注释过程将基因组中的一个基因集转换为一个K number集, 用于自动重建KEGG pathways和其他网络, 使之能够解释高水平功能.
+Network reconstruction(KEGG mapping): Functional othologs定义为KEGG pathway maps和其他分子网络, 均通过K number节点构建成网络; 通过KEGG mapping, 基因组注释过程将基因组中的一个基因集转换为一个K number集, 用于自动重建KEGG pathways和其他网络, 使之能够解释高水平功能(不分物种搜索).
 
 ![image-20200218225727377](https://tva1.sinaimg.cn/large/0082zybpgy1gc0y4ptufrj312u05u0tz.jpg)
 
@@ -74,9 +74,9 @@ KEGG Mapper是用于KEGG mapping的工具集, 包含最流行的KEGG pathway map
 
 #####General mapping tools against multiple databases
 
-[Reconstruct Pathway][https://www.genome.jp/kegg/tool/map_pathway.html]为基本的比对工具, 用于处理KO annotation(K number assignment)数据, 可在内部针对KEGG GENES, 外部使用[BlastKOALA][https://www.kegg.jp/blastkoala/]服务器, 以及其他注释服务器.
+[Reconstruct Pathway][https://www.genome.jp/kegg/tool/map_pathway.html]为基本的比对工具, 支持基因组和metagenome注释. 用于处理KO annotation(K number assignment)数据, 可在内部针对KEGG GENES, 外部使用[BlastKOALA][https://www.kegg.jp/blastkoala/]服务器, 以及其他注释服务器. **输入数据为针对单个物种的单个基因列表或者针对多重物种的多个基因列表; 每个基因列表格式为`gene_id	K number`; 通过K numbers将其进行pathway maps/brite hierarchies/brite tables/modules比对.**
 
-[Search Pathway](https://www.genome.jp/kegg/tool/map_pathway1.html) 和 [Search&Color Pathway](https://www.genome.jp/kegg/tool/map_pathway2.html) 为KEGG 项目开始使用的传统工具, 尽管其数据库已经得到扩展. 当对象同时存在参考数据和物种特异性通路中时, 这些工具实现匹配. 
+[Search Pathway](https://www.genome.jp/kegg/tool/map_pathway1.html) 和 [Search&Color Pathway](https://www.genome.jp/kegg/tool/map_pathway2.html) 为KEGG 项目开始使用的传统工具, 但是其数据库已经得到扩展. 当对象同时存在参考数据和物种特异性通路中时, 这些工具方实现匹配. **针对给定的对象(genes, proteins, compouds, glycans, reactions, drugs, etc), 根据搜索模式搜索KEGG pathway maps/Brite hierarchies/Brite tables/KEGG modules/KEGG network variation maps/KEGG disease entries; 输入为空格或换行隔开的KEGG identifiers.**
 
 ![image-20200218201706697](https://tva1.sinaimg.cn/large/0082zybpgy1gc0thtzhnlj30wg0l4gpi.jpg)
 
@@ -108,6 +108,10 @@ KEGG database包含三个主要组成用于genome/metagenome注释:
 
 ***
 
+***
+
+***
+
 ####非模式生物KEGG pathway分析
 
 ####1. 基因组蛋白注释
@@ -132,7 +136,7 @@ KEGG database包含三个主要组成用于genome/metagenome注释:
 
 ####2. 通路注释
 
-* 提取其中的k nubmers, 使用[KO(KEGG ORTHOLOGY) Database)][https://www.kegg.jp/kegg/ko.html]对K numbers进行KEGG pathway/BRITE/MODULE mapping.
+* 提取其中的k nubmers, 使用[KO(KEGG ORTHOLOGY) Database)][https://www.kegg.jp/kegg/ko.html]对K numbers进行KEGG pathway/BRITE/MODULE mapping(不限制物种).
 
 ![image-20200218215326608](https://tva1.sinaimg.cn/large/0082zybpgy1gc0wa29260j314s0ae0vv.jpg)
 
@@ -142,7 +146,7 @@ KEGG database包含三个主要组成用于genome/metagenome注释:
 
 ![image-20200218230223879](https://tva1.sinaimg.cn/large/0082zybpgy1gc0y9veflmj313c0ck0ud.jpg)
 
-* 或其中的k nubmers, 使用KEGG Mapper [Search Pathway](https://www.genome.jp/kegg/tool/map_pathway1.html)注释:
+* 或使用其中的k nubmers, 使用KEGG Mapper [Search Pathway](https://www.genome.jp/kegg/tool/map_pathway1.html)注释(可选物种):
 
 ![image-20200218230658754](https://tva1.sinaimg.cn/large/0082zybpgy1gc0yems2oij31ew0lggp0.jpg)
 
@@ -151,6 +155,34 @@ KEGG database包含三个主要组成用于genome/metagenome注释:
 ![image-20200218230540435](https://tva1.sinaimg.cn/large/0082zybpgy1gc0yd9lz4fj315e0cotas.jpg)
 
 #### 3. 下载对应网页内容使用RCurl或浏览器resource下载并解析
+
+这里选择的是BlastKOALA注释得到的K numbers, 然后使用KEGG Mapper Search Pathway比对, 选择物种abu(鲍曼):
+
+Pathway:
+
+![image-20200219144147615](https://tva1.sinaimg.cn/large/0082zybpgy1gc1pfaj4k2j31sq0bi76a.jpg)
+
+写R脚本解析获得:
+
+![image-20200219142104026](https://tva1.sinaimg.cn/large/0082zybpgy1gc1otogcl3j31sq088jv1.jpg)
+
+Module:
+
+![image-20200219143501722](https://tva1.sinaimg.cn/large/0082zybpgy1gc1p87fqckj31ti0bu0ux.jpg)
+
+解析可得:
+
+![image-20200219143547589](https://tva1.sinaimg.cn/large/0082zybpgy1gc1p901eynj31vs06cju3.jpg)
+
+#### 4. 调用clusterProfiler包, 使用enricher函数富集
+
+[enricher][https://bioconductor.org/packages/release/bioc/manuals/clusterProfiler/man/clusterProfiler.pdf]是一个通用的富集分析工具, 分析需要准备差异基因(gene), gene和注释term(ko/M)之间的对应关系文件(TERM2GENE), 还可以提供可选的背景基因(universe)和term对应的名称文件(TERM2NAME).
+
+![image-20200219154422646](https://tva1.sinaimg.cn/large/0082zybpgy1gc1r8db1b2j31rs0fadi9.jpg)
+
+#### 5. 绘图
+
+略！
 
 
 
