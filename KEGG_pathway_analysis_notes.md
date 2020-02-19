@@ -146,7 +146,7 @@ KEGG database包含三个主要组成用于genome/metagenome注释:
 
 ![image-20200218230223879](https://tva1.sinaimg.cn/large/0082zybpgy1gc0y9veflmj313c0ck0ud.jpg)
 
-* 或使用其中的k nubmers, 使用KEGG Mapper [Search Pathway](https://www.genome.jp/kegg/tool/map_pathway1.html)注释(可选物种):
+* 或使用其中的k nubmers, 使用KEGG Mapper [Search Pathway](https://www.genome.jp/kegg/tool/map_pathway1.html)注释(可选物种, 选择reference时结果接近KO map?):
 
 ![image-20200218230658754](https://tva1.sinaimg.cn/large/0082zybpgy1gc0yems2oij31ew0lggp0.jpg)
 
@@ -156,11 +156,19 @@ KEGG database包含三个主要组成用于genome/metagenome注释:
 
 #### 3. 下载对应网页内容使用RCurl或浏览器resource下载并解析
 
-这里选择的是BlastKOALA注释得到的K numbers, 然后使用KEGG Mapper Search Pathway比对, 选择物种abu(鲍曼):
+这里选择的是BlastKOALA注释得到的K numbers, 然后使用KEGG Mapper Search Pathway比对, 选择物种abau(鲍曼):
 
-Pathway:
+Pathway(abau):
 
-![image-20200219144147615](https://tva1.sinaimg.cn/large/0082zybpgy1gc1pfaj4k2j31sq0bi76a.jpg)
+![image-20200219211638644](https://tva1.sinaimg.cn/large/0082zybpgy1gc20u2z4g8j31so0di40z.jpg)
+
+Pathway(reference):
+
+![image-20200219211757833](https://tva1.sinaimg.cn/large/0082zybpgy1gc20vix08cj31sk0diwgm.jpg)
+
+KO:
+
+![image-20200219211825536](https://tva1.sinaimg.cn/large/0082zybpgy1gc20vz5ux8j31su0f040p.jpg)
 
 写R脚本解析获得:
 
