@@ -82,14 +82,14 @@ linux针对GO和gene关系构建gmt文件
 
 ![image-20190901115026747](https://tva1.sinaimg.cn/large/006y8mN6gy1g6k0ctoo9bj316c030mx7.jpg)
 
-permutation: [/'pɝmjʊ'teʃən/] (一组事物可能的一种)序列,排列;排列中的任一组数字或文字
-NES是基于针对所有数据的排列的gene set富集值，因此，改变排列方式，排列数目或表达数据大小都会影响NES值。考虑两种分析: 分析表达数据，GSEA生成了ranked list且分析ranked list；使用GSEAPreranked分析由第一种分析生成的ranked list。若使用相同的参数设置，得到富集值是一致的。然而，NES会反映不同数据用于排序的差异(the expression dataset versus the ranked list of genes)
+permutation: [/'pɝmjʊ'teʃən/] (一组事物可能的一种)序列, 排列; 排列中的任一组数字或文字
+NES是基于针对所有数据的排列的gene set富集值, 因此, 改变排列方式, 排列数目或表达数据大小都会影响NES值。考虑两种分析: 分析表达数据，GSEA生成了ranked list且分析ranked list；使用GSEAPreranked分析由第一种分析生成的ranked list。若使用相同的参数设置，得到富集值是一致的。然而，NES会反映不同数据用于排序的差异(the expression dataset versus the ranked list of genes)
 
 ![image-20190901115929092](https://tva1.sinaimg.cn/large/006y8mN6gy1g6k0com29uj31ee0ekdja.jpg)
 
 - False Discovery Rate(FDR)
 
-FDR为针对gene set在给定NES时为假阳性的可能性。例如, FDR为25%表明75%的结果时有效的。**GSEA报告最高的同时含小于25%的ES值的gene set为感兴趣结果，同时针对给gene set进行下一步分析，但是针对所有gene set都提供分析结果。**(However, if you have a small number of samples and use gene_set permutation (rather than phenotype permutation) for your analysis, you are using a less stringent assessment of significance and would then want to use a more stringent FDR cutoff, such as 5%.)
+FDR为针对gene set在给定NES时为假阳性的可能性。例如, FDR为25%表明75%的结果是有效的。**GSEA报告最高的同时含小于25%的ES值的gene set为感兴趣结果，同时针对给gene set进行下一步分析，但是针对所有gene set都提供分析结果。**(However, if you have a small number of samples and use gene_set permutation (rather than phenotype permutation) for your analysis, you are using a less stringent assessment of significance and would then want to use a more stringent FDR cutoff, such as 5%.)
 
 - Nominal P Value
 
@@ -128,6 +128,102 @@ Leading-edge subset为位于ES值前的gene集合，leading-edge subset可解释
 ![image-20190901134058623](https://tva1.sinaimg.cn/large/006y8mN6gy1g6k0cv2ropj316q0fkwfa.jpg)
 
 Jacquard is the intersection divided by the union for a pair of leading edge subsets。Number of Occurences is the number of leading edge subset pairs in a particular bin。略！
+
+***
+
+#### [fgsea][https://github.com/ctlab/fgsea]
+
+1. 构建genes列表
+
+基因排列: `-sign(avg_fold)*log10(pvalue)`
+
+![image-20200220160935149](https://tva1.sinaimg.cn/large/0082zybpgy1gc2xkxlx50j312q02ygm7.jpg)
+
+2. 构建注释文件
+
+![image-20200220161213262](https://tva1.sinaimg.cn/large/0082zybpgy1gc2xnn2kq8j316i098772.jpg)
+
+3. 分析
+
+`fgseaMultilevelRes <- fgseaMultilevel(pathways=Ann_list, stats = gene_ranks, minSize=5, maxSize=500)`
+
+`head(fgseaMultilevelRes[order(pval),])`
+
+![image-20200220161620698](https://tva1.sinaimg.cn/large/0082zybpgy1gc2xrxknj1j317o0ei0y4.jpg)
+
+`plotEnrichment(pathway=Ann_list[["map00364_Fluorobenzoate degradation"]], stats=gene_ranks, gseaParam = 1) + labs(title="Fluorobenzoate degradation")`
+
+![image-20200220161556527](https://tva1.sinaimg.cn/large/0082zybpgy1gc2xrile44j318k0fiq4r.jpg)
+
+`topPathwaysUp <- fgseaMultilevelRes[ES > 0][head(order(pval), n =10), pathway]`
+
+`topPathwaysDown <- fgseaMultilevelRes[ES < 0][head(order(pval), n=10), pathway]`
+
+`topPathways <- c(topPathwaysUp, rev(topPathwaysDown))`
+
+`plotGseaTable(Ann_list[topPathways], gene_ranks, fgseaMultilevelRes, gseaParam=0.5)`
+
+![image-20200220161912094](https://tva1.sinaimg.cn/large/0082zybpgy1gc2xuwttnaj31ce0kydn9.jpg)
+
+collapsedPathways:
+
+![image-20200220162754927](https://tva1.sinaimg.cn/large/0082zybpgy1gc2y3z4vtxj312m02gwey.jpg)
+
+Fwrite:
+
+![image-20200220162830080](https://tva1.sinaimg.cn/large/0082zybpgy1gc2y4l7an5j312i028wer.jpg)
+
+***
+
+#### [pathview][http://www.bioconductor.org/packages/release/bioc/html/pathview.html] : pathway based data integration and visualization
+
+`pathview`自动下载通路图像数据(pathway graph data), 解析数据文件, 在通路(pathway)上比对用户的数据, 同时提供包含比对了数据后到通路图像.
+
+`pathview`可分为4个功能模块: the Downloader, Parser, Mapper, Viewer.  最重要的是, `pathview`比对并提交用户的数据到相关的通路图像上.
+
+当前`pathview`仅能使用KEGG的通路数据.
+
+`pathview`对于数据整合提供了强有力支持. 1) 包含可比对到通路的, 所有必要的生物数据类型; 2)  支持超过10中基因或蛋白ID类型, 20种化合物或代谢物ID类型; 3) 包含约4800个物种和KEGG orthology的通路; 4) 支持多种数据属性和格式, 例如, 连续/离散数据, 矩阵/向量, 单个/多个样本等.
+
+`BiocManager::install("pathview")`
+
+`BiocManager::install(c("Rgraphviz", "png", "KEGGgraph", "org.Hs.eg.db"))`
+
+加载查看帮助:
+
+`library(pathview)`
+
+`library(help=pathview)`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1074,9 +1074,159 @@ re匹配对象的重要方法:
 
 ![image-20200217223215806](https://tva1.sinaimg.cn/large/0082zybpgy1gbzrs5g6yjj31f209ego2.jpg)
 
-p356
+模版(template)是一种文件, 可在其中插入具体的值来得到最终的文本. Python提供了一种高级模版机制: 字符串格式设置, 使用正则表达式可让这个系统更加高级.
 
+![image-20200220201318123](https://tva1.sinaimg.cn/large/0082zybpgy1gc34mhect9j31200420t2.jpg)
 
+![image-20200220201733984](https://tva1.sinaimg.cn/large/0082zybpgy1gc34qx3fhfj312e046q3u.jpg)
+
+* 其他有趣标准模块
+
+`argparse`: 提供功能齐备的命令行界面
+
+`cmd`: 编写类似Python交互式解释器的命令行解释器
+
+`csv`: csv指的是逗号分隔的值(comma-seperated values), 模块`csv`帮助轻松读写csv文件,  以非常透明的方式处理CSV格式的一些棘手部分
+
+`datetime`: 支持特使的日期和时间对象, 并让你能够以各种方式创建和合并这些对象
+
+`difflib`: 确定两个序列的相似程度, 帮组从很多序列中找出与指定序列最为相似的序列. 可使用difflib来创建简单的搜索程序
+
+`enum`: 枚举类型是一种只有少数几个可能取值的类型
+
+`hashlib`: 使用该模块可计算字符串的小型“签名”(数), 可用来计算大型文件的签名, 这个模块在加密和安全领域有很多用途
+
+`functools`: 在调用函数时只提供部分参数(部分求值, partial evaluation), 以后再填充其他的参数. 在Python3.0中, 这个模块包含filter和reduce
+
+`itertools`: 包含大量用于创建和合并迭代器(或其他可迭代对象)的工具,其中包括可以串接可迭代对象, 创建返回无限连续整数的迭代器(类似于range, 但没有上限), 反复遍历可迭代对象以及具有其他作用的函数
+
+`logging`: 提供了一系列标准工具, 可用于管理一个或多个中央日志, 它还支持多种优先级不同的日志消息
+
+`statistics`: 使用该模块进行高级运算
+
+`timeit, profile, trace`: 模块timeit(和配套的命令脚本)是一个测量代码执行时间的工具; 模块profile(和配套模块pstats)可用于对代码段的效率进行更全面的分析; 模块trace可帮助你进行覆盖率分析(即代码的哪些部分执行了, 哪些部分没有执行), 在编写测试代码时很有用
+
+* 打开文件
+
+调用模考io中的open函数, 通过指定模式来显示指出这点:`r` 读取模式(默认值); `w` 写入模式; `x` 独占写入模式; `a` 附加模式; `b` 二进制模式(与其他模式结合使用); `t` 文本模式(默认值, 与其他模式结合使用); `+` 读写模式(与其他模式结合使用)
+
+`w` 写入模式能够在文件不存在时创建它, 此时打开的文件, 既有内容将被删除(截断), 并从文件开头处写入; 若要在既有文件末尾继续写入, 可使用附加模式  `x` 独占写入模式会在文件已经存在时引发FileExistsError异常; `+` 可与其他任何模式结合起来使用, 表示既可读取也可写入, 例如`r+`表示打开进行读写, `w+`则会截断文本
+
+![image-20200220204714665](https://tva1.sinaimg.cn/large/0082zybpgy1gc35ltasxrj312003074r.jpg)
+
+* 读取和写入
+
+write:
+
+![image-20200220205244282](https://tva1.sinaimg.cn/large/0082zybpgy1gc35rk4q00j314m07kaae.jpg)
+
+read:
+
+![image-20200220205430209](https://tva1.sinaimg.cn/large/0082zybpgy1gc35te3lk9j314u05s74i.jpg)
+
+* 使用管道重定向输出
+
+例如编写脚本统计单词数目:
+
+![image-20200220205916861](https://tva1.sinaimg.cn/large/0082zybpgy1gc35ycyqqnj31140d6abq.jpg)
+
+我们将文件都视为流, 只能按顺序从头到尾读取. 实际上, 可在文件中移动, 只访问感兴趣的部分(称为随机存取). 使用文件对象两个方法: seek 和 tell
+
+`seek`设置偏移量:
+
+![image-20200220210608406](https://tva1.sinaimg.cn/large/0082zybpgy1gc365gnrk2j31220d8mzc.jpg)
+
+`tell`返回当前位于文件的什么位置:
+
+![image-20200220210725508](https://tva1.sinaimg.cn/large/0082zybpgy1gc366uephrj311w08iq3d.jpg)
+
+* 读取和写入行
+
+要读取一行(从当前位置到下一个分行符的文本), 使用方法`readline`, 调用时不提供任何参数(读取一行并返回它); 也可提供一个非负整数, 指定readline最对可读取多少个字符. 若要读取文本中所有行, 并以列表方式返回, 可使用方法`readlines`; 方法`writelines`与`readlines`相反, 接受一个字符串列表(可以是任何序列或可迭代对象), 并将这些字符串都写入到文件(或流)中.
+
+* 关闭文件
+
+对于写入过的文件, 一定要将其关闭, 因为Python可能缓冲你写入的数据(将数据暂时存储在某个地方, 以提供效率). 因此如果程序因某种原因崩溃, 数据可能根本不会写入到文本中. 安全的做法是, 使用完文件后就将其关闭. 如果要重置缓冲, 让所做的修改反应到磁盘文件中, 但又不想关闭文件, 可使用方法flush.
+
+![image-20200220211514889](https://tva1.sinaimg.cn/large/0082zybpgy1gc36f0bdgzj314m06kmxe.jpg)
+
+专门为此设计的语句, `with`语句. 能够打开文件并将其赋给一个变量. 在语句体中, 你将数据写入文件(可能是做其他事情). 到达该语句末尾时, 将自动关闭文件, 即便出现异常亦如此
+
+![image-20200220211740465](https://tva1.sinaimg.cn/large/0082zybpgy1gc36hi9ebyj314m02mq35.jpg)
+
+* 使用文件的基本方法
+
+`open("test.py","r").read()`
+
+`open("test.py","r").readline()`
+
+`open("test.py","r").readlines()`
+
+`open("t.txt","a").write("This \n is \n no \n haiku")`
+
+![image-20200220213047424](https://tva1.sinaimg.cn/large/0082zybpgy1gc36v6b38dj314s08kt9l.jpg)
+
+* 迭代文件内容
+
+一种最常见的文本操作是迭代其内容, 并在迭代过程中反复采用某种措施
+
+![image-20200220213521740](https://tva1.sinaimg.cn/large/0082zybpgy1gc36zxb1zij314q02ojrf.jpg)
+
+更有用的实现包括将数据存储在数据结构中, 计算总和, 使用模块re进行模式替换以及添加行号
+
+* 每次一个字符(或字节)
+
+最简单(也可能是最不常见)的文件内容迭代方式是, 在while循环中使用方法read
+
+![image-20200220213937520](https://tva1.sinaimg.cn/large/0082zybpgy1gc374cf493j310604kjrr.jpg)
+
+或使用while True/break技巧
+
+![image-20200220214114037](https://tva1.sinaimg.cn/large/0082zybpgy1gc3760dss4j30zw05cwer.jpg)
+
+* 每次一行
+
+![image-20200220214219398](https://tva1.sinaimg.cn/large/0082zybpgy1gc37761pbcj314m060jry.jpg)
+
+* 读取所有内容
+
+如果文件不太大, 可一次读取整个文件; 为此, 可使用方法read并不提供任何参数(将整个文件读到一个字符串中)
+
+![image-20200220214552440](https://tva1.sinaimg.cn/large/0082zybpgy1gc37av0h9vj314a03qdfz.jpg)
+
+也可使用方法readlines(将文件读取到一个字符串列表中, 其中每个字符串都是一行)
+
+![image-20200220214638132](https://tva1.sinaimg.cn/large/0082zybpgy1gc37bn4rrmj314o03kglu.jpg)
+
+* 使用fileinput实现延迟行迭代
+
+Python中, 在可能的情况下, 应首选for循环; 模块fileinput会负责打开文件, 只需要提供一个文件名即可
+
+![image-20200220215117979](https://tva1.sinaimg.cn/large/0082zybpgy1gc37gi863aj312u07yaal.jpg)
+
+* 文件迭代器
+
+文件实际上是可以迭代的, 这意味着可在for循环中直接使用它们来迭代
+
+![image-20200220215312413](https://tva1.sinaimg.cn/large/0082zybpgy1gc37ihdqxdj311s08ejrl.jpg)
+
+在不将文件对象赋给变量的情况下迭代文件
+
+![image-20200220215447194](https://tva1.sinaimg.cn/large/0082zybpgy1gc37k35pkxj312o0703z6.jpg)
+
+和其他文件一样, `sys.stdin`也是可以迭代的, 因此要迭代标准输入中的所有行
+
+![image-20200220215619073](https://tva1.sinaimg.cn/large/0082zybpgy1gc37lpzeq2j312a05sdg1.jpg)
+
+另外可对迭代器做的事情基本上都可以对文件做, 如(使用list(open(filename))))将其转换为字符列表, 其效果与使用readlines相同
+
+![image-20200220220237730](https://tva1.sinaimg.cn/large/0082zybpgy1gc37sdaph4j31hc0iamzp.jpg)
+
+注意, 使用print来写入文件, 这将自动在提供的字符串后面添加换行符; 写入文件后将其关闭, 以确保数据得以写入磁盘.
+
+***
+
+#### Miscellaneous	
 
 
 
