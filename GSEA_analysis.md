@@ -177,6 +177,66 @@ Fwrite:
 
 #### [pathview][http://www.bioconductor.org/packages/release/bioc/html/pathview.html] : pathway based data integration and visualization
 
+Pathview是基于数据整合和可视化的通路工具组合. 根据用户提供的基因和化合物数据比对到指定的通路上. Pathview自该动下载通路图像数据, 解析数据文件, 比对用户提供的数据. 同时提供KEGG原始的图形和Graphviz图形(keggview.native and kegg.graph are the two viewer functions, and pathview is the main function proving a unified interface to downloader, parser, mapper and viewer functions). 
+
+#####Parameter
+
+![image-20200224084700280](https://tva1.sinaimg.cn/large/0082zybpgy1gc779r87ouj311i08ugom.jpg)
+
+`gene.data`: 单个样本向量或多个样本矩阵. 向量需要为数字, 同时gene IDs为其名称(基因IDs也可以是字符). gene IDs为遗传概念, 包含多重唯一比对到KEGG  gene IDs的gene/transcript/protein名称类型.
+
+`gene.idtype`: gene.data数据ID类型
+
+`cpd.data`: 同`gene.data`, 但是名称为可比对KEGG compound IDs的IDs名称
+
+`cpm.idtype`: cpd.data数据ID类型
+
+`pathway.id`: KEGG pathway ID.
+
+`species`: 物种. kegg code/common name
+
+`kegg.dir`: KEGG pathway data file(.xml)和image file(.png)路径
+
+`kegg.native`: 是否提供原始KEGG图像(`.png`)/ graphvie为`.pdf`
+
+`expand.node`: 是否将多重基因nodes扩展为单个基因node, 默认FLASE
+
+`split.group`: 是否将多重node groups分成单个的node(each split member nodes inherits all edges from the node group).
+
+`map.symbol`: 是否比对gene IDs到symbols来表示节点(This option is only effective for kegg.native=FALSE or same.layer=FALSE when kegg.native=TRUE)
+
+`map.cpdname`: 是否比对compoud IDs到正式名称来表示compound节点标签, 或使用来自KGML文件(kEGG compound accessions)的图像名称(This option is only effective for kegg.native=FALSE)
+
+`node.sum`: 当多重genes或compouds比对到一个节点时, 用于计算node summary的方法: 'sum', 'mean', 'median', 'max', max.abs', 'random'. 默认为node.sum='sum'
+
+`sign.pos`: 控制通路签名的位置: bottomleft/bottomright/topleft/topright
+
+`key.pos`: 控制颜色图例位置: bottomleft/bottomright/topleft/topright
+
+  ...
+
+##### Value
+
+`kegg.names`: 比对到节点的标准KEGG IDs/Names. 为Entez Gene ID或KEGG Compound Accessions
+
+`labels`: 节点标签
+
+`all.mapped`: 所有比对到该节点的所有分子(gene or compound) IDs
+
+`type`: 节点类型, 当前4种: 'gene', 'enzyme', 'compound', 'ortholog'
+
+`x`: 原始KEGG通路图的x坐标
+
+`y`: 原始KEGG通路图的y坐标
+
+`width`: 原始KEGG通路图的node宽度
+
+`height`: 原始KEGG通路图的node高度
+
+`other columns`: 比对的gene/compound数据的列, 和对应样本的pseudo-color codes
+
+#####Tutorial
+
 `pathview`自动下载通路图像数据(pathway graph data), 解析数据文件, 在通路(pathway)上比对用户的数据, 同时提供包含比对了数据后到通路图像.
 
 `pathview`可分为4个功能模块: the Downloader, Parser, Mapper, Viewer.  最重要的是, `pathview`比对并提交用户的数据到相关的通路图像上.
@@ -194,6 +254,100 @@ Fwrite:
 `library(pathview)`
 
 `library(help=pathview)`
+
+一般可视化操作:
+
+`filename <- system.file("extdata/gse16873.demo", package="pathview")`
+
+`gse16873 <- read.delim(filename,row.names=1)`
+
+`gse16873.d <- gse16873[,2*(1:6)] - gse16873[,2*(1:6)-1]`
+
+`data(demo.paths)`
+
+`i <- 1`
+
+`pv.out <- pathview(gene.data = gse16873.d[,1], pathway.id = demo.paths$sel.paths[i], species = "hsa", out.suffix = "gse16873", kegg.native =TRUE)`
+
+![image-20200224144341285](/Users/carlos/Library/Application Support/typora-user-images/image-20200224144341285.png)
+
+根据返回结果重构`gene.data`文件, 对应提供向量名称, gene IDs:
+
+`tmp <- head(gse16873.d[,1],92)`
+
+`names(tmp) <- pv.out$plot.data.gene$kegg.names`  #(gene.idtype="ENTREZID")或者
+
+`#names(tmp) <- pv.out$plot.data.gene$labels` #(gene.idtype="SYMBOL")
+
+`pv.out <- pathview(gene.data = tmp, gene.idtype="ENTREZID", pathway.id = demo.path$sel.paths[i], species="hsa",out.suffix="gse16873",kegg.native=TRUE)`
+
+![image-20200224165528696](https://tva1.sinaimg.cn/large/0082zybpgy1gc7ldzmar5j31610iajtx.jpg)
+
+`str(pv.out)`
+
+![image-20200224170133200](https://tva1.sinaimg.cn/large/0082zybpgy1gc7lkiaxe3j310s0dcn0n.jpg)
+
+或者使用Graphviz显示de novo pathway graph, 图像拥有相同的nodes和edges, 但是使用不用的形式显示:
+
+`pv.out <- pathview(gene.data="tmp", pathway.id=demo.paths$sel.paths[i], species="hsa", out.suffix="gse16873", kegg.native=F, sign.pos="bottomleft")`
+
+![image-20200224170555157](https://tva1.sinaimg.cn/large/0082zybpgy1gc7low89wkj30xn0gp0v2.jpg)
+
+可以通过设置参数`same.layer=FASLE`将图和图例显示在不同的页面, 略!
+
+**在原始的KEGG view, 一个基因node可能代表具有相似或重复功能角色的基因/蛋白. 将其当成一个node来对待是为了更清晰地显示在图中.**
+
+在使用Graphviz查看时, 可将node groups分为individual detached nodes; 或者将multiple-gene nodes扩展到individual genes, 这两种方式都会继承unsplit group/unexpanded nodes的edges信息.
+
+**默认将涉及到相同反应的基因自动聚集到一起, split.group=FALSE**
+
+`pv.out <- pathview(gene.data=tmp, pathway.id=demo.paths$sel.paths[i], species="hsa", out.suffix="ges16873.split", kegg.native=F, sign.pos="bottomleft", split.group=TURE)`
+
+![image-20200224172326174](https://tva1.sinaimg.cn/large/0082zybpgy1gc7m70pa5dj314r0g10zh.jpg)
+
+扩展multiple-gene nodes到individual genes
+
+`pv.out <- pathview(gene.data=tmp, pathway.id=demo.paths$sel.paths[i], species="hsa", out.suffix="gse16873.split.expanded", kegg.native=FALSE, sign.pos ="bottomleft", split.group=TRUE, expand.nodes=TREU)`
+
+![image-20200224173313898](https://tva1.sinaimg.cn/large/0082zybpgy1gc7mhc5ek7j312g0euaeh.jpg)
+
+`str(pv.out)`
+
+![image-20200224173454402](https://tva1.sinaimg.cn/large/0082zybpgy1gc7mj0nmxwj315s0cemzx.jpg)
+
+**pathview拥有强大的数据整合能力, 可用于整合, 分析, 可视化多种生物数据: 基因表达, 蛋白表达, 遗传相关性, 代谢, 基因组数据, 文献和其他可以比对到通路的数据类型**
+
+**化合物和基因数据**
+
+查看代谢通路, 因此除了gene nodes外, 还有compound nodes. 因此在代谢通路中整合gene和compound数据.
+
+![image-20200224174510060](https://tva1.sinaimg.cn/large/0082zybpgy1gc7mtnz0ufj30y801uglx.jpg)
+
+`sim.cpd.data <- sim.mol.data(mol.type="cpd",nmol=3000)` #模拟cpd数据
+
+`tmp <- sample(tmp,25)`
+
+`names(tmp) <- pv.out$plot.data.gene$kegg.names`
+
+`pv.out <- pathview(gene.data=tmp, cpd.data=sim.cpd.data, pathway.id=demo.paths$sel.paths[3], speceis="hsa", out.suffix="gse16873.cpd", keys.align="y", kegg.native=TREU, key.pos="topright")`
+
+![image-20200224175852867](https://tva1.sinaimg.cn/large/0082zybpgy1gc7n7yhvzyj310c0efjtm.jpg)
+
+`str(pv.out)`
+
+![image-20200224180045214](https://tva1.sinaimg.cn/large/0082zybpgy1gc7n9xr88uj31eu0m2dl7.jpg)
+
+使用Graphviz查看, `cpd.lab.offset` 指定高过默认compoud labels的程度
+
+`pv.out <- pathview(gene.data=tmp, cpd.data=sim.cpd.data, pathway.id=demo.paths$sel.paths[3], speceis="hsa", out.suffix="gse16873.cpd", keys.align="y", kegg.native=FALSE, key.pos="topright", cpd.lab.offset="-1")`
+
+![image-20200224180555554](https://tva1.sinaimg.cn/large/0082zybpgy1gc7nfg29f3j30xn0eata2.jpg)
+
+**多重条件或样本**
+
+
+
+
 
 
 
