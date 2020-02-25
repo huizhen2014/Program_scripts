@@ -245,6 +245,22 @@ Pathview是基于数据整合和可视化的通路工具组合. 根据用户提�
 
 `pathview`对于数据整合提供了强有力支持. 1) 包含可比对到通路的, 所有必要的生物数据类型; 2)  支持超过10中基因或蛋白ID类型, 20种化合物或代谢物ID类型; 3) 包含约4800个物种和KEGG orthology的通路; 4) 支持多种数据属性和格式, 例如, 连续/离散数据, 矩阵/向量, 单个/多个样本等.
 
+查看pathview所支持的KEGG物种和其默认gene IDs
+
+`data(korg)`
+
+`head(korg)`
+
+![image-20200225130457373](https://tva1.sinaimg.cn/large/0082zybpgy1gc8kcdz8fsj31fg0eowhe.jpg)
+
+Bioconductor支持的注释物种包
+
+`data(bods)`
+
+`bods`
+
+![image-20200225130818813](https://tva1.sinaimg.cn/large/0082zybpgy1gc8kfvhs4fj31ec0cywgu.jpg)
+
 `BiocManager::install("pathview")`
 
 `BiocManager::install(c("Rgraphviz", "png", "KEGGgraph", "org.Hs.eg.db"))`
@@ -345,9 +361,54 @@ Pathview是基于数据整合和可视化的通路工具组合. 根据用户提�
 
 **多重条件或样本**
 
+`sed.seed(10)`
 
+`sim.cpd.data2 <- matrix(sample(sim.cpd.data, 18000, replace=T), ncol=6)`
 
+`rownames(sim.cpd.data2) <- names(sim.cpd.data)`
 
+`colnames(sim.cpd.data2) <- paste("exp", 1:6, sep="")`
+
+`head(sim.cpd.data2, 3)`
+
+![image-20200225104803817](https://tva1.sinaimg.cn/large/0082zybpgy1gc8ge2d3sfj3114072gno.jpg)
+
+KEGG view with data match(建议使用`data.match=T`, 可使samples和compounds对应)
+
+`pv.out <- pathview(gene.data=gse16873.d[,1:3], cpd.data = sim.cpd.data2[,1:2], pathway.id=demo.paths$sel.pathes[3], species="hsa", out.suffix="gse16873.cpd.3-2s.match", keys.align="y", kegg.native=T, match.data=T, multi.state=T, same.layer=T)`
+
+![image-20200225105134006](https://tva1.sinaimg.cn/large/0082zybpgy1gc8ghrrstjj31o60pqwkz.jpg)
+
+Graphviz view
+
+`pv.out <- pathview(gene.data = gse16873.d[,1:3], cpd.data=sim.cpd.data2[,1:2], pathway.id=demo.paths$sel.paths[3], species="hsa",out.suffix="gse16873.cpd.3-2s", keys.align="y", kegg.native=F, match.data=T, multi.state=T, same.layer=T, key.pos="bottomright", sign.pos="topright")`
+
+![image-20200225105910256](https://tva1.sinaimg.cn/large/0082zybpgy1gc8gpit1joj31v80qewhv.jpg)
+
+**离散型数据**
+例如, 基于一些统计检验(p-value, fold change, etc) 选择一组显著性genes或compounds. 输入数据可以命名为两个水平的向量, 1和0(显著或不显著), 或者是一小组显著性gene/compound名称
+
+`discrete`: 指定两逻辑参数,gene/cpd, 该参数指定gene/cpd是否为离散值; 默认`discrete=list(gene=FALSE, cpd=FALSE)`
+
+`limit`: 指定两数字单元, gene/cpd,  该参数指定gene.data/cpd.data转换为颜色时的限制数值. 长度为1时, 表示离散值/正值方向的数据, 或针对2个方向数据的绝对限制; 长度为2表示两个方向的数据. 默认为`limit=list(gene=1,cpd=1)`
+
+`bins`: 两个整数单元的列表(gene/cpd), 该参数指定gene.data/cpd.data转换为颜色的水平. 默认为`bins=list(gene=10,cpd=10)`
+
+`require(org.Hs.eg.db)`
+
+`gse16873.t <- apply(gse16873.d, 1, function(x)t.test(x,alternative="two sided")$p.value)`
+
+`sel.genes <- names(gse16873.t)[gse16873.t < 0.1]`
+
+`sel.cpds <- names(sim.cpd.data)[abs(sim.cpd.data) > 0.5]`
+
+![image-20200225120850519](https://tva1.sinaimg.cn/large/0082zybpgy1gc8iq03xydj31ge0bqgp8.jpg)
+
+![image-20200225121040921](https://tva1.sinaimg.cn/large/0082zybpgy1gc8irx3a67j31oa0nwafg.jpg)
+
+![image-20200225125852676](https://tva1.sinaimg.cn/large/0082zybpgy1gc8k62zps7j31oe0lk792.jpg)
+
+***
 
 
 
