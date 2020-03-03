@@ -220,7 +220,7 @@ library(igraph)/detach(package:igraph)
 
 1. factor(x, levels=sort(x,decreasing=F)/levels=rev(x))
 2. 将数字专为factor后反转需要: as.numeric(as.charactor(x))
-3. leves(factor)[factor]
+3. levels(factor)[factor]
 
 #### 基本数据管理
 
