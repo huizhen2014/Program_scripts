@@ -175,35 +175,135 @@ Examples of unsupervised methods are TWINSPAN or cluster analysis, supervised me
 
 ###[Evaluation of classification results][https://www.davidzeleny.net/anadat-r/doku.php/en:class-eval]
 
+silhouette(library cluster)
 
+若样本含有相近的group memebership. 样本具有较高的的s值表示样本很好的聚集, s值在0附近表示样本位于两个cluster之间, 负值则表示样本被错误的分类了.
 
+```R
+## Example of silhouette function
+ 
+## Following code is not necessary, if you already used examples above...
+# library (cluster)
+# dis <- vegdist (sqrt (vltava.spe), method = 'bray') # percentage cover data are transformed by square root
+# cluster.flexible <- agnes (x = dis, method = 'flexible', par.method = 0.625)
+# cluster.flexible.hclust <- as.hclust (cluster.flexible)
+ 
+cl <- cutree (cluster.flexible.hclust, k = 5)
+si <- silhouette (cl, dis)
+plot (si)
+ 
+# Group 3 has the highest number of missclassified samples, on the other hand groups 1, 2 and 5 are well defined. 
+```
 
+![image-20200303201926773](https://tva1.sinaimg.cn/large/00831rSTgy1gch08uh7j5j30ml0g0wf4.jpg)
 
+```R
+# Comparison of silhouettes for single linkage, complete average linkage method.
+# dis <- vegdist (sqrt (vltava.spe), method = 'bray') # percentage cover data are transformed by square root
+# cluster.single <- hclust (d = dis, method = 'single')
+# cluster.complete <- hclust (dis, 'complete')
+# cluster.average <- hclust (dis, 'average')
+ 
+par (mfrow = c(1,3))
+plot (silhouette (cutree (cluster.single, k = 5), dis))
+plot (silhouette (cutree (cluster.complete, k = 5), dis))
+plot (silhouette (cutree (cluster.average, k = 5), dis))
+```
 
+![image-20200303202018192](https://tva1.sinaimg.cn/large/00831rSTgy1gch09j98baj310x0ehalk.jpg)
 
 ***
 
 ###[Diversity analysis][https://www.davidzeleny.net/anadat-r/doku.php/en:diversity_analysis]
 
+#### Theory
 
+一般而言, 多样性是一个系统内的不同状态的测量量化数目. 针对生态环境时, 这些状态常指的是物种, 但是也可能是genera, family, OTU's或 功能类型. 许多重要的生态理论在一个community中预测物种数目. 多样性被认为是一个community的'emergent property', 在community水平作用, 而不是在个体物种水平. 多样性也是用于保护管理的一个重要指标, 作为生态环境'well-being'的指标.
 
+**Diversity包含两个组成: species richness(community中的物种数目)和evenness(物种丰度分布(SAD)的形状, 表现为一些物种常见而另一些罕见的现实情况)**
 
+![image-20200303203002652](https://tva1.sinaimg.cn/large/00831rSTgy1gch0l9wwfnj30zh0fqjuw.jpg)
 
+由于采用取样的方法来评估community的多样性, 同时取样往往是不完整的. 来自取样数据的多样性评估依靠与取样效果, 并且假如多样性(alpha, beta, gamma)需要在不同的community间比较, 那么, 取样效果就应该被标准化. 可通过rarefaction curves来完成, 允许根据相同的个体数目或相同的样本数目比较多样性.  另一种使用diversity estimators的是评估没有被取样采集到的物种数目, 同时假设在取样效果增加时就会看到这些物种. 
 
+两类diversity estimators存在, 第一种是根据丰度数据(一个样本中物种的丰度, 根据个体数据或biomass量体现); 第二种是incidence data(物种存在某一组样本中的频率, 在每个样本中只含有species incidence, 例如, 存在-缺失信息被记录).
 
+存在多种用于指定多样性差异形式的概念. `alpha`, `beta`和`gamma`多样性. 
 
+Whittaker构建了根据Fisher's alpha, 并且延伸局部物种richness(alpha diversity)的概念到区域物种richness(gamma diversity), 和样本间物种组成的改变(beta diversity). 
 
+**Beta divesity是一个和alpha, gamma diversity根本上不同的概念, 并且它自身代表一个复杂的方面. Beta diversity可看作species turnover(directional exchange of species among pair of samples or along spatial, temporal or environmental gradient)或者物种组成的变化(no-directional description of heterogeneity in species composition within the dataset). 或者说, beta diversity既可以被看作是不同的多样性(考虑物种组成的差异), 或是成比例的多样性(在一个区域或局部水平上的物种比例, gamma vs alpha diversity).**
 
+![image-20200304142756904](https://tva1.sinaimg.cn/large/00831rSTgy1gchw08nf5rj30jf0aejrv.jpg)
 
+alpha diversity, 样本中物种数目; gamma diversity, 数据集, community或区域中物种数目; beta d diversity, 差异性多样性, 成对样本间的相似性(jaccard similarity index), 灰色带更宽, 相似度越高; beta p diversity, 成比例多样性, 两个被调查考虑alpha或gamma水平上的物种数目水平之间的关系.
 
+#### [Diversity indices][https://www.davidzeleny.net/anadat-r/doku.php/en:div-ind]
 
+##### species richness
 
+表示为: S, 是最直观的和最自然的多样性指针(index). 由于它平等的评估所有物种, 独立与它们的相对丰度, 也是对不同取样效果最敏感的. 
 
+**Shannon index**
+又称为Shannon entropy, Shannon-Wiener, 考虑了物种的richness和evenness. 从信息理论推导而来, 并且代表了哪一些物种通过从community内随机选择而能被预测的不确定性. 假如, community仅包含一个物种, 那么不确定性为0. community中包含越多的物种, 不确定性就越高; 在一个多样性的community, 我们无法猜测哪些物种将会被随机选择出来. 然而, 假如community包含很多物种, 但是其中一个或几个显著性存在其中(prevails), 那么不确定性就不会很高, 因为我们有很高的概率随机选择的个体就是丰度最高的物种. 这就是为什么Shannon index随着richness和evenness而增加, 同时richness给予的权重高于evenness.
 
+真实的生态数据, H值一般为1.5-3.5(the units are bits of information); 同时该值根据底数不同变化. 给定richeness条件下, community的最大的H index发生在所有物种都是均匀分布的完美情况下(all species have the relative proportion).
 
+![image-20200304152808323](https://tva1.sinaimg.cn/large/00831rSTgy1gchxfvdqj0j309306v3yk.jpg)
 
+**Simpson index**
+又称为Simpson concentration index, 也会考虑richness和evenness, 但是相对于Shannon, evenness对其影响超过richness. 它代表两个随机被选择个体是相同species的概率. 由于该概率随着物种richness升高而降低, Simpson index也会随之而降低, which is not too intuitive. 因此, 使用Goni-Simpson index 更有意义, 1 - Simpson index, 该值随着richness增加而增加.
 
+其值D的范围为0-1, 单位为一个probability. 当community中物种richness超过10, Simpson index就会主要被evenness所影响.
 
+![image-20200304153453031](https://tva1.sinaimg.cn/large/00831rSTgy1gchxn6nicgj3093079dfv.jpg)
+
+**Comparison of species richness, Shanon index and Simpson index**
+在一个完美均匀的community条件下, Shannon和Simpson index随之community中物种数目的增加而非线形增加; Gini-Simpson index增加更快.
+
+![image-20200304153823962](https://tva1.sinaimg.cn/large/00831rSTgy1gchxqgqq2jj30lp0aj75b.jpg)
+
+三个diversity indices(richness, Shannon, Simpson)针对不同均匀的多样性分布如下:
+
+![image-20200304154210488](https://tva1.sinaimg.cn/large/00831rSTgy1gchxuipfjnj30mb06agmb.jpg)
+
+A/B/C标记对应了三个不同均匀程度的community, 每个community包含12个物种(species richness=12)
+
+![image-20200304154544603](https://tva1.sinaimg.cn/large/00831rSTgy1gchxybffjmj310l0lqjxn.jpg)
+
+随着evenness下降, Shannon entropy和Gini-Simpson index都是下降的.
+
+**evenness**
+是一个认为描述community中物种相对丰度的模型. 有多种方式可以计算evenenss.
+
+Shannon' evenness, 又称为Pielou's J, 被计算为Shannon index的比例(from real community). S species, p1,p2,p3..pi为物种的相对丰度. 针对相同丰度下最大Shannon index是1, 此时所有物种都拥有相同的丰度(p1,p2,p3...pi = 1/S).
+
+![image-20200304160221511](https://tva1.sinaimg.cn/large/00831rSTgy1gchyfe9tewj308x031q2u.jpg)
+
+Simpson's evenness, 又称为均匀度(equitability), 是除以物种观察数目得到的Simpson's有效物种数目. 物种有效数目(ENS, effective number of species)为相同丰度物种的数目. 针对Simpson's D, 物种有效数目为1/D.
+
+![image-20200304162743702](https://tva1.sinaimg.cn/large/00831rSTgy1gchz5sal9cj308n02qwee.jpg)
+
+**Effective numbers of species(ENS)**
+
+Effective number of species(ENS), i.e. number of species in equivalent community (i.e. the one which has the same value of diversity index as the community in question) composed of equally-abundant species.
+
+在完美均匀community条件下, ENS等同于物种richness; 针对不均匀community, ENS常小于S. 转换公式如下:
+
+![image-20200304163713330](https://tva1.sinaimg.cn/large/00831rSTgy1gchzgaqicvj308p04oq2z.jpg)
+
+**Hill numbers**
+
+![image-20200304163931503](https://tva1.sinaimg.cn/large/00831rSTgy1gchzi51rqtj308w07kmx8.jpg)
+
+物种richness, Shannon entropy和Simpson‘ concentration index都是相同多样性indices家族成员, 后称之为Hill numbers. 个体Hill nubmer之间差异为参数q, which quantifies how much the measure discounts rare species when calculating diversity. q=0, 为简单的物种richness; q=1, 为Shannon diversity; q=2, 为Simpson diversity. 当q>0, indices不考虑罕有物种, 当q<0, indices忽略常见物种而仅考虑罕有物种.
+
+**Diversity profiles**
+绘制coefficient q绘制物种有效数目图, 增加q会降低罕有物种在多样性测量方面的影响. q=0等同于物种richness, q=1等同于Shannon diversity, q=2等同于Simpson diversity. 
+
+![image-20200304164448924](https://tva1.sinaimg.cn/large/00831rSTgy1gchznoj1a7j310n0jujt6.jpg)
+
+***
 
 
 

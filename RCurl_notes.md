@@ -114,6 +114,8 @@ getURL()/getForm()/postForm()查看请求相应相关信息
 
 ####getURL()
 
+这些命令下载一个或多个URIs(aka, URLs). `getURLContent`作为一个高级别的函数类似`getURL`和`getBinaryURL`, 但是通过查看HTTP header's Content-Type field对应什么样的内容类型被下载. 使用这个来判断bytes是binary, 还是text.
+
 ![image-20191011184820517](https://tva1.sinaimg.cn/large/006y8mN6gy1g7ugdggkcxj31hc0u0wgh.jpg)
 
 url.exists(url="...") 判断url是否存在
