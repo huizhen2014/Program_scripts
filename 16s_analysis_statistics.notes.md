@@ -123,10 +123,10 @@ Ordination diagrams常为二维图表来表示ordination分析结果. 不同的o
 
 展示ordination diagrams的标准形式:
 
-* Samples(sites) - points; 点之间的距离近似于样本间的组成差异(通过相对距离表示, 例如PCA/RDA中的Euclidean, CA/DCA/CCAZ中的chi-square)
-* 物种(species) - 箭头针对线性, centroids针对单峰形式以及根据距离的方法: 箭头指明物种丰度增加的方向, 在给定物种丰度在所有方向都降低的条件下, centroids表明ordination diagram中物种最佳(species optima)的位置.
-* Ordination axes - 水平坐标往往比垂直坐标更有意义(高一个数量级, 例如, 水平=1s axis相当于垂直=2nd); axes代表了物种组成的主要层级.
-* Environmental variables - 箭头针对定量, centroids用于定性; 箭头制定环境值增加的方向; centroids表明定性变量位于其所在的那部分diagram.
+* **样本(sites) - points; 点之间的距离近似于样本间的组成差异(通过相对距离表示, 例如PCA/RDA中的Euclidean, CA/DCA/CCAZ中的chi-square)**
+* **物种(species) - 箭头针对线性, centroids针对单峰形式以及根据距离的方法: 箭头指明物种丰度增加的方向; 在给定物种丰度在所有方向都降低的条件下, centroids表明ordination diagram中物种最佳(species optima)的位置.**
+* **Ordination axes - 水平坐标往往比垂直坐标更有意义(高一个数量级, 例如, 水平=1s axis相当于垂直=2nd); axes代表了物种组成的主要层级.**
+* **Environmental variables - 箭头针对定量, centroids用于定性; 箭头制定环境值增加的方向; centroids表明定性变量位于其所在的那部分diagram.**
 
 ![ordination_diagram](https://tva1.sinaimg.cn/large/00831rSTgy1gcgu85uwu1j30u00u0wit.jpg)
 
@@ -313,3 +313,4 @@ Effective number of species(ENS), i.e. number of species in equivalent community
 
 
 
+ 
