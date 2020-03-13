@@ -206,7 +206,7 @@ RS_Modification_and_Motif_Analysis.1 分析流程生成二个报告和四个数�
 
 * Start 修饰起点
 
-* End 修饰重点
+* End 修饰终点
 
 * Score -10log(p-value), 默认20为最小阈值(p=0.01).
 

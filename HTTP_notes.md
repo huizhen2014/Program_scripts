@@ -1,3 +1,5 @@
+####[HTTP][https://www.jmarshall.com/easy/http/#http1.1s9]
+
 #####[HTTP][https://code.tutsplus.com/tutorials/http-the-protocol-every-web-developer-must-know-part-1--net-31177]为超文本传输协议([hypertext transfer protocol][https://www.w3.org/Protocols/rfc2616/rfc2616.html])。stateless，分布式系统之间的用于交流的应用层面的协议，是现代网页的基础。
 
 ##### HTTP Basics
@@ -116,6 +118,8 @@ Response Format类似于request message, 除了status line和headers。status li
 例如：
 
 ![image-20191006103536613](https://tva1.sinaimg.cn/large/006y8mN6gy1g7oa17wtykj30xc02sdfp.jpg)
+
+***
 
 
 
