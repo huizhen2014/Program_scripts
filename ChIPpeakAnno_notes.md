@@ -162,6 +162,8 @@ or
 
 * makeTxDbFromGFF
 
+`library(GenomicFeatures)`
+
 `hs11286_txdb <- makeTxDbFromGFF("GCF_000240185.1_ASM24018v2_genomic.gff",organism="Klebsiella_pneumonia_hs11286",taxonomyId = 573,dataSource="NCBI Klebseilla pneumonia HS11286 gff file",dbxrefTag = "locus_tag",circ_seqs = c("NC_016838.1","NC_016839.1","NC_016840.1","NC_016841.1","NC_016845.1","NC_016846.1","NC_016847.1"))`
 
 `select(hs11286_txdb,keys=keys(hs11286_txdb),columns=columns(hs11286_txdb),keytype = "GENEID")`

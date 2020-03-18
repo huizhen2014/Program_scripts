@@ -1,4 +1,6 @@
-#### Blast
+
+
+#### [Blast][https://www.ncbi.nlm.nih.gov/books/NBK279684/]
 
 [BLAST](https://www.baidu.com/s?wd=BLAST&tn=SE_PcZhidaonwhc_ngpagmjz&rsv_dl=gh_pc_zhidao) (Basic Local Alignment Search Tool)是一套在蛋白质数据库或DNA数据库中进行相似性比较的分析工具；对一条或多条序列(可以是任何形式的序列)在一个或多个核酸或蛋白序列库中进行比对。
 
@@ -119,3 +121,92 @@ Table 11 is used for Bacteria, Archaea, prokaryotic viruses and chloroplast prot
 
 
 ![9_blastxxxx](https://tva1.sinaimg.cn/large/006tNbRwgy1g9sr4afappj316s0pkwhg.jpg)
+
+#### Evaluation criteria
+
+![1](https://tva1.sinaimg.cn/large/00831rSTgy1gcwqqq1sovj30qn0iugoj.jpg)
+
+![2](https://tva1.sinaimg.cn/large/00831rSTgy1gcwqqwynclj30qn0iu778.jpg)
+
+![3](https://tva1.sinaimg.cn/large/00831rSTgy1gcwqr4s3d1j30qn0iu0wp.jpg)
+
+![4](https://tva1.sinaimg.cn/large/00831rSTgy1gcwqraltzfj30qn0iuq5r.jpg)
+
+![5](https://tva1.sinaimg.cn/large/00831rSTgy1gcwqrg8op5j30qn0iuacx.jpg)
+
+![6](https://tva1.sinaimg.cn/large/00831rSTgy1gcwqrl71j8j30qn0iu78k.jpg)
+
+![7](https://tva1.sinaimg.cn/large/00831rSTgy1gcwqrqkqqvj30qn0iudii.jpg)
+
+![8](https://tva1.sinaimg.cn/large/00831rSTgy1gcwqrvhnh7j30qn0iu77t.jpg)
+
+***
+
+#### [blastpgp][http://etutorials.org/Misc/blast/Part+V+BLAST+Reference/Chapter+13.+NCBI-BLAST+Reference/13.8+blastpgp+Parameters+PSI-BLAST+and+PHI-BLAST/]
+
+`blastpgp`用于PSI-BLAST和PHI-BLAST搜索. 对于标准的blasts, 这两个程序为更为敏感的蛋白blast搜索程序.
+
+PSI-BLAST再搜索显著性hits时考虑位置特异性信息; PHI-BLAST使用pattern, 或profile来搜索比对.
+
+##### PSI-BLAST
+
+Position-specific iterated blast(`psiblast`), 通过制定的打分矩阵(scoring matrix)将query序列中的每个位置給予分值(基于搜索的连续迭代定义的比对情况). 指定的矩阵为位置特异性打分矩阵(position-specific scoring matrix, PSSM), 针对该位置的每一个氨基酸给予一个分值:
+
+![image-20200317111736975](https://tva1.sinaimg.cn/large/00831rSTgy1gcwr9c7257j30gs046wey.jpg)
+
+如图, 根据coelacanth Hoxa11蛋白(AAG39070)计算而来的PSSM. 查询序列位于左侧列, 每行是针对20种氨基酸给予的位置特异性分值. 针对1/7/8行的Y, 若是常规的blast算法, 这3个位置的Y将会拥有相同的分值.
+
+PSSM, 或为checkpoint文件, 是由PSI-BLAST内部生成的, 同时也可以使用参数`-C`导出为一个文件. 该参数很有用. 该checkpoint文件用于随后的PSI-BLAST(`blastpgp`)搜索, 或作为RPS-BLAST程序的数据库输入文件. 同时也用在blastall(a specifialized tblastn serach)搜索, `-p psitblastn`, 使用`-R <checkpoint file>`.
+
+运行PSI-BLAST时, 参数`-j`需设置为大于1的值. 默认的`-j 1`表示不实用迭代搜索, 和单个BLASTP搜索一样. 通过`-j`参数指定最大的迭代数目, 程序会在出现convergence时停止. 当没有新的序列发现优于`-h`设置的阈值时, 搜索终止.
+
+![image-20200317113502235](https://tva1.sinaimg.cn/large/00831rSTgy1gcwrra2ln6j30qa01rdfs.jpg)
+
+##### PHI-BLAST
+
+Pattern-hit initiated BLAST, 使用输入序列定义pattern, 然后在蛋白数据中查询. 使用[PROSITE][http://ca.expasy.org/prosite/]格式定义pattern, 且用于比对的seed. 不同于用于seeding比对的words:
+
+![image-20200317114037049](https://tva1.sinaimg.cn/large/00831rSTgy1gcwrx3o17qj30k201dglf.jpg)
+
+以ID起始的行, 随后两空格跟随pattern的名称. 下一行以PA起始, 随后两个空格, 接着为PROSITE格式pattern. dash(-)用于分隔字符, X表示任意字符, 方括号指定一个氨基酸的选择. 如果一个pattern出现超过一次, 可能需要限制其发生发的次数, 可通过HI(hit initiation)标签指定它在pattern文件中的位置. 例如, 指定143位置出现的pattern经被使用:
+
+![image-20200317114612656](https://tva1.sinaimg.cn/large/00831rSTgy1gcws2woxxtj30is01vq2s.jpg)
+
+[规则][https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Web&PAGE_TYPE=BlastDocs&DOC_TYPE=BlastHelp#phi_pattern]:
+
+![image-20200317143605536](https://tva1.sinaimg.cn/large/00831rSTgy1gcwwzrigpij30oz0a4myg.jpg)
+
+例如:
+
+![image-20200317143738002](https://tva1.sinaimg.cn/large/00831rSTgy1gcwx1aciztj30ky04n3z1.jpg)
+
+解释:
+
+![image-20200317143804811](https://tva1.sinaimg.cn/large/00831rSTgy1gcwx1xctlhj30lg0cydgj.jpg)
+
+例如:
+
+![image-20200317144036483](https://tva1.sinaimg.cn/large/00831rSTgy1gcwx4dr0e8j30b80203yd.jpg)
+
+解释: 使用HI指定pattern出现的位置区间一个为19-22; 第二个为201-204
+
+***
+
+#### [Practices][http://bioinf-hpc.ibun.unal.edu.co/cgi-bin/emboss/help/phiblast#input]
+
+![image-20200317162208344](https://tva1.sinaimg.cn/large/00831rSTgy1gcx021hxvtj30gq0bfmym.jpg)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
