@@ -1,12 +1,14 @@
 ###Configuration
 
+![circos_configuration](https://tva1.sinaimg.cn/large/00831rSTgy1gczcfm5o2dj31110m5dha.jpg)
+
 ####File Organization
 
 文件结构建议，对于不同的图片使用不同的文件目录。将配置文件放置到etc/中，数据放置在data/中，circos将自动查找主要配置文件circos.conf。
 
 ![image-20190627125242390](http://ww3.sinaimg.cn/large/006tNc79gy1g4fmeq7ki2j30xu0983z7.jpg)
 
-这样配置，就可以直接运行circos，无需添加-conf circos.conf参数。同时默认输出文件路径同circos.conf文件所在路径(dir = conf(congifdir))，可修改：
+这样配置，就可以直接运行circos，无需添加`-conf circos.conf`参数。同时默认输出文件路径同circos.conf文件所在路径(dir = conf(congifdir))，可修改：
 
 `circos -outputfile snp.png [-outputdir /tmp]`
 
@@ -130,7 +132,7 @@ SVG为scalable vector graphics, 使用基于向量的元素绘图，例如线条
 
 ####Karyotype
 
-karyotype文件是必须的，该文件定义了染色体的名称，大小和颜色，同时又不仅限与染色体信息，还可以提供序列conigs，genes，indexed positions，blocks of time，任何整数构成的坐标系统。circos软件内含多个常见序列装配信息：人类，大鼠，小鼠，果蝇，这些文件位于data/karyotype中。
+karyotype文件是必须的，该文件定义了染色体的名称，大小和颜色，同时又不仅限与染色体信息，还可以提供序列contigs，genes，indexed positions，blocks of time，任何整数构成的坐标系统。circos软件内含多个常见序列装配信息：人类，大鼠，小鼠，果蝇，这些文件位于data/karyotype中。
 
 **简单绘制染色体图，需提供karyotype文件，图像的最大像素为1500，如果radius=0.8，就意味着0.8*1500=1200像素**，染色体之间距离通过spacing来设置：
 
@@ -146,11 +148,13 @@ karyotype文件是必须的，该文件定义了染色体的名称，大小和�
 
 **向ideogram模块添加标签参数，刻度标签信息定义在ticks内**。另外，在定义ideogram位置时，参考信息为image半径，当定义track 位置时，参考位置为ideogram半径。
 
-`karyotype=data/karyotype.txt` 	#定义ideogram文件
+`karyotype=data/karyotype/karyotype.human.txt` 	#定义ideogram文件
 
- `chromosomes_units=1000000` 		#定义染色体单位bp大小，以后使用单位为u
+**`chromosomes_units=10000000` 		#定义染色体单位大小，以后使用单位为u**
 
-label信息位于\<ideogram>内，label_parallel表示label方向，yes，和染色体方向平行；no，和染色体方向垂直
+**chromosomes_units=10,000,000, ticks的spacoing在10M, 5M, 1M分别为10u, 5u和1u**
+
+label信息位于\<ideogram>内，label_parallel表示label方向，yes，和染色体方向平行；no，和染色体方向垂直:
 
 ![image-20190627192350878](http://ww3.sinaimg.cn/large/006tNc79ly1g4fxppb3voj30su06saay.jpg)
 

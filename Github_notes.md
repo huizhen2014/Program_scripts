@@ -50,7 +50,7 @@ git log: 查看历史记录; git log --pretty=oneline
 
 **返回任意版本: git reset --hard 3628164   ###3628164位commit id** 
 
-![HEAD](https://ws2.sinaimg.cn/large/006tKfTcgy1g1ieb267k3j30re0uuwot.jpg)
+![HEAD](https://tva1.sinaimg.cn/large/006tKfTcgy1g1ieb267k3j30re0uuwot.jpg)
 
 **若退回到某个版本后, 想恢复到新的版本, 找不到新版本的commit id**: 
 
@@ -68,7 +68,7 @@ git log: 查看历史记录; git log --pretty=oneline
 
 **版本库(repository): 工作区有一个隐藏目录".git", 这个不算工作区, 而是git的版本库, 版本库里还有很多东西, 其中最重要的就是stage(或者叫idnex)的暂存区, 还有git为我们自动创建的第一个分支master, 以及指向master的一个指针叫HEAD** 
 
-![stage](https://ws1.sinaimg.cn/large/006tKfTcgy1g1iel8pdbfj31cy0ow4bc.jpg)
+![stage](https://tva1.sinaimg.cn/large/006tKfTcgy1g1iel8pdbfj31cy0ow4bc.jpg)
 
 **往git版本库添加文件时分两步**
 
@@ -124,13 +124,13 @@ git log: 查看历史记录; git log --pretty=oneline
 
 **当我们创建新的分支, 例如dev, git新建了一个指针dev, 指向master相同的提交, 再把HEAD指向dev, 就表示当前分支在dev上**
 
-![dev](https://ws1.sinaimg.cn/large/006tKfTcly1g1ii2wy0n2j30ww0icwgn.jpg)
+![dev](https://tva1.sinaimg.cn/large/006tKfTcly1g1ii2wy0n2j30ww0icwgn.jpg)
 
 
 
 **假如新提交后, dev指针往前移动一步, 而master指针不变; 当我们完成dev工作后, 将dev合并到master上**
 
-![merge](https://ws4.sinaimg.cn/large/006tKfTcly1g1ii5i4ydsj30zy0j4jtv.jpg)
+![merge](https://tva1.sinaimg.cn/large/006tKfTcly1g1ii5i4ydsj30zy0j4jtv.jpg)
 
 **删除分支后dev后, 就只剩一条分支master**
 
@@ -139,7 +139,7 @@ git log: 查看历史记录; git log --pretty=oneline
 3. 完成dev分支任务提交后,切换回master分支, 在dev分支做的修改不可见, 此时合并dev分支内容到master: git merge dev, 该过程属于Fast-forward模式, 然后可放心删除dev分支: git branch -d dev
 4. 当dev分支和master分支均有提交时, 此时的merge无法实现, 会产生冲突, 表现在提交的文件内容上. 此时需要手动修改后: git add file.txt; git commit -m "confilct fixed"
 
-![dev master merge](https://ws2.sinaimg.cn/large/006tKfTcly1g1ijormp5xj31d80omwj3.jpg)
+![dev master merge](https://tva1.sinaimg.cn/large/006tKfTcly1g1ijormp5xj31d80omwj3.jpg)
 
 **使用带参数的git log查看分支合并情况**
 

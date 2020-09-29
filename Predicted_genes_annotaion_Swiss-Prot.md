@@ -6,7 +6,7 @@ Swiss-prot是由欧洲生物信息研究说(EBI)维护的人工注释审核的�
 
 [序列条目结果说明](https://web.expasy.org/docs/userman.html#entrystruc)
 
-![image-20190613164750962](http://ww3.sinaimg.cn/large/006tNc79gy1g3zmj2k615j30um0u0wkz.jpg)
+![image-20190613164750962](https://tva1.sinaimg.cn/large/007S8ZIlgy1gizrdtgpuwg30dc0a03yg.gif)
 
 累述下ID/AC，swiss-prot entry names，格式为X_Y，其中x为蛋白名称，例如，B2MG为beta-2-microglobulin，HBA为Hemoglobin alpha chain；Y为物种识别字符，一般前3个字母种属，后2个为物种，例如PSEPU，为Pseudomonas putida
 

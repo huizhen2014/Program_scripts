@@ -150,7 +150,7 @@ IPD: interpulse duration ratios, 对应在前一个碱基完成结合后新碱�
 
 当使用in silico control时, 检测准确性可能通过activating 修饰的识别而增加(detecting accuracy may be increased by activating modification identification in SMRT Analysis). 该分析比较修饰信号和额外的计算模型(of the expected positive signature), 检测三种修饰类型:6-mA, 4-mC,和Tet-converted 5-mC. 当前, SMRT分析仅支持使用in silico control的修饰识别. 
 
-最后, IPD ratios也可通过比较两个不同的样本来计算. 这种情况下, 两DNA样本分别测序然后互相比对, 检测不同的修饰, 该修饰可来源不同的生长条件, 或细菌菌株之间的比较. 使用该分析方法, 菌株共有的修饰将不会被检出. 为实现识别的修饰和motifs的差异分析, 最简单是先使用in silico control执行分别分析, 然后在比对两分析结果.使用native DNA control将会有助于定位差异修饰的位置, 但是不兼容于当前SMRT分析过程.
+最后, IPD ratios也可通过比较两个不同的样本来计算. 这种情况下, 两DNA样本分别测序然后互相比对, 检测不同的修饰, 该修饰可来源不同的生长条件, 或细菌菌株之间的比较. 使用该分析方法, 菌株共有的修饰将不会被检出. 为实现识别的修饰和motifs的差异分析, 最简单是先使用in silico control执行分别分析, 然后再比对两分析结果.使用native DNA control将会有助于定位差异修饰的位置, 但是不兼容于当前SMRT分析过程.
 
 ##### The particular modification you are analyzing
 

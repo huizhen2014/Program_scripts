@@ -1,6 +1,6 @@
 #### [qiime2][https://docs.qiime2.org/2019.7/]
 
-![image-20200121095209407](https://tva1.sinaimg.cn/large/006tNbRwgy1gb3y30b68zj30nl0cit9y.jpg)
+![image-20200121095209407](https://gitee.com/huizhen2014/Pic/raw/master/006tNbRwgy1gb3y30b68zj30nl0cit9y.jpg)
 
 屏显帮助信息:
 
@@ -65,7 +65,7 @@ Artifacts(.qza)/visualization(.qzv)文件为包含了一个或多个数据文件
 
 `q2-vsearch`采用三种不同的[OTU clustering strategies][http://qiime.org/tutorials/otu_picking.html]: de novo, closed reference, the open reference. 所有输入输入数据都应经过[基本的质量过滤][https://www.nature.com/articles/nmeth.2276], 随后进行[chimera][https://docs.qiime2.org/2019.7/tutorials/chimera/]过滤和[aggressive OTU][https://www.nature.com/articles/nmeth.2276]过滤
 
-![image-20200212144913750](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmatqc5tj31i20lok31.jpg)
+![image-20200212144913750](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbtmatqc5tj31i20lok31.jpg)
 
 ##### Taxonomy classification and taxonomic analyses
 
@@ -77,11 +77,11 @@ Artifacts(.qza)/visualization(.qzv)文件为包含了一个或多个数据文件
 
 以上三个方法都很不错, 其中`classify-sklearn`使用Naive Bayes classifer表现稍微好些
 
-![image-20200212145106257](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmcs64bzj31gc0qsdyf.jpg)
+![image-20200212145106257](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbtmcs64bzj31gc0qsdyf.jpg)
 
 ##### Sequence alignment and phylogeny building
 
-![image-20200212145332560](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmfbejqfj315y0u0k19.jpg)
+![image-20200212145332560](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbtmfbejqfj315y0u0k19.jpg)
 
 ##### Diversity analysis
 
@@ -103,11 +103,11 @@ Artifacts(.qza)/visualization(.qzv)文件为包含了一个或多个数据文件
 
 `PCoAResults` artifacts, 包含每个距离/差异性 metric的principal coordinates ordination结果, [principal coordinates analysis][https://mb3is.megx.net/gustame/dissimilarity-based-methods/principal-coordinates-analysis]是一个维度所见技术, 用于在2/3维空间查看样本差异性比较
 
-![image-20200212145410748](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmfz8qq8j313u0u0tn7.jpg)
+![image-20200212145410748](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbtmfz8qq8j313u0u0tn7.jpg)
 
 ##### Fun with feature tables
 
-![image-20200212145458770](https://tva1.sinaimg.cn/large/0082zybpgy1gbtmgt9hj9j316c0u0e0j.jpg)
+![image-20200212145458770](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbtmgt9hj9j316c0u0e0j.jpg)
 
 Analyze longitudinal data: `q2-longitudinal` is a plugin for performing statistical analyses of [longitudinal experiments][https://en.wikipedia.org/wiki/Longitudinal_study], 例如, where samples are collected from individual patients/subjects/sites repeatedly over time. This include longitudinal studies of alpha and beta diversity, and some really awesome, interactive plots.
 
@@ -133,7 +133,7 @@ Evaluate and control data quality: `q2-quality-control`用于评估和控制测�
 
 sample metadata: https://data.qiime2.org/2019.7/tutorials/moving-pictures/sample_metadata.tsv
 
-![image-20200209130135399](https://tva1.sinaimg.cn/large/0082zybpgy1gbq2bz96mnj316q07oq52.jpg)
+![image-20200209130135399](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbq2bz96mnj316q07oq52.jpg)
 
 barcode reads:https://data.qiime2.org/2019.7/tutorials/moving-pictures/emp-single-end-sequences/barcodes.fastq.gz
 
@@ -167,7 +167,7 @@ sequences reads:https://data.qiime2.org/2019.7/tutorials/moving-pictures/emp-sin
 
 `qiime tools view demux-details.visual.qzv`
 
-![image-20200209135614683](https://tva1.sinaimg.cn/large/0082zybpgy1gbq3wti8ayj31sq0d8tc8.jpg)
+![image-20200209135614683](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbq3wti8ayj31sq0d8tc8.jpg)
 
 拆分完序列后, 生成拆分summary
 
@@ -179,7 +179,7 @@ sequences reads:https://data.qiime2.org/2019.7/tutorials/moving-pictures/emp-sin
 
 `qiime tools view demux.qzv`
 
-![image-20200209135734280](https://tva1.sinaimg.cn/large/0082zybpgy1gbq3y58uvkj319u0g6402.jpg)
+![image-20200209135734280](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbq3y58uvkj319u0g6402.jpg)
 
 ####3. Sequence quality control and feature table construction
 
@@ -189,7 +189,7 @@ Option 1: DADA2
 
 DADA2是一个可以检测并矫正Illumina amplicon sequence data的流程.  由插件`q2-dada2`完成, 该质控过程将会额外过滤序列数据中额外的phiX reads, 同时还有chimeric序列. 根据`qiime demux summarize`生成的`demux.qzv`文件, 设置对应的`--p-trim-left m`(删除每个序列前m个碱基)和`--p-trunc-len n`(在位置n截短序列), 这两个参数允许用户删除序列的低质量区域.
 
-![image-20200209173800359](https://tva1.sinaimg.cn/large/0082zybpgy1gbqabl7vmpj31rr0u079n.jpg)
+![image-20200209173800359](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbqabl7vmpj31rr0u079n.jpg)
 
 可见序列初始处质量高, 在120位置质量下降厉害
 
@@ -285,7 +285,7 @@ QIIME2的多样性分析可通过`q2-diversity`插件完成, 该插件支持alph
   --m-metadata-file sample-metadata.tsv \
   --output-dir core-metrics-results`
 
-![image-20200210154446620](https://tva1.sinaimg.cn/large/0082zybpgy1gbrco28jwoj313c06iwg2.jpg)
+![image-20200210154446620](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbrco28jwoj313c06iwg2.jpg)
 
 计算完diversity metrics, 我们开始探索sample metadata文件中的样本的微生物组成. 该信息存在于`sample metadata`文件中.
 
@@ -301,7 +301,7 @@ QIIME2的多样性分析可通过`q2-diversity`插件完成, 该插件支持alph
   --m-metadata-file sample-metadata.tsv \
   --o-visualization core-metrics-results/evenness-group-significance.qzv`
 
-![image-20200210154502656](https://tva1.sinaimg.cn/large/0082zybpgy1gbrcobqtwij313a04ejs3.jpg)
+![image-20200210154502656](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbrcobqtwij313a04ejs3.jpg)
 
 该数据集中, 因为不存在和alpha diversi相关的连续取样信息列(i.e. Days-since-experiment-start), 因此我们这里不进一步分析.  若对这些分析感兴趣(for this data set, or for others), 可以使用`qiime diversity alpha-correlation`命令实现.
 
@@ -321,7 +321,7 @@ QIIME2的多样性分析可通过`q2-diversity`插件完成, 该插件支持alph
   --o-visualization core-metrics-results/unweighted-unifrac-subject-group-significance.qzv \
   --p-pairwise`
 
-![image-20200210160426531](https://tva1.sinaimg.cn/large/0082zybpgy1gbrd8h6woej317o04ggmj.jpg)
+![image-20200210160426531](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbrd8h6woej317o04ggmj.jpg)
 
 同样, 没有和样本组成相关的连续的采样信息, 无法检测它们之间的关系. 若感兴趣, 可使用`qiime metadata distance-matrix`和`qiime diversity mantel`和`qiime diversity bioenv`命令完成.
 
@@ -339,7 +339,7 @@ QIIME2的多样性分析可通过`q2-diversity`插件完成, 该插件支持alph
   --p-custom-axes days-since-experiment-start \
   --o-visualization core-metrics-results/bray-curtis-emperor-days-since-experiment-start.qzv`
 
-![image-20200210161708170](https://tva1.sinaimg.cn/large/0082zybpgy1gbrdlo5esyj318u056ab3.jpg)
+![image-20200210161708170](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbrdlo5esyj318u056ab3.jpg)
 
 ####7. Alpha rarefaction plotiing
 
@@ -360,7 +360,7 @@ QIIME2的多样性分析可通过`q2-diversity`插件完成, 该插件支持alph
 
 注意, `--p-max-depth`值应该根据上面`table.qzv`文件中的'Frequency per sample'来选择. 一般而言, 在频率中值附近选择值都将可行; 假如上图线条并没出现接近0斜率, 此时可能想要增加该值(sampling depth), or decrease that value if you seem to be losing many of your samples due to low total frequencies closer to the minimum sampling depth than the maximum sampling depth(抽样深度大于样本counts/frequency/频率, 将舍弃该样本).
 
-![image-20200210225601307](https://tva1.sinaimg.cn/large/0082zybpgy1gbrp4rn1fpj31ni0hkmyn.jpg)
+![image-20200210225601307](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbrp4rn1fpj31ni0hkmyn.jpg)
 
 ####8. Taxonomic analysis
 
@@ -379,7 +379,7 @@ gg-13-8-99-515-806-nb-classifier.qza: https://data.qiime2.org/2019.7/common/gg-1
   --m-input-file taxonomy.qza \
   --o-visualization taxonomy.qzv`
 
-![image-20200211122028392](https://tva1.sinaimg.cn/large/0082zybpgy1gbscdw74vzj315o07cjsh.jpg)
+![image-20200211122028392](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbscdw74vzj315o07cjsh.jpg)
 
 使用交互式条形图查看taxonomic composition
 
@@ -389,7 +389,7 @@ gg-13-8-99-515-806-nb-classifier.qza: https://data.qiime2.org/2019.7/common/gg-1
   --m-metadata-file sample-metadata.tsv \
   --o-visualization taxa-bar-plots.qzv`
 
-![image-20200211130432922](https://tva1.sinaimg.cn/large/0082zybpgy1gbsdnlakwpj318003gwes.jpg)
+![image-20200211130432922](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbsdnlakwpj318003gwes.jpg)
 
 #### 9. Differential abundance testing with ANCOM
 
@@ -409,7 +409,7 @@ ANCOM可在样本分组中识别差异丰度的特征(features)(i.e. present in 
   --p-where "[body-site]='gut'" \
   --o-filtered-table gut-table.qza`
 
-![image-20200211133809588](https://tva1.sinaimg.cn/large/0082zybpgy1gbsemn4rdtj318003m3ym.jpg)
+![image-20200211133809588](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbsemn4rdtj318003m3ym.jpg)
 
 ANCOM针对`FeatureTable[Composition]`进行分析, 该软件基于特征的频率(which is based on frequencies of features on a per-sample basis), 但是不能包含频率为0的数据. 因此, 需先对`FeatureTable[Frequency]`做处理
 
@@ -417,7 +417,7 @@ ANCOM针对`FeatureTable[Composition]`进行分析, 该软件基于特征的频�
   --i-table gut-table.qza \
   --o-composition-table comp-gut-table.qza`
 
-![image-20200211134144230](https://tva1.sinaimg.cn/large/0082zybpgy1gbseqc57pvj318a04074e.jpg)
+![image-20200211134144230](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbseqc57pvj318a04074e.jpg)
 
 运行`subject`列来判断差异丰度feature
 
@@ -427,7 +427,7 @@ ANCOM针对`FeatureTable[Composition]`进行分析, 该软件基于特征的频�
   --m-metadata-column subject \
   --o-visualization ancom-subject.qzv`
 
-![image-20200211134508091](https://tva1.sinaimg.cn/large/0082zybpgy1gbseu0zt3xj317i0383yn.jpg)
+![image-20200211134508091](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbseu0zt3xj317i0383yn.jpg)
 
 同时, 我们也想在特殊的taxonomic level上执行差异丰度检测. To do this, we can collapse the features in our `FeatureTable[Frequency]` at the taxonomic level of interest, and then re-run the above steps. 这里在genus水平查看feature情况
 
@@ -447,7 +447,7 @@ ANCOM针对`FeatureTable[Composition]`进行分析, 该软件基于特征的频�
   --m-metadata-column subject \
   --o-visualization l6-ancom-subject.qzv`
 
-![image-20200211135305010](https://tva1.sinaimg.cn/large/0082zybpgy1gbsf23gk1tj317w07qmy9.jpg)
+![image-20200211135305010](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbsf23gk1tj317w07qmy9.jpg)
 
 ***
 
@@ -482,9 +482,9 @@ emp-paired-end-sequences/barcodes.fastq.gz: https://data.qiime2.org/2019.7/tutor
   --i-data demux.qza \
   --o-visualization demux.qzv`
 
-![image-20200212193346089](https://tva1.sinaimg.cn/large/0082zybpgy1gbtuiw2yndj317q07kmy5.jpg)
+![image-20200212193346089](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbtuiw2yndj317q07kmy5.jpg)
 
-![image-20200212200520254](https://tva1.sinaimg.cn/large/0082zybpgy1gbtvfsl7u0j31r80icwle.jpg)
+![image-20200212200520254](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbtvfsl7u0j31r80icwle.jpg)
 
 根据forward/reverse reads的质控图. 因为需要read足够长来满足双端read的重叠, 根据图示去除foward/reverse reads的前13bp, 但不修剪reads的末端序列, 避免减少read长度太多:
 
@@ -556,7 +556,7 @@ Total-frequency的过滤可以根据频率过滤feature table中samples或featur
   --p-min-frequency 1500 \
   --o-filtered-table sample-frequency-filtered-table.qza`
 
-![image-20200211201730396](https://tva1.sinaimg.cn/large/0082zybpgy1gbsq6395orj31ty0d0407.jpg)
+![image-20200211201730396](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbsq6395orj31ty0d0407.jpg)
 
 同时也可根据feature来过滤, 过滤掉低丰度低features
 
@@ -763,7 +763,7 @@ rep-seqs.qza: https://data.qiime2.org/2019.7/tutorials/training-feature-classifi
   --input-path 85_otu_taxonomy.txt \
   --output-path ref-taxonomy.qza`
 
-![image-20200212095808726](https://tva1.sinaimg.cn/large/0082zybpgy1gbtdw1nq5cj3172058q3i.jpg)
+![image-20200212095808726](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbtdw1nq5cj3172058q3i.jpg)
 
 ##### Extract reference reads
 
@@ -880,7 +880,7 @@ qiime tools extract \
 
 ![image-20200213102932977](https://tva1.sinaimg.cn/large/0082zybpgy1gbukezlrx6j319s03imy8.jpg)
 
-![image-20200213102915699](https://tva1.sinaimg.cn/large/0082zybpgy1gbukeoewhyj30n603ejrr.jpg)
+![image-20200213102915699](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbukeoewhyj30n603ejrr.jpg)
 
 `qiime tools import \
   --type EMPSingleEndSequences \
@@ -925,11 +925,11 @@ casava-18-single-end-demultiplexed.zip: https://data.qiime2.org/2019.7/tutorials
 
 manifest文件是tab-分隔的文本文件(i.e. `.tsv`). 第一列定义了样本的ID, 第二列定义了正向reads文件的绝对路径, 第三列定义了对应反向reads文件的绝对路径(该绝对路径可包含环境变量, `$HOME/$PWD`).
 
-![image-20200213143242902](https://tva1.sinaimg.cn/large/0082zybpgy1gburfycvunj318606i0uf.jpg)
+![image-20200213143242902](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gburfycvunj318606i0uf.jpg)
 
 单端fastq文件的manifest文件如下:
 
-![image-20200213143322742](https://tva1.sinaimg.cn/large/0082zybpgy1gburgn5xd2j317w042dgg.jpg)
+![image-20200213143322742](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gburgn5xd2j317w042dgg.jpg)
 
 SingleEndFastqManifestPhred33V2
 
@@ -963,7 +963,7 @@ pe-64-manifest: https://data.qiime2.org/2019.7/tutorials/importing/pe-64-manifes
 
 支持导入QIIME1 `seqs.fna`文件格式, 每个记录包含2行内容: header和sequence. 每个sequence必须仅且占一行. header中的ID格式为: `<sample-id>_<seq-id>`. `<sample-id>`为样本sequence所属的样本名称(ID), `<seq-id>`为样本内的sequence的名称(ID).
 
-![image-20200213144955408](https://tva1.sinaimg.cn/large/0082zybpgy1gburxy9c05j319q06uadt.jpg)
+![image-20200213144955408](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gburxy9c05j319q06uadt.jpg)
 
 7. Per-feature unaligned sequence data (i.e., representative fasta sequences)
 
@@ -987,7 +987,7 @@ aligned-sequences.fna: https://data.qiime2.org/2019.7/tutorials/importing/aligne
   --output-path aligned-sequences.qza \
   --type 'FeatureData[AlignedSequence]'`
 
-![image-20200213150014482](https://tva1.sinaimg.cn/large/0082zybpgy1gbus8lfe61j30z80gcn3h.jpg)
+![image-20200213150014482](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbus8lfe61j30z80gcn3h.jpg)
 
 9. Feature table data
 
@@ -1025,12 +1025,12 @@ unrooted-tree.tre: https://data.qiime2.org/2019.7/tutorials/importing/unrooted-t
 `qiime tools import \
   --show-importable-formats`
 
-![image-20200213151832444](https://tva1.sinaimg.cn/large/0082zybpgy1gbusrp8ovhj30mw066q3m.jpg)
+![image-20200213151832444](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbusrp8ovhj30mw066q3m.jpg)
 
 `qiime tools import \
   --show-importable-types`
 
-![image-20200213151937863](https://tva1.sinaimg.cn/large/0082zybpgy1gbusstfygbj30r2068wf4.jpg)
+![image-20200213151937863](https://gitee.com/huizhen2014/Pic/raw/master/0082zybpgy1gbusstfygbj30r2068wf4.jpg)
 
 ***
 

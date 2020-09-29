@@ -7,13 +7,15 @@ pathway analysis已经应用于Gene Ontology(GO, also referred to as a 'gene' se
 
 这里介绍的pathway analysis具体指在当前公共的数据库的基础上例如GO, KEGG探索pathway信息。也就是，knowledge base-driven pathway analysis。
 
+![image-20200922171657508](https://tva1.sinaimg.cn/large/007S8ZIlgy1gizjralj3dj30ui0hadk1.jpg)
+
 ####Firste Generation: Over-Representation Analysis (ORA) Approaches
 
 使用统计学知识评估差异表达基因中的涉及到特殊pathway的一部分基因。也值得是"2 x 2" table method。首先，对输入基因列表使用明确的阈值或标准，例如选择FDR为0.05时的过表达或低表达的基因；然后，计算差异基因所设计的pathway(例如，计算microarray上所有的基因)；最后，在输入基因列表基础上，计算每一个pathway的过表达或低表达。
 
 最常用的统计方法为，hypergeometric，chi-square，或binomial distribution。
 
-![image-20190514083937184](https://ws1.sinaimg.cn/large/006tNc79ly1g30jtwk39cj31i60om0zo.jpg)
+![image-20200922171546893](https://tva1.sinaimg.cn/large/007S8ZIlgy1gizjq30t8ij30p40bhmyt.jpg)
 
 具有以下局限，首先，ORA使用的不同统计方法(hypergeometic distribution, binomial distribution, chi-square distribution, etc)，都是独立的检测改变，仅仅考虑的基因的数目而没有考虑与之相关的值，例如探针的密度，因此ORA平等对待每一个基因。但是regulation的范围(fold-change, significance of a change, etc)在分配输入基因比重方面是有用的，同样还有所涉及的pathway；其次，ORA检测过程中仅仅使用了最显著的基因而忽略了其他基因，可能哪些稍微高于fold阈值或者PDR阈值的基因就会丢弃，这就可能导致信息丢失。Breitling et al. addressed this problem by proposing an ORA method for avoiding thresholds. It uses an interactive approach that adds one gene at a time to find a set of genes for which a pathway is most significant；再次，ORA假设每个基因都是独立的，平等看待每一基因，但是生物是一个复杂的设计到基因产物交互作用的过程，基因表达分析的一个目的可能就在于获得基因产物之间如何地相互作用；最后，ORA假定每个pathway都是独立存在，这也忽略了pathways之间的相互作用问题。
 
@@ -21,7 +23,7 @@ pathway analysis已经应用于Gene Ontology(GO, also referred to as a 'gene' se
 
 Functional class scoring(FCS) 假设基因大的改变会对pathways产生显著效果，同时较弱且功能相关的一套基因步调一致的改变也会产生显著效果。首先，计算来molecular measurements的gene-level的统计分析，这涉及到计算差异表达的个体基因和蛋白，当前用于gene-level的统计包含具有phenotype，ANOVA，Q-statistic， signal-to-noise ratio的molecular measurements的相关性；其次，所有基因gene-level的统计分析汇聚成单个pathway-level的统计分析，该统计分析可以是多变量，计算基因间的独立性，也可以是单变量的，不考虑基因间的的相互依靠性。不考虑使用的不同统计方式，pathway-level统计能力依赖于一个pathway中差异表达基因的部分，也就是pathway的大小。Although, multivariate statistics are expected to have higher statistical power, univariate statistics show more power at stringent cutoffs when applied to real biological data(p~0.001), and equal power as multivariate statistics at less stringent cutoffs(p~0.05)；最后，评估pathway-level的统计显著性。当在计算统计显著性时，当前使用的null假设可分为两类：1）competitive null hypothesis 和2）self-contained null hypothesis。self-contained null hypothesis 变换每个样本的类别标签(i.e., phenotypes)，检测给定pathway中一套基因本身的显著性，不考虑不在其中的基因；competitive null hypothesis针对每个pathway变换基因标签，比较一套存在于pathway中的基因和一套不在pathway中的基因。
 
-![image-20190514143524771](https://ws1.sinaimg.cn/large/006tNc79ly1g30u4igkj7j31ic0hwjvr.jpg)
+![image-20200922171606715](https://tva1.sinaimg.cn/large/007S8ZIlgy1gizjqf6xjdj30p3087dgr.jpg)
 
 FCS方法解决了ORA三个局限性，首先，不需要一个阈值将表达数据任意的分成显著性和非显著性两类，而是使用所有可以得到的molecular measurements来分析pathway；其次，ORA在识别显著性pathway时完成忽略了molecular measurements，FCS使用该信息来检测同一个pathway内一致性改变的基因；最后，通过基因表达一致性的改变，FCS能够实现pathway内基因间的依赖性，而ORA不行。
 
@@ -31,7 +33,7 @@ FCS局限性，首先，FCS类似ORA，独立地分析每一个pathway，pathway
 
 基于大量可用的公开pathway的信息，而不是每个pathway简单的基因信息，进行pathway分析。不同于GO和Molecular Signatures Database (MSigDB)，这些数据库也提供了给定pathway内基因产物相互作用的信息(e.g., activation, inhibition, etc.)，以及作用位置(e.g., cytoplasm, nucleus, etc.)。它们包括KEGG, MetaCyc, Reactome, RegulonDB, STKE, BioCarta和pantherDB。
 
-![image-20190514143614416](https://ws2.sinaimg.cn/large/006tNc79ly1g30u4w11dmj31i806m75p.jpg)
+![image-20200922171631497](https://tva1.sinaimg.cn/large/007S8ZIlgy1gizjqu73naj30p60370sx.jpg)
 
 ORA和FCS方法仅考虑pathway中基因数据，或着共表达基因来识别显著性pathway，而不考虑这些数据库额外的可行信息。Pathway topoloty (PT)-based methods，能使用这些额外的信息。PT-based 方法同FCS一样执行相同的三步分析处理。其关键差异在于，PT-based方法使用pathway topology来计算gene-level统计结果。
 
@@ -79,7 +81,7 @@ GO和KEGG是最常用的功能分析。由于它们长期的收录支持以及�
 
 P-value 采用超几何分布计算：
 
-![image-20190516124739006](https://ws4.sinaimg.cn/large/006tNc79gy1g3328ixj87j30zm04kt8y.jpg)
+![image-20200922172405515](https://tva1.sinaimg.cn/large/007S8ZIlgy1gizjyryikej308f02na9y.jpg)
 
 例如：Microarry study， 11812个基因用于差异表达分析，2个样本中，有202个基因发现DE，在这些DE中，有25个基因注释到了特殊的功能gene set中，该gene set包含了262个基因。则2x2四格表：
 
@@ -112,8 +114,6 @@ Adjustment for Multiple Hypothesis Testing
 当整个gene set都被评估后，DOSE针对多重假设检验调整评估的显著性水平，同时针对FDR control 计算q-value。
 
 The false discovery rate (FDR)指的是type I 型错误的期待比率。Type I型错误就是错误拒绝null假设；换言之，就是得到了假阳性。FDR就是假阳性的数目在所有拒绝假设中的比率(拒绝 null hypothesis)。医学上，就是当你得到一个阳性检测结果但实际上并没有得病的比率，其对应面就是阳性预测值(PPV)，就是阳性结果准确性的比率。
-
-![image-20190516103421704](https://ws1.sinaimg.cn/large/006tNc79gy1g32ydtiwaxj30qo0mywi8.jpg)
 
 **p-value告诉我们单次检测假阳性的概率；当针对小样本进行大量数目的检测时(genomics或protoemics), 就应使用q-value了：p-value为5%意味着5%的检测将会导致加假阳性结果，q-value为5%意味着5%的显著性结果将会为假阳性。使用q-value来控制FDR的过程称为Benjamini-Hochberg procedure。**
 

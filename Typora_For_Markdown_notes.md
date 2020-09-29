@@ -235,6 +235,6 @@ $\leq$ $\geq$ $\neq$ $\times$ $\pm$ $\approx$
 
 ![typora_binary](http://ww2.sinaimg.cn/large/006tNc79gy1g3zq9w904bj30u0174gu1.jpg)
 
-![typora_symbol](http://ww2.sinaimg.cn/large/006tNc79gy1g3zqa3ltdgj30u016rjyi.jpg)
+![typora_symbol](https://tva1.sinaimg.cn/large/007S8ZIlgy1gizrbg5ubzg30a00dcmx4.gif)
 
-![typora_other](http://ww1.sinaimg.cn/large/006tNc79gy1g4jgyuv20vj30u011fjyc.jpg)
+![typora_other](http://tva1.sinaimg.cn/large/006tNc79gy1g4jgyuv20vj30u011fjyc.jpg)

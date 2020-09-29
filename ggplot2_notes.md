@@ -316,7 +316,7 @@ mpg2 <- subset(mpg, cyl != 5 && drv %in% c("4","f"))
 
 facet_grid(cyl ~ drv, margins=T)
 
-![margins](https://ws3.sinaimg.cn/large/006tKfTcgy1g1gjt3vq01j30v80u0nl2.jpg)
+![margins](https://tva1.sinaimg.cn/large/006tKfTcgy1g1gjt3vq01j30v80u0nl2.jpg)
 
 **facet_wrap, 先生成一个长的面板条块(由任意数目的变量生成), 然后将它封装在2维中**: 分面变量的设置形式为~a+b+c, facet_wrap默认把图形面板尽可能摆成方形, 且更偏好于宽扁型的矩形. 可以通过设置ncol,nrow来更新默认设置.
 
@@ -344,7 +344,7 @@ facet_wrap(~cyl, scales="free")
 
 **manufacturer <- reorder(manufacturer, -cty)})**
 
-![reorder](https://ws3.sinaimg.cn/large/006tKfTcgy1g1gjrndh5ej30uy0sw1e8.jpg)
+![reorder](https://tva1.sinaimg.cn/large/006tKfTcgy1g1gjrndh5ej30uy0sw1e8.jpg)
 
 **对连续变量进行分面,首先需要将其变换成离散型**: 将数据分为n个长度相同的部分, 用cut_interval(x, n=10)控制划分数目, 或用cut_interval(x, length=1)控制每个部分的长度
 
@@ -392,7 +392,7 @@ hgramt + theme(panel.grid.minor=element_blank(), panel.grid.major=element_blank(
 
 hgramt + theme(element_blank())
 
-![element_blank](https://ws2.sinaimg.cn/large/006tKfTcgy1g1gjpye7muj317o0u0nd3.jpg)
+![element_blank](https://tva1.sinaimg.cn/large/006tKfTcgy1g1gjpye7muj317o0u0nd3.jpg)
 
 **使用theme_get()可得到当前主题的设置, theme()可在一副图中对某些元素进行局部性修改, theme_update()可为后面图形的绘制进行全局性地修改**
 
@@ -414,7 +414,7 @@ vp3 <- viewport(width=unit(2, "cm"), height=unit(3, "cm"))
 
 b; print(c, vp=subvp); dev.off()
 
-![子图](https://ws3.sinaimg.cn/large/006tKfTcgy1g1gjosopl1j31920n2wzg.jpg)
+![子图](https://tva1.sinaimg.cn/large/006tKfTcgy1g1gjosopl1j31920n2wzg.jpg)
 
 **注意需要使用pdf()或png()将图形存储到磁盘中, 因为ggsave()只能存储一副图**
 
@@ -442,7 +442,7 @@ print(c, vp=vplayout(2,2))
 
 dev.off()
 
-![矩形网格视图](https://ws4.sinaimg.cn/large/006tKfTcgy1g1gjnp42ssj31920qukej.jpg)
+![矩形网格视图](https://tva1.sinaimg.cn/large/006tKfTcgy1g1gjnp42ssj31920qukej.jpg)
 
 **默认grid.layout()中, 每个单元格的大小都相同, 可设置widths和heights参数使它们具有不同的大小**
 
@@ -462,11 +462,11 @@ p3 <- ggplot(mtcars, aes(wt,mpg,color=factor(cyl),shape=factor(cyl)))+geom_point
 
 ggarange(p1,p2,p3,ncol=2,nrow=2,labels=c("A","B","C"))
 
-![ggpubr_1](https://ws3.sinaimg.cn/large/006tNc79gy1g2ccg8sj64j30jm0e6t91.jpg)
+![ggpubr_1](https://tva1.sinaimg.cn/large/006tNc79gy1g2ccg8sj64j30jm0e6t91.jpg)
 
 ggarrange(p2, ggarrange(p1,p3,ncol=2,labels=c("B","C")),now=2,lables="A")
 
-![ggpubr_2](https://ws3.sinaimg.cn/large/006tNc79gy1g2ccgcz28cj30jm0e6t8q.jpg)
+![ggpubr_2](https://tva1.sinaimg.cn/large/006tNc79gy1g2ccgcz28cj30jm0e6t8q.jpg)
 
 ***
 
@@ -599,7 +599,7 @@ qplot(date, value, data=emp2, geom="line", colour=variable, linetype=variable)
 
 qplot(date, value, data=emp, geom="line", color=variable) + facet_grid(variable~., scales="free_y")
 
-![scale_economics](https://ws2.sinaimg.cn/large/006tKfTcly1g1hlcx2ya9j311q0im4gg.jpg)
+![scale_economics](https://tva1.sinaimg.cn/large/006tKfTcly1g1hlcx2ya9j311q0im4gg.jpg)
 
 **平行坐标图: 就是以varaible变量为x轴表示变量名, 以value为y轴表示变量取值, 此外, 还需要一个分组变量来把各个观测分组(所以每个观测分别对应一条线)** 
 
@@ -615,7 +615,7 @@ molten <- melt(ratings, id=".row")
 
 ggplot(molten, aes(variable, value, group=.row))+geom_line(colour="black", alpha=1/20, position="jitter")
 
-![jitter](https://ws1.sinaimg.cn/large/006tKfTcly1g1hllf6vxxj30us0u01kx.jpg)
+![jitter](https://tva1.sinaimg.cn/large/006tKfTcly1g1hllf6vxxj30us0u01kx.jpg)
 
 **使用kmeans聚类, 将所有电影分为6类, 平均分最低的记做第一类, 平均分最高的记做第六类**
 
@@ -635,7 +635,7 @@ pcp_cl <- ggplot(molten, aes(variable, value, group=.row, colour=cluster))
 
 pcp_cl + geom_line(position="jitter", alpha=1/5)
 
-![kmeans](https://ws3.sinaimg.cn/large/006tKfTcly1g1hluqemjkj319i0omqnt.jpg)
+![kmeans](https://tva1.sinaimg.cn/large/006tKfTcly1g1hluqemjkj319i0omqnt.jpg)
 
 pcp_cl + geom_line(position="jitter", colour="black", alpha=1/5) + facet_wrap(~cluster)
 

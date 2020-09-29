@@ -68,7 +68,7 @@ Chi-square: wroks great for gradients(很适合梯度数据)
 
 Comparison: Guerrero Negro
 
-![image-20200301155120279](https://tva1.sinaimg.cn/large/00831rSTgy1gceh91r7fyj30zk0aa0t5.jpg)
+![00831rSTgy1gceh91r7fyj30zk0aa0t5](https://tva1.sinaimg.cn/large/00831rSTgy1gd9uk9nk0fj30zk0aawew.jpg)
 
 Summary:
 
@@ -158,13 +158,29 @@ Generalized linear models(better underlying distributions)
 
 Non-parametric tests(no distribution assumptions)
 
+**Controlling for multiple tests**
 
+* For one test, use alpha = 0.05
+* For many tests:
+  * For every tests, 5 will appear significant by chance
+  * Bonferroni correction is most strict
+    * Divide alpha by # tests
+    * Controls the probability of having one or more false positive
+  * False Discovery Rate(FDR) more lenient, common 
+    * Slightly more complex formula
+    * Guarantees expected rate of false positive
 
+**Negative binomial distribution**
 
+"number of successes in a sequence of independent and identically distributed bernoulli trials before a specificed(non-random) number of failures(denoted r) occurs" 在获得5次非1前得到一个1, 需要掷骰子几次
 
+例如, 大多数人拥有很少的bug数目, 一些人拥有中等数目bug, 很少的人拥有很多的bug
 
+![image-20200328193401136](https://tva1.sinaimg.cn/large/00831rSTgy1gd9vf2rcklj30r60da424.jpg)
 
+改变参数R(为成功次数), 接近正态分布:
 
+![image-20200328193820528](https://tva1.sinaimg.cn/large/00831rSTgy1gd9vjk905hj30rq0cswi0.jpg)
 
 
 
@@ -254,3 +270,8 @@ Non-parametric tests(no distribution assumptions)
 
 
 
+
+
+
+
+ 

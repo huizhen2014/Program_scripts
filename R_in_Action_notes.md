@@ -32,7 +32,6 @@
 * plyr::summarize()
 * BiocManager::install("packages")
 * 代码(code): `print("hello, R!")`
-* 安装本地下载包install.packages("/Users/carlos/Downloads/gridGraphics_0.3-0.tar.gz")
 * github安装：install.packages("devtools"); devtools::install_github("tidyverse/tidyr")
 * 列举包中的函数及数据集 ls("package:GO.db")
 * 查看包中所有函数help help(package="GO.db")
@@ -831,6 +830,15 @@ Parallel computing: `parallel` 包
 默认的下载地址都在国外，所以一般来说下载速度十分慢。但其实在国内都有相关的镜像，可以用来下载相关包
 
 Rstudio直接在Tools-->Global Options-->Packages-->CRAN mirror 选项中选择一个距离你最近的国内镜像就行，如China (Shanghai) [https] - Tongji University。这样以后下载包就都从这个站点下载了
+
+**Review the installed packages information**
+使用`library()`查看已经安装包列表
+
+使用`installed.packages()`查看各个包安装路径, 版本信息
+
+也可使用`.packages(all.available=T)`在控制台现实已经安装包名字
+
+卸载删除包, `remove.packages(c("pkg1","pkg2"),lib=file.path=("path","to","library"))`
 
 ***
 

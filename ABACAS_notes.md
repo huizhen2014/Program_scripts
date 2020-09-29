@@ -60,4 +60,4 @@ Bin file(.bin)：未能用于生成pseudomolecule的contigs名称
 
 `abacas -v 5 -c -N -m -g ref_query_gaps -b -r ASM24018v2_chromosomal_seq.fna -q 39401_scaffolds_filtered_500_30.fasta -p nucmer -o ref_query_5`
 
-![image-20190624193323468](http://ww4.sinaimg.cn/large/006tNc79gy1g4ch4pdr79j30ys09g75i.jpg)
+![image-20190624193323468](http://tva1.sinaimg.cn/large/006tNc79gy1g4ch4pdr79j30ys09g75i.jpg)

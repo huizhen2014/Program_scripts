@@ -163,7 +163,7 @@ results函数包含了一系列变量指导输出最终results table。同时可
 
 `summary(res05)`
 
-![DESeq2_res05](https://ws2.sinaimg.cn/large/006tNc79gy1g2uubr8qkpj30sm0dc409.jpg)
+![DESeq2_res05](https://tva1.sinaimg.cn/large/006tNc79gy1g2uubr8qkpj30sm0dc409.jpg)
 
 A generalization of the idea of p value filtering is to weight hypotheses to optimize power. A new Bioconductor package, IHW , is now available that implements the method of Independent Hypothesis Weighting.
 
@@ -195,7 +195,7 @@ plotMA函数展示log2倍数随着标准化的counts均值改变情况。
 
 res[, idx]对应的是baseMean，log2FoldChange对应图上的点。
 
-![DESeq2_plotMA](https://ws1.sinaimg.cn/large/006tNc79gy1g2uukx07c7j30zj0u0tio.jpg)
+![DESeq2_plotMA](https://tva1.sinaimg.cn/large/006tNc79gy1g2uukx07c7j30zj0u0tio.jpg)
 
 x轴为标准化的counts均值，也就是经过片段校准后的平均counts，y轴对应为log2倍数改变。可以看到没有经过shrinkage的图像显示，counts数越小，dispersion会越大。
 
@@ -207,7 +207,7 @@ x轴为标准化的counts均值，也就是经过片段校准后的平均counts�
 
 `plotMA(res_shrunken, main="shunken DESeq2", ylim=c(-2,2))`
 
-![DESeq2_shrunken_MAP](https://ws3.sinaimg.cn/large/006tNc79gy1g2uzqt4zzzj310w0u07al.jpg)
+![DESeq2_shrunken_MAP](https://tva1.sinaimg.cn/large/006tNc79gy1g2uzqt4zzzj310w0u07al.jpg)
 
 图中红色点代表padj值小于0.1的genes(metadata(res)$alpha, 0.1)，超过窗口范围的点分别用向上或向下的三角点代表。
 
@@ -225,7 +225,7 @@ x轴为标准化的counts均值，也就是经过片段校准后的平均counts�
 
 这里的widht，height向jitter同时增加了正负方向的距离，因此途中离散距离是指定值的两倍。
 
-![DESeq2_plotCounts](https://ws2.sinaimg.cn/large/006tNc79gy1g2v0dx15p3j311l0u0jsj.jpg)
+![DESeq2_plotCounts](https://tva1.sinaimg.cn/large/006tNc79gy1g2v0dx15p3j311l0u0jsj.jpg)
 
 * More information on results columns
 
@@ -271,7 +271,7 @@ x轴为标准化的counts均值，也就是经过片段校准后的平均counts�
 
 或
 
-![DESeq2_resultsNames](https://ws1.sinaimg.cn/large/006tNc79gy1g2v13kxzakj30sg044wew.jpg)
+![DESeq2_resultsNames](https://tva1.sinaimg.cn/large/006tNc79gy1g2v13kxzakj30sg044wew.jpg)
 
 `results(ddsMF, name="type_single.read_vs_paired.end")`
 
@@ -332,7 +332,7 @@ unbiased by the information about experimental groups, for example to perform sa
 
 改图展示了经过直接变换或rlog函数变换后的row standard deviations随row means变化的情况。这里，标准差随均值变化越小，越能减少因均值不同而带来的差异。
 
-![DESeq2_rlog_vsd_plot](https://ws4.sinaimg.cn/large/006tNc79gy1g2v4blmtttj313i0fcteq.jpg)
+![DESeq2_rlog_vsd_plot](https://tva1.sinaimg.cn/large/006tNc79gy1g2v4blmtttj313i0fcteq.jpg)
 
 ***
 
@@ -362,7 +362,7 @@ unbiased by the information about experimental groups, for example to perform sa
 
 这里的normTransform函数简单创建了DESeqTransform对象：normTransform(object, f=log2, pc=1)
 
-![DESeq2_pheatmap](https://ws4.sinaimg.cn/large/006tNc79gy1g2v4tu4brdj31b60pqgqq.jpg)
+![DESeq2_pheatmap](https://tva1.sinaimg.cn/large/006tNc79gy1g2v4tu4brdj31b60pqgqq.jpg)
 
 * Heatmap of the sample-to-sample distance
 
@@ -388,7 +388,7 @@ dist函数使用特殊的方法计算返回data matrix的行之间距离: dist(x
 
 `pheatmap(sampleDistMatrix, clustering_distance_rows=samleDists, clustering_distance_cols=sampleDists, col=colors)`
 
-![DESeq2_sample_to_sample_pheatmap](https://ws3.sinaimg.cn/large/006tNc79gy1g2v5h296uxj315y0pmjts.jpg)
+![DESeq2_sample_to_sample_pheatmap](https://tva1.sinaimg.cn/large/006tNc79gy1g2v5h296uxj315y0pmjts.jpg)
 
 * Principal component plot of the samples
 
@@ -404,7 +404,7 @@ dist函数使用特殊的方法计算返回data matrix的行之间距离: dist(x
 
 `ggplot(data, aes(PC1, PC2, color=condition, shape=type)) + geom_point(size=3) + xlab(paste0("PC1: ", percentVar[1], "% variance")) + ylab(paste0("PC2: ", percentVar[2], "% variance")) + coord_fixed()`
 
-![DESeq2_PCA_samples](https://ws4.sinaimg.cn/large/006tNc79gy1g2v5qsmdpgj312m0u076d.jpg)
+![DESeq2_PCA_samples](https://tva1.sinaimg.cn/large/006tNc79gy1g2v5qsmdpgj312m0u076d.jpg)
 
 ***
 
@@ -509,7 +509,7 @@ results函数自动标记Cook's distance高于阈值同时包含3个或3个以�
 
 `ggplot(melt_cooks, aes(variable, value, color=variable))+geom_boxplot() + scale_y_log10()`
 
-![DESeq2_outlier_boxplot](https://ws3.sinaimg.cn/large/006tNc79gy1g2v8cfww8rj31040sydha.jpg)
+![DESeq2_outlier_boxplot](https://tva1.sinaimg.cn/large/006tNc79gy1g2v8cfww8rj31040sydha.jpg)
 
 * Dispersion plot and fitting alternatives
 
@@ -520,7 +520,7 @@ dispersions estimates是一个很有用的诊断图
 `dds <- estimateDispersions(dds)`
 `plotDispEsts(dds)`
 
-![DESeq_plotDispEsts](https://ws3.sinaimg.cn/large/006tNc79gy1g2v97piy52j311k0rodlb.jpg)
+![DESeq_plotDispEsts](https://tva1.sinaimg.cn/large/006tNc79gy1g2v97piy52j311k0rodlb.jpg)
 
 改图x轴为标准化的counts均值，y轴为离散度：The dispersion estimate plot shows the gene-wise estimates (black), the fitted values (red), and the final maximum a posteriori estimates used in testing (blue)。
 
@@ -576,7 +576,7 @@ less : $\beta$ < lfcThreshold
 
 `abline(h=-0.5, col="dodgerblue", lwd=2)`
 
-![DESeq2_altHypothesis](https://ws3.sinaimg.cn/large/006tNc79gy1g2vae2m77xj30v20u07bv.jpg)
+![DESeq2_altHypothesis](https://tva1.sinaimg.cn/large/006tNc79gy1g2vae2m77xj30v20u07bv.jpg)
 
 * Access to all caclulated values
 
@@ -628,7 +628,7 @@ DEASeq and cqn packages can help correct the GC and length biases， they would 
 
 `abline(h=qf(0.99,p,m-p))`
 
-![image-20190510100837028](https://ws2.sinaimg.cn/large/006tNc79gy1g2vzx6unajj31240t0ti8.jpg)
+![image-20190510100837028](https://tva1.sinaimg.cn/large/006tNc79gy1g2vzx6unajj31240t0ti8.jpg)
 
 x轴为wald statistics for condition(经过rank排序), y轴为maximum cook's distance。
 
@@ -640,7 +640,7 @@ Independent filtering 是不依靠统计检验，过滤掉哪些没有或具有�
 
 `plot(res$baseMean+1, -log(res$pvalue), log="x", xlab="mean of normalized counts", ylab=expression(-log[10](pvalue)), ylim=c(0,30), cex=0.4, col=rgb((0,0,0.3))`
 
-![image-20190510102145960](https://ws3.sinaimg.cn/large/006tNc79gy1g2w0aviv5lj315s0u0q8a.jpg)
+![image-20190510102145960](https://tva1.sinaimg.cn/large/006tNc79gy1g2w0aviv5lj315s0u0q8a.jpg)
 
 整体而言，p值不会随着counts数目变化而发生变化。
 
@@ -660,7 +660,7 @@ colori <- c('do not pass' = "khaki",'pass' = "powderblue")
 
 `legend("topright", fill=rev(colori), legend=rev(names(colori)))`
 
-![image-20190510103524060](https://ws4.sinaimg.cn/large/006tNc79gy1g2w0p2t3bej31340jqwhj.jpg)
+![image-20190510103524060](https://tva1.sinaimg.cn/large/006tNc79gy1g2w0p2t3bej31340jqwhj.jpg)
 
 * Get unfiltered DESeq results
 

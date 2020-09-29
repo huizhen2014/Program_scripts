@@ -180,11 +180,11 @@ s, r, a分别使用了str, repr和ascii进行转换; 函数str创建外观普通
 
 模块string, 包含了一些字符串没有的常量和函数: sring.digits, 包含了数字0～9的字符串; string.ascii_letters, 包含了说有ASCII字母(大写和小写)的字符串; string.ascii_lowercase, 包含了所有小写ASCII字符的字符串; string.printable, 包含所有可以打印的ASCII字符的字符串
 
-![image-20190818131001570](http://ww4.sinaimg.cn/large/006tNc79gy1g63r4rtumlj30v603imy7.jpg)
+![image-20190818131001570](https://gitee.com/huizhen2014/Pic/raw/master/006tNc79gy1g63r4rtumlj30v603imy7-20200925140935301-20200925140941987.jpg)
 
 string.punctuation, 包含所有ASCII标点字符的字符串
 
-![image-20190818131117245](http://ww1.sinaimg.cn/large/006tNc79gy1g63r62kwhjj30u801yaad.jpg)
+![image-20190818131117245](https://gitee.com/huizhen2014/Pic/raw/master/006tNc79gy1g63r62kwhjj30u801yaad.jpg)
 
 方法center通过在两边添加填充字符(默认为空格)让字符串剧中: `"The Middle by Jimmy Eat World".format(39, "*")`, `'*****The Middle by Jimmy Eat World*****'`
 
@@ -194,7 +194,7 @@ string.punctuation, 包含所有ASCII标点字符的字符串
 
 join方法可以合并序列元素: `'+'.join(seq)`, 所有合并序列的元素必须都是字符串, 不能为数字: `'+'.join(seq=['1','2','3','4'])`
 
-![image-20190818145122372](http://ww3.sinaimg.cn/large/006tNc79gy1g63u2835ntj30um06kmy0.jpg)lower方法 返回字符串的小写版本; title方法返回字符串为词首大写, 或使用string中的capwords, 将词首转换为大写; upper方法返回字符串的大写版本
+![image-20190818145122372](https://gitee.com/huizhen2014/Pic/raw/master/006tNc79gy1g63u2835ntj30um06kmy0.jpg)lower方法 返回字符串的小写版本; title方法返回字符串为词首大写, 或使用string中的capwords, 将词首转换为大写; upper方法返回字符串的大写版本
 
 replace方法将指定子串都替换为另一个字符串, 并返回替换后的结果: `seq.replace('is', 'eez')`
 
@@ -334,11 +334,11 @@ zip缝合后可在循环中将元组解包:
 
 使用index一次查询字符'xxx'位置且替换:
 
-![image-20190818210005285](http://ww1.sinaimg.cn/large/006tNc79ly1g644pvkjsyj30vc0523z1.jpg)
+![image-20190818210005285](https://raw.githubusercontent.com/huizhen2014/Pic/master/006tNc79ly1g644pvkjsyj30vc0523z1.jpg)
 
 或使用内置函数enumerate:
 
-![image-20190818210100763](http://ww3.sinaimg.cn/large/006tNc79ly1g644qtk9hnj30x20400t6.jpg)
+![image-20190818210100763](https://raw.githubusercontent.com/huizhen2014/Pic/master/006tNc79ly1g644qtk9hnj30x20400t6.jpg)
 
 enumerate能够迭代返回索引-值对, 其中索引是自动提供的
 
@@ -356,7 +356,7 @@ reversed/sorted, 不就地修改对象, 而是返回反排和排序后的版本,
 
 break结束(跳出)循环; continue结束当前迭代,并跳到下一次迭代开头, 这意味着跳过循环体中余下的语句, 但是不结束循环
 
-![image-20190818211328710](/Users/carlos/Library/Application Support/typora-user-images/image-20190818211328710.png)
+![image-20190818211328710](https://gitee.com/huizhen2014/Pic/raw/master/image-20190820202354662.png)
 
 或:
 
@@ -418,7 +418,7 @@ zip(seq1,seq2,...), 创建一个使用于并行迭代的新序列
 
 内置函数help可获得有关函数的信息:
 
-![image-20190820193330839](/Users/carlos/Library/Application Support/typora-user-images/image-20190820193330839.png)
+![image-20190820193330839](https://gitee.com/huizhen2014/Pic/raw/master/image-20190818211328710.png)
 
 函数中return后可不接内容, 表示结束函数; 函数内部给参数赋值对外部没有任何影响, 函数存在局部作用域中
 
@@ -442,11 +442,11 @@ zip(seq1,seq2,...), 创建一个使用于并行迭代的新序列
 
 元组：
 
-![image-20190820202452468](/Users/carlos/Library/Application Support/typora-user-images/image-20190820202452468.png)
+![image-20190820202452468](https://gitee.com/huizhen2014/Pic/raw/master/image-20190820202452468.png)
 
 字典：
 
-![image-20190820202354662](/Users/carlos/Library/Application Support/typora-user-images/image-20190820202354662.png)
+![image-20190820202354662](https://gitee.com/huizhen2014/Pic/raw/master/image-20190820193330839.png)
 
 * 作用域
 
@@ -462,7 +462,7 @@ zip(seq1,seq2,...), 创建一个使用于并行迭代的新序列
 
 python函数可以嵌套, 即将一个函数放在另一个函数内, 例如一个函数位于另一函数中, 且外面函数返回里面的函数:
 
-![image-20190820205216104](/Users/carlos/Library/Application Support/typora-user-images/image-20190820205216104.png)
+![image-20190820205216104](https://gitee.com/huizhen2014/Pic/raw/master/image-20190820205216104.png)
 
 此类multiplyByFactor这样存储其所在的作用域的函数称为闭包, 通常不能给外部作用域内的变量赋值, 但如果一定要这样做, 可能使用关键字nonlocal, 能够给外部作用域(非全局作用域)内的变量赋值
 
@@ -472,11 +472,11 @@ python函数可以嵌套, 即将一个函数放在另一个函数内, 例如一�
 
 阶乘：
 
-![image-20190820210433951](/Users/carlos/Library/Application Support/typora-user-images/image-20190820210433951.png)
+![image-20190820210433951](https://gitee.com/huizhen2014/Pic/raw/master/image-20190820210433951.png)
 
 二分查找：
 
-![image-20190820210456592](/Users/carlos/Library/Application Support/typora-user-images/image-20190820210456592.png)
+![image-20190820210456592](https://gitee.com/huizhen2014/Pic/raw/master/image-20190820211851981.png)
 
 **模块bisect提供了标准的二分查找实现**
 
@@ -486,7 +486,7 @@ python函数可以嵌套, 即将一个函数放在另一个函数内, 例如一�
 
 函数filter根据布尔函数的返回值对元素进行过滤:
 
-![image-20190820211851981](/Users/carlos/Library/Application Support/typora-user-images/image-20190820211851981.png)
+![image-20190820211851981](https://gitee.com/huizhen2014/Pic/raw/master/image-20190820210456592.png)
 
 等同于`[x for x in seq if x.isalnum()]`
 
@@ -496,7 +496,7 @@ reduce函数针对序列项采用累增的方式, 从左到右依次减少序列
 
 `reduce(lambda x,y:x+y, [1,2,3,4,5])`等同`((((1+2)+3)+4)+5)`
 
-![image-20190820212228032](/Users/carlos/Library/Application Support/typora-user-images/image-20190820212228032.png)
+![image-20190820212228032](https://gitee.com/huizhen2014/Pic/raw/master/image-20190820212228032.png)
 
 lambda源于希腊字母, 在数学中用于表示匿名函数
 
@@ -648,11 +648,11 @@ python库参考手册的'Built-in Exceptions', 描述了所有内置异常类, �
 
 创建构造函数, 只需将方法init的名称从普通的init改为魔法版\_\_init\_\_即可, 这样以来调用不用init了, 直接完成init:`f=FooBar()`; `f.init()`, 仅需`f=FooBar()`即可
 
-![image-20190827224103073](/Users/carlos/Library/Application Support/typora-user-images/image-20190827224103073.png)
+![image-20190827224103073](https://gitee.com/huizhen2014/Pic/raw/master/image-20190827224214240.png)
 
 修改init为\_\_init\_\_
 
-![image-20190827224214240](/Users/carlos/Library/Application Support/typora-user-images/image-20190827224214240.png)
+![image-20190827224214240](https://gitee.com/huizhen2014/Pic/raw/master/image-20190827224103073.png)
 
 重写是继承机制的一个重要方面, 对构造函数来说尤其重要; 但是与重写普通方法相比, 重写构造函数时更有可能遇到一个特别的问题: 重写构造函数时, 必须调用超类(继承的类)的构造函数, 否则可能无法正确地初始化对象
 
@@ -660,11 +660,11 @@ python库参考手册的'Built-in Exceptions', 描述了所有内置异常类, �
 
 超类:
 
-![image-20190827225124333](/Users/carlos/Library/Application Support/typora-user-images/image-20190827225124333.png)
+![image-20190827225124333](https://gitee.com/huizhen2014/Pic/raw/master/image-20190827225124333.png)
 
 重写构造函数super:
 
-![image-20190827225157736](/Users/carlos/Library/Application Support/typora-user-images/image-20190827225157736.png)
+![image-20190827225157736](https://gitee.com/huizhen2014/Pic/raw/master/image-20190827225157736.png)
 
 函数super很聪明, 因此即便有多个超类, 也只需调用函数super一次
 
@@ -832,7 +832,7 @@ p296????
 
 为组织模块, 可将其编组为包(package). 包其实就是另一种模块, 但有趣的是他们可包含其他模块. 模块存储在扩展名为`.py`的文件中, **而包则是一个目录. 要被python视为包, 目录必须包含文件`__init__.py`.  如果像普通模块一样导入包, 文件`__init__.py`的内容就将是包的内容.** 例如
 
-![image-20200216220050204](https://tva1.sinaimg.cn/large/0082zybpgy1gbyl958m8kj311m04et97.jpg)
+![image-20200216220050204](https://raw.githubusercontent.com/huizhen2014/Pic/master/0082zybpgy1gbyl958m8kj311m04et97.jpg)
 
 那么, 若要将模块加入包中, 只需将模块文件放在包的目录中即可:
 
@@ -1227,6 +1227,50 @@ Python中, 在可能的情况下, 应首选for循环; 模块fileinput会负责�
 ***
 
 #### Miscellaneous	
+
+* Jupyter Notebook
+
+Jupyter Notebook是一个JSON文件, 拥有概况,  同时包含一系列输入和输出的有序cells, 这些cells包含了代码, MarkDown文件, 数学表达式, 图形, 表格和媒体. Jupyter Notebooks使用`.ipynb`文件后缀.
+
+Jupyter Notebook可以转换成一系列不同的格式, 例如, HTML, slides, PDF, Markdown甚者Python. 该文件非常方便构建逐步的交互Python程序. 非常适合于数据分析和绘图.
+
+![Jupyter Notebook: A Beginner's Tutorial](https://raw.githubusercontent.com/huizhen2014/Pic/master/007S8ZIlgy1giyc3eoujdj30mc02r74m.jpg)
+
+安装并加载
+
+![Jupyter Notebook: A Beginner's Tutorial](https://raw.githubusercontent.com/huizhen2014/Pic/master/007S8ZIlgy1giyc3qaeooj30m701dglm-20200924171854493.jpg)
+
+`print (2+3)`; Shift+Enter, return 5, 交互式形式
+
+* % (String Formatting Operator)
+
+根据指定的格式来格式化字符串: `%[key][flags][width][.precison][length type] conversion type % values`
+
+`%`是必须的, 标志着指定的开始;  `key`可选, 由括号包围的字符; `flags`可选, 转换字符; `width`可选, 最小的字符宽度, 若指定为`*`表示实际宽度来自元组中的下一个值宽度; `precision`可选, 以点开头随后数字表示精度`.3`; `length type`可选, 长度修订符号; `conversion type`: 可选, 转换类型; `values`必须, 数字, 字符串或包含值的一个变量, 用于替代转换类型.
+
+`conversion flags`: `#`表示使用替换模式(alternate form); `0`针对数字做0填充宽度; `-`左对称; ` `空格, 针对正数左边使用空格填充;`+`代替空格填充.
+
+`conversion types`: `d`含符号整数;  `i`含符号整数; `e/E`浮点指数格式; `f/F`浮点十进制格式; `g/G`浮点格式; `r` 字符串, 使用`repr()`转换字符; `s`字符串, 使用`str()`转换字符; `%`不转换, 结果输出`%`字符.
+
+`print '(%(language)s has %(number)03d quote types.' % {"language":"Python", "number":2})`
+
+`Python has 002 quote types.`
+
+`print ("%s %s",("foo","bar"))`
+
+`foo bar`
+
+`dct = {"foo":10,"bar":20}`
+
+`print("%(foo)s" % dct)`
+
+`10`
+
+`print ("%s" % "aaa")`
+
+`aaa`
+
+
 
 
 
